@@ -10,6 +10,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->decimal('price', 10, 2)->nullable();
+            $table->string('size')->nullable(); // hoặc ->default('Size M') nếu muốn
             $table->integer('stock')->default(0);
             $table->timestamps();
         });
