@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+// use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -18,7 +19,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('admins.auth.login');
     }
 
     /**
@@ -33,6 +34,28 @@ class AuthenticatedSessionController extends Controller
     //     return redirect()->intended(route('dashboard', absolute: false));
     // }
 
+    // public function store(Request $request): RedirectResponse
+    // {
+    //     $request->validate([
+    //         'email' => ['required', 'email'],
+    //         'password' => ['required'],
+    //     ]);
+
+    //     $user = User::where('email', $request->email)->first();
+
+    //     if ($user && $user->password === $request->password) {
+    //         Auth::login($user, $request->boolean('remember'));
+    //         $request->session()->regenerate();
+
+    //         return redirect()->intended(RouteServiceProvider::HOME);
+    //     }
+
+    //     return back()->withErrors([
+    //         'email' => 'Email hoặc mật khẩu không đúng.',
+    //     ]);
+    // }
+
+
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -43,7 +66,7 @@ class AuthenticatedSessionController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && $user->password === $request->password) {
-            Auth::login($user, $request->boolean('remember'));
+                    Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
             return redirect()->intended(RouteServiceProvider::HOME);
@@ -53,6 +76,8 @@ class AuthenticatedSessionController extends Controller
             'email' => 'Email hoặc mật khẩu không đúng.',
         ]);
     }
+
+
     /**
      * Destroy an authenticated session.
      */

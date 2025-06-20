@@ -45,9 +45,9 @@
 <body id="page-top">
     <div id="layout-wrapper">
 
-        @include('admins.blocks.header')
+        @include('admins.partials.header')
 
-        @include('admins.blocks.siderbar')
+        @include('admins.partials.siderbar')
 
         <div class="vertical-overlay"></div>
 
@@ -58,7 +58,7 @@
 
             </div>
 
-            @include('admins.blocks.footer')
+            @include('admins.partials.footer')
 
         </div>
     </div>

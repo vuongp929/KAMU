@@ -36,7 +36,7 @@
                                             <h5 class="modal-title text_white">Đăng nhập</h5>
                                         </div>
                                         <div class="modal-body">
-                                            <form action="{{ route('admin.postLogin') }}" method="post">
+                                            <form action="{{ route('admins.postLogin') }}" method="post">
                                                 @csrf
                                                 <div class>
                                                     <input type="text" class="form-control"
