@@ -12,18 +12,9 @@
     <meta content="Themesbrand" name="author" />
 
     <title>@yield('title') - Admin Dashboard</title>
-    {{-- Điền các link CSS dùng chung --}}
-    <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('admins/img/mini_logo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('admins/img/logo.png') }}">
 
-    <!-- jsvectormap css -->
-    <link href="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!--Swiper slider css-->
-    <link href="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- Layout config Js -->
-    <script src="{{ asset('assets/admins/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
     <link rel="stylesheet" href="{{ asset('admins/css/bootstrap1.min.css') }}" />
     <!-- Icons Css -->
@@ -73,9 +64,31 @@
         <a title="Go to Top" href="#">
             <i class="ti-angle-up"></i>
         </a>
+    <link href="{{ asset('admins/css/bootstrap1.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Main Style Css -->
+    <link href="{{ asset('admins/css/style1.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Menu Css -->
+    <link href="{{ asset('admins/css/metisMenu.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Nếu có thêm css custom thì thêm ở đây -->
+    @stack('styles')
+</head>
+
+<body id="page-top">
+    <div id="layout-wrapper">
+
+        @include('admins.partials.siderbar')
+
+        <div class="vertical-overlay"></div>
+
+        <section class="main_content">
+            @include('admins.partials.header')
+            <div class="main_content_iner">
+                @yield('content')
+            </div>
+            @include('admins.partials.footer')
+        </section>
     </div>
 
-    {{-- Các đoạn script dùng chung --}}
     <script src="{{ asset('admins/js/jquery1-3.4.1.min.js') }}"></script>
     <script src="{{ asset('admins/js/popper1.min.js') }}"></script>
     <script src="{{ asset('admins/js/bootstrap1.min.js') }}"></script>
@@ -117,6 +130,10 @@
     <script src="{{ asset('admins/vendors/chart_am/chart-custom.js') }}"></script>
     <script src="{{ asset('admins/js/dashboard_init.js') }}"></script>
     <script src="{{ asset('admins/js/custom.js') }}"></script>
+    <script src="{{ asset('admins/js/bootstrap1.min.js') }}"></script>
+    <script src="{{ asset('admins/js/custom.js') }}"></script>
+    <script src="{{ asset('admins/js/metisMenu.js') }}"></script>
+    <script src="{{ asset('admins/js/dashboard_init.js') }}"></script>
     @yield('JS')
 </body>
 
