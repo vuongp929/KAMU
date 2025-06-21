@@ -15,6 +15,7 @@ class ProductReview extends Model
         'stars',
         'content',
         'parent_id',
+        'is_hidden',
     ];
 
     // Người viết bình luận/đánh giá
