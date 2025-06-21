@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DiscountController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,6 +27,11 @@ Route::group(
         Route::get('/dashboard', function () {
             return view('admins.dashboard');
         })->name('dashboard');
+
+
+        // Discount routes
+        Route::resource('discounts', DiscountController::class);
+        Route::post('discounts/apply', [DiscountController::class, 'applyDiscount'])->name('discounts.apply');
         Route::get('/reviews', [\App\Http\Controllers\Admin\ProductReviewController::class, 'index'])->name('reviews.index');
         Route::delete('/reviews/{id}', [\App\Http\Controllers\Admin\ProductReviewController::class, 'destroy'])->name('reviews.destroy');
         Route::post('/reviews/{id}/reply', [\App\Http\Controllers\Admin\ProductReviewController::class, 'reply'])->name('reviews.reply');
@@ -42,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 Route::get('/test-cache-driver', function () {
     return config('cache.default');
 });
