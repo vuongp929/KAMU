@@ -14,88 +14,42 @@
     <title>@yield('title') - Admin Dashboard</title>
     {{-- Điền các link CSS dùng chung --}}
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ asset('assets/admins/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('admins/img/logo.png') }}">
 
-    <!-- jsvectormap css -->
-    <link href="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!--Swiper slider css-->
-    <link href="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- Layout config Js -->
-    <script src="{{ asset('assets/admins/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
-    <link href="{{ asset('assets/admins/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="{{ asset('assets/admins/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="{{ asset('assets/admins/css/app.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="{{ asset('assets/admins/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- Custom fonts -->
-    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-    <!-- Custom styles -->
-    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('admins/css/bootstrap1.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Main Style Css -->
+    <link href="{{ asset('admins/css/style1.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Menu Css -->
+    <link href="{{ asset('admins/css/metisMenu.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Nếu có thêm css custom thì thêm ở đây -->
     @stack('styles')
 </head>
 
 <body id="page-top">
     <div id="layout-wrapper">
 
-        @include('admins.blocks.header')
-
-        @include('admins.blocks.siderbar')
+        @include('admins.partials.siderbar')
 
         <div class="vertical-overlay"></div>
 
-        <div class="main-content">
-            <div class="page-content">
-
+        <section class="main_content">
+            @include('admins.partials.header')
+            <div class="main_content_iner">
                 @yield('content')
-
             </div>
+            @include('admins.partials.footer')
+        </section>
 
-            @include('admins.blocks.footer')
-
-        </div>
     </div>
 
     {{-- Các đoạn script dùng chung --}}
-    <script src="{{ asset('assets/admins/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/simplebar/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/node-waves/waves.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/feather-icons/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
-    <script src="{{ asset('assets/admins/js/plugins.js') }}"></script>
-
-    <!-- apexcharts -->
-    <script src="{{ asset('assets/admins/libs/apexcharts/apexcharts.min.js') }}"></script>
-
-    <!-- Vector map-->
-    <script src="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/jsvectormap/maps/world-merc.js') }}"></script>
-
-    <!--Swiper slider js-->
-    <script src="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.js') }}"></script>
-
-    <!-- Dashboard init -->
-    <script src="{{ asset('assets/admins/js/pages/dashboard-ecommerce.init.js') }}"></script>
-
-    <!-- App js -->
-    <script src="{{ asset('assets/admins/js/app.js') }}"></script>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-
-    <!-- Custom scripts -->
-    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+    <script src="{{ asset('admins/js/jquery1-3.4.1.min.js') }}"></script>
+    <script src="{{ asset('admins/js/bootstrap1.min.js') }}"></script>
+    <script src="{{ asset('admins/js/custom.js') }}"></script>
+    <script src="{{ asset('admins/js/metisMenu.js') }}"></script>
+    <script src="{{ asset('admins/js/dashboard_init.js') }}"></script>
+    <!-- Nếu có thêm js custom thì thêm ở đây -->
     @yield('JS')
 </body>
 

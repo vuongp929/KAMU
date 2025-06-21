@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->tinyInteger('stars')->nullable()->unsigned(); // nếu có đánh giá sao
             $table->text('content')->nullable();                  // nội dung đánh giá/bình luận
             $table->foreignId('parent_id')->nullable()->constrained('product_reviews')->onDelete('cascade'); // reply
+            $table->boolean('is_hidden')->default(false); // ẩn/hiện bình luận
             $table->timestamps();
         });
     }
