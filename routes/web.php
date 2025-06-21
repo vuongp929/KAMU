@@ -26,6 +26,14 @@ Route::group(
         Route::get('/dashboard', function () {
             return view('admins.dashboard');
         })->name('dashboard');
+        Route::get('/reviews', [\App\Http\Controllers\Admin\ProductReviewController::class, 'index'])->name('reviews.index');
+        Route::delete('/reviews/{id}', [\App\Http\Controllers\Admin\ProductReviewController::class, 'destroy'])->name('reviews.destroy');
+        Route::post('/reviews/{id}/reply', [\App\Http\Controllers\Admin\ProductReviewController::class, 'reply'])->name('reviews.reply');
+        Route::post('/reviews/{id}/toggle-hide', [\App\Http\Controllers\Admin\ProductReviewController::class, 'toggleHide'])->name('reviews.toggleHide');
+        Route::get('/reviews/create', [\App\Http\Controllers\Admin\ProductReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/reviews', [\App\Http\Controllers\Admin\ProductReviewController::class, 'store'])->name('reviews.store');
+        Route::get('/reviews/{id}/edit', [\App\Http\Controllers\Admin\ProductReviewController::class, 'edit'])->name('reviews.edit');
+        Route::put('/reviews/{id}', [\App\Http\Controllers\Admin\ProductReviewController::class, 'update'])->name('reviews.update');
     }
 );
 
