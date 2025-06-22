@@ -9,12 +9,17 @@ return new class extends Migration {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products');
             $table->foreignId('product_variant_id')->constrained('product_variants');
             $table->integer('quantity')->default(1);
             // $table->decimal('price', 10, 2);
             $table->decimal('price_at_order', 10, 2)->nullable();
             $table->string('size')->nullable(); // nếu size cũng bị thiếu
             $table->unsignedBigInteger('product_id')->nullable();
+
+            $table->decimal('price', 10, 2)->nullable();
+            $table->decimal('price_at_order', 10, 2)->nullable();
+            $table->string('size')->nullable();
             $table->timestamps();
         });
     }
