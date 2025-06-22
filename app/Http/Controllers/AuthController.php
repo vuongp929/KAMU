@@ -15,24 +15,48 @@ class AuthController extends Controller
         return view('admins.auth.login');
     }
 
+    // public function postLogin(Request $request)
+    // {
+    //     $request->validate(
+    //         [
+    //             'email' => 'required|email',
+    //             'password' => 'required',
+    //         ],
+    //         [
+    //             'email.required' => 'Email không được để trống.',
+    //             'email.email' => 'Email không đúng định dạng.',
+    //             'password.required' => 'Mật khẩu không được để trống.',
+    //         ]
+    //     );
+    //     if (Auth::attempt($request->only('email', 'password'))) {
+    //         return redirect()->route('admin.dashboard');
+    //     }
+    //     return redirect()->back()->withErrors(['email' => 'Tài khoản mật khẩu không đúng.'])->withInput();
+    // }
     public function postLogin(Request $request)
     {
-        $request->validate(
-            [
-                'email' => 'required|email',
-                'password' => 'required',
-            ],
-            [
-                'email.required' => 'Email không được để trống.',
-                'email.email' => 'Email không đúng định dạng.',
-                'password.required' => 'Mật khẩu không được để trống.',
-            ]
-        );
-        if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect()->route('admin.dashboard');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ], [
+            'email.required' => 'Email không được để trống.',
+            'email.email' => 'Email không đúng định dạng.',
+            'password.required' => 'Mật khẩu không được để trống.',
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        // So sánh mật khẩu thuần (KHÔNG mã hóa)
+        if ($user && $user->password === $request->password) {
+            Auth::login($user); // Không dùng attempt nữa
+            return redirect()->route('admins.dashboard');
         }
-        return redirect()->back()->withErrors(['email' => 'Tài khoản mật khẩu không đúng.'])->withInput();
+
+        return redirect()->back()
+            ->withErrors(['email' => 'Tài khoản hoặc mật khẩu không đúng.'])
+            ->withInput();
     }
+
 
     public function logOut($id)
     {

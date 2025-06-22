@@ -76,6 +76,7 @@
 <body id="page-top">
     <div id="layout-wrapper">
 
+        @include('admins.partials.header')
         @include('admins.partials.siderbar')
 
         <div class="vertical-overlay"></div>
@@ -85,6 +86,10 @@
             <div class="main_content_iner">
                 @yield('content')
             </div>
+
+            @include('admins.partials.footer')
+
+        </div>
             @include('admins.partials.footer')
         </section>
     </div>

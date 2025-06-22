@@ -112,7 +112,7 @@
                             <div class="profile_info_details">
                                 <a href="#">Tài khoản </a>
                                 @if (auth()->check())
-                                    <form action="{{ route('admin.logOut', ['id' => auth()->user()->id]) }}"
+                                    <form action="{{ route('admins.logout', ['id' => auth()->user()->id]) }}"
                                         method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Đăng

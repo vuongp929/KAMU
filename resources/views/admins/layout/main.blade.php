@@ -40,6 +40,8 @@
 
     <link rel="stylesheet" href="{{ asset('admins/css/style1.css') }}" />
     <link rel="stylesheet" href="{{ asset('admins/css/colors/default.css') }}" id="colorSkinCSS">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 </head>
 
 <body class="crm_body_bg">
@@ -122,6 +124,11 @@
 
     <script src="{{ asset('admins/js/dashboard_init.js') }}"></script>
     <script src="{{ asset('admins/js/custom.js') }}"></script>
+    {{-- <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
+
 </body>
 
 </html>

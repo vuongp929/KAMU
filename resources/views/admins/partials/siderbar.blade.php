@@ -8,12 +8,22 @@
     </div>
     <ul id="sidebar_menu">
         <li>
-            <a href="" aria-expanded="false">
+            <a href="{{ route('admins.dashboard') }}" aria-expanded="false">
                 <div class="nav_icon_small">
                     <img src="{{ asset('admins') }}/img/menu-icon/dashboard.svg" alt>
                 </div>
                 <div class="nav_title">
                     <span>Dashboard</span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="{{route('admins.categorys.index')}}" aria-expanded="false">
+                <div class="nav_icon_small">
+                    <img src="{{ asset('admins') }}/img/menu-icon/dashboard.svg" alt>
+                </div>
+                <div class="nav_title">
+                    <span>Danh mục</span>
                 </div>
             </a>
         </li>
