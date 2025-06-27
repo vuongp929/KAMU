@@ -52,7 +52,7 @@
             <ul class="navbar-nav" id="navbar-nav">
                 <li class="menu-title"><span data-key="t-menu">Quản lý</span></li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('dashboard') }}">
+                    <a class="nav-link menu-link" href="{{ route('admin.dashboard') }}">
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                     </a>
                 </li>
@@ -84,14 +84,14 @@
                     <div class="collapse menu-dropdown" id="sidebarDanhMuc">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                {{-- <a href="{{ route('category.index') }}" class="nav-link">
+                                <a href="{{ route('admin.categories.index') }}" class="nav-link">
                                     Danh sách
-                                </a> --}}
+                                </a>
                             </li>
                             <li class="nav-item">
-                                {{-- <a href="{{ route('category.create') }}" class="nav-link">
+                                <a href="{{ route('admin.categories.create') }}" class="nav-link">
                                     Thêm mới
-                                </a> --}}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -124,15 +124,15 @@
                 </li>
 
                 <li class="nav-item">
-                    {{-- <a class="nav-link menu-link" href="{{ route('admin.orders.index') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('admin.orders.index') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý đơn hàng</span>
-                    </a> --}}
+                    </a>
                 </li>
                 <li class="nav-item">
-                    {{-- <a class="nav-link menu-link" href="{{ route('admin.feedback.index') }}" role="button">
+                    <a class="nav-link menu-link" href="{{ route('admin.reviews.index') }}" role="button">
                         <i class="ri-message-2-line"></i> <span data-key="t-advance-ui">Quản lý phản hồi</span>
-                    </a> --}}
+                    </a>
                 </li> 
 
                 <li class="nav-item">
