@@ -12,7 +12,6 @@ return new class extends Migration {
             $table->decimal('price', 10, 2)->nullable();
             $table->string('size')->nullable(); // hoặc ->default('Size M') nếu muốn
             $table->integer('stock')->default(0);
-            $table->string('size')->nullable();
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });

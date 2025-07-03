@@ -23,11 +23,14 @@ class DiscountController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|unique:discounts,code',
-            'discount_value' => 'required|numeric|min:0|max:100',
+            'discount_type' => 'required|in:percent,amount',
+            'discount_value' => 'required_if:discount_type,percent|nullable|numeric|min:0|max:100',
+            'amount' => 'required_if:discount_type,amount|nullable|numeric|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'min_order_amount' => 'required|numeric|min:0',
             'max_uses' => 'required|integer|min:1',
+            'once_per_order' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -43,7 +46,10 @@ class DiscountController extends Controller
         }
 
         $data = $request->all();
-        $data['discount'] = $request->input('discount_value');
+        $data['discount_type'] = $request->input('discount_type');
+        $data['discount'] = $request->input('discount_type') === 'percent' ? $request->input('discount_value') : null;
+        $data['amount'] = $request->input('discount_type') === 'amount' ? $request->input('amount') : null;
+        $data['once_per_order'] = $request->has('once_per_order');
         $data['is_active'] = $request->has('is_active');
         $data['used_count'] = 0;
         if (isset($data['start_date'])) $data['start_at'] = $data['start_date'];
@@ -64,11 +70,14 @@ class DiscountController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|unique:discounts,code,' . $discount->id,
-            'discount_value' => 'required|numeric|min:0|max:100',
+            'discount_type' => 'required|in:percent,amount',
+            'discount_value' => 'required_if:discount_type,percent|nullable|numeric|min:0|max:100',
+            'amount' => 'required_if:discount_type,amount|nullable|numeric|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'min_order_amount' => 'required|numeric|min:0',
             'max_uses' => 'required|integer|min:1',
+            'once_per_order' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -84,7 +93,10 @@ class DiscountController extends Controller
         }
 
         $data = $request->all();
-        $data['discount'] = $request->input('discount_value');
+        $data['discount_type'] = $request->input('discount_type');
+        $data['discount'] = $request->input('discount_type') === 'percent' ? $request->input('discount_value') : null;
+        $data['amount'] = $request->input('discount_type') === 'amount' ? $request->input('amount') : null;
+        $data['once_per_order'] = $request->has('once_per_order');
         $data['is_active'] = $request->has('is_active');
         if (isset($data['start_date'])) $data['start_at'] = $data['start_date'];
         if (isset($data['end_date'])) $data['end_at'] = $data['end_date'];
