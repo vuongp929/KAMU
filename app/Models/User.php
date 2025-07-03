@@ -83,4 +83,9 @@ class User extends Authenticatable implements MustVerifyEmail
     // ==========================================================
     // === KẾT THÚC PHẦN THÊM MỚI ================================
     // ==========================================================
+
+    public function role()
+    {
+        return $this->hasOne(UserRole::class);
+    }
 }
