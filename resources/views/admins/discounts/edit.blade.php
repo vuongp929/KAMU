@@ -42,7 +42,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="discount_type">Loại giảm giá</label>
                                     <select class="form-control @error('discount_type') is-invalid @enderror" id="discount_type" name="discount_type">
@@ -54,19 +54,14 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-md-4">
-                                <div class="form-group mb-3">
+                                <div class="form-group mb-3" id="discount_percent_group">
                                     <label for="discount_value">Giá trị giảm (%)</label>
                                     <input type="number" class="form-control @error('discount_value') is-invalid @enderror" id="discount_value" name="discount_value" min="0" max="100" value="{{ old('discount_value', $discount->discount) }}">
                                     @error('discount_value')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="col-md-4">
                                 <div class="form-group mb-3 d-none" id="discount_amount_group">
                                     <label for="amount">Số tiền giảm (VNĐ)</label>
                                     <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" min="0" value="{{ old('amount', $discount->amount) }}">
@@ -153,12 +148,17 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    function toggleDiscountFields() {
-        var type = document.getElementById('discount_type').value;
-        document.getElementById('discount_percent_group').classList.toggle('d-none', type !== 'percent');
-        document.getElementById('discount_amount_group').classList.toggle('d-none', type !== 'amount');
+    var discountType = document.getElementById('discount_type');
+    var percentGroup = document.getElementById('discount_percent_group');
+    var amountGroup = document.getElementById('discount_amount_group');
+    if (discountType && percentGroup && amountGroup) {
+        function toggleDiscountFields() {
+            var type = discountType.value;
+            percentGroup.classList.toggle('d-none', type !== 'percent');
+            amountGroup.classList.toggle('d-none', type !== 'amount');
+        }
+        discountType.addEventListener('change', toggleDiscountFields);
+        toggleDiscountFields();
     }
-    document.getElementById('discount_type').addEventListener('change', toggleDiscountFields);
-    toggleDiscountFields();
 });
 </script>
