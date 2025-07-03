@@ -12,11 +12,20 @@
     <meta content="Themesbrand" name="author" />
 
     <title>@yield('title') - Admin Dashboard</title>
-    <link rel="shortcut icon" href="{{ asset('admins/img/mini_logo.png') }}">
-    <link rel="shortcut icon" href="{{ asset('admins/img/logo.png') }}">
+    {{-- Điền các link CSS dùng chung --}}
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{{ asset('assets/admins/images/favicon.ico') }}">
 
+    <!-- jsvectormap css -->
+    <link href="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!--Swiper slider css-->
+    <link href="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- Layout config Js -->
+    <script src="{{ asset('assets/admins/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
-    <link rel="stylesheet" href="{{ asset('admins/css/bootstrap1.min.css') }}" />
+    <link href="{{ asset('assets/admins/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
     <link href="{{ asset('assets/admins/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- App Css-->
@@ -30,110 +39,63 @@
 
     <!-- Custom styles -->
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('admins/vendors/themefy_icon/themify-icons.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/niceselect/css/nice-select.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/owl_carousel/css/owl.carousel.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/gijgo/gijgo.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/font_awesome/css/all.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/tagsinput/tagsinput.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/datepicker/date-picker.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/vectormap-home/vectormap-2.0.2.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/scroll/scrollable.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/datatable/css/jquery.dataTables.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/datatable/css/responsive.dataTables.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/datatable/css/buttons.dataTables.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/text_editor/summernote-bs4.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/vendors/morris/morris.css') }}">
-    <link rel="stylesheet" href="{{ asset('admins/vendors/material_icon/material-icons.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/metisMenu.css') }}">
-    <link rel="stylesheet" href="{{ asset('admins/css/style1.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/colors/default.css') }}" id="colorSkinCSS">
-    @stack('styles')
-</head>
-
-<body class="crm_body_bg" style="padding-top: 80px;">
-    @include('admins.partials.siderbar')
-    <section class="main_content dashboard_part large_header_bg">
-        @include('admins.partials.header')
-        <div class="main_content_iner overly_inner ">
-            @yield('content')
-        </div>
-        @include('admins.partials.footer')
-    </section>
-    <div id="back-top" style="display: none;">
-        <a title="Go to Top" href="#">
-            <i class="ti-angle-up"></i>
-        </a>
-    <link href="{{ asset('admins/css/bootstrap1.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Main Style Css -->
-    <link href="{{ asset('admins/css/style1.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Menu Css -->
-    <link href="{{ asset('admins/css/metisMenu.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Nếu có thêm css custom thì thêm ở đây -->
     @stack('styles')
 </head>
 
 <body id="page-top">
     <div id="layout-wrapper">
 
-        @include('admins.partials.siderbar')
+        @include('admins.blocks.header')
+
+        @include('admins.blocks.siderbar')
 
         <div class="vertical-overlay"></div>
 
-        <section class="main_content">
-            @include('admins.partials.header')
-            <div class="main_content_iner">
+        <div class="main-content">
+            <div class="page-content">
+
                 @yield('content')
+
             </div>
-            @include('admins.partials.footer')
-        </section>
+
+            @include('admins.blocks.footer')
+
+        </div>
     </div>
 
-    <script src="{{ asset('admins/js/jquery1-3.4.1.min.js') }}"></script>
-    <script src="{{ asset('admins/js/popper1.min.js') }}"></script>
-    <script src="{{ asset('admins/js/bootstrap1.min.js') }}"></script>
-    <script src="{{ asset('admins/js/metisMenu.js') }}"></script>
-    <script src="{{ asset('admins/vendors/count_up/jquery.waypoints.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chartlist/Chart.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/count_up/jquery.counterup.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/niceselect/js/jquery.nice-select.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/owl_carousel/js/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/dataTables.responsive.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/buttons.flash.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/jszip.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/pdfmake.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/vfs_fonts.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/buttons.html5.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datatable/js/buttons.print.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datepicker/datepicker.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datepicker/datepicker.en.js') }}"></script>
-    <script src="{{ asset('admins/vendors/datepicker/datepicker.custom.js') }}"></script>
-    <script src="{{ asset('admins/js/chart.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chartjs/roundedBar.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/progressbar/jquery.barfiller.js') }}"></script>
-    <script src="{{ asset('admins/vendors/tagsinput/tagsinput.js') }}"></script>
-    <script src="{{ asset('admins/vendors/text_editor/summernote-bs4.js') }}"></script>
-    <script src="{{ asset('admins/vendors/am_chart/amcharts.js') }}"></script>
-    <script src="{{ asset('admins/vendors/scroll/perfect-scrollbar.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/scroll/scrollable-custom.js') }}"></script>
-    <script src="{{ asset('admins/vendors/vectormap-home/vectormap-2.0.2.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/vectormap-home/vectormap-world-mill-en.js') }}"></script>
-    <script src="{{ asset('admins/vendors/apex_chart/apex-chart2.js') }}"></script>
-    <script src="{{ asset('admins/vendors/apex_chart/apex_dashboard.js') }}"></script>
-    <script src="{{ asset('admins/vendors/echart/echarts.min.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chart_am/core.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chart_am/charts.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chart_am/animated.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chart_am/kelly.js') }}"></script>
-    <script src="{{ asset('admins/vendors/chart_am/chart-custom.js') }}"></script>
-    <script src="{{ asset('admins/js/dashboard_init.js') }}"></script>
-    <script src="{{ asset('admins/js/custom.js') }}"></script>
-    <script src="{{ asset('admins/js/bootstrap1.min.js') }}"></script>
-    <script src="{{ asset('admins/js/custom.js') }}"></script>
-    <script src="{{ asset('admins/js/metisMenu.js') }}"></script>
-    <script src="{{ asset('admins/js/dashboard_init.js') }}"></script>
+    {{-- Các đoạn script dùng chung --}}
+    <script src="{{ asset('assets/admins/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/admins/libs/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/admins/libs/node-waves/waves.min.js') }}"></script>
+    <script src="{{ asset('assets/admins/libs/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ asset('assets/admins/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
+    <script src="{{ asset('assets/admins/js/plugins.js') }}"></script>
+
+    <!-- apexcharts -->
+    <script src="{{ asset('assets/admins/libs/apexcharts/apexcharts.min.js') }}"></script>
+
+    <!-- Vector map-->
+    <script src="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.js') }}"></script>
+    <script src="{{ asset('assets/admins/libs/jsvectormap/maps/world-merc.js') }}"></script>
+
+    <!--Swiper slider js-->
+    <script src="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- Dashboard init -->
+    <script src="{{ asset('assets/admins/js/pages/dashboard-ecommerce.init.js') }}"></script>
+
+    <!-- App js -->
+    <script src="{{ asset('assets/admins/js/app.js') }}"></script>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+    <!-- Custom scripts -->
+    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
     @yield('JS')
 </body>
 
