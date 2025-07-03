@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 
@@ -69,4 +70,12 @@ Route::group([
     Route::post('/reviews/{id}/reply', [ProductReviewController::class, 'reply'])->name('reviews.reply');
     Route::post('/reviews/{id}/toggle-hide', [ProductReviewController::class, 'toggleHide'])->name('reviews.toggleHide');
 
+
+    // 4. QUẢN LÝ NGƯỜI DÙNG
+    Route::get( 'users', [AuthController::class, 'listUser'])->name('users.index');
+    Route::get('users/create', [AuthController::class, 'createUser'])->name('users.create');
+    Route::post('users', [AuthController::class, 'storeUser'])->name('users.store');
+    Route::get('users/{id}/edit', [AuthController::class, 'editUser'])->name('users.edit');
+    Route::post('users/{id}', [AuthController::class, 'updateUser'])->name('users.update');
+    Route::delete('users/{id}', [AuthController::class, 'deleteUser'])->name('users.destroy');
 });

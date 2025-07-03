@@ -27,7 +27,7 @@
             @forelse($orders as $order)
                 <tr>
                     <td>{{ $order->id }}</td>
-                    <td>{{ $order->customer->name }}</td>
+                    <td>{{ $order->customer?->name ?? 'Không xác định' }}</td>
                     <td>{{ $order->status }}</td>
                     <td>{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
                     <td>{{ $order->created_at->format('d-m-Y') }}</td>

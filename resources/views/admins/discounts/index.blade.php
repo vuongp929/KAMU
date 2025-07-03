@@ -22,6 +22,7 @@
                                 <tr>
                                     <th>Mã</th>
                                     <th>Giá trị giảm (%)</th>
+                                    <th>Số tiền giảm (VND)</th>
                                     <th>Đơn hàng tối thiểu</th>
                                     <th>Ngày bắt đầu</th>
                                     <th>Ngày kết thúc</th>
@@ -36,6 +37,13 @@
                                 <tr>
                                     <td>{{ $discount->code }}</td>
                                     <td>{{ $discount->discount }}%</td>
+                                    <td>
+                                        @if($discount->discount_type === 'amount' && $discount->amount)
+                                            {{ number_format($discount->amount) }} VND
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>{{ number_format($discount->min_order_amount) }} VND</td>
                                     <td>{{ $discount->start_at ? (\Carbon\Carbon::parse($discount->start_at)->format('d/m/Y H:i')) : '' }}</td>
                                     <td>{{ $discount->end_at ? (\Carbon\Carbon::parse($discount->end_at)->format('d/m/Y H:i')) : '' }}</td>

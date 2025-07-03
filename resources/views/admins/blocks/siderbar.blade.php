@@ -142,6 +142,26 @@
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Trang chủ</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarUser" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarUser">
+                        <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý người dùng</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarUser">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.index') }}" class="nav-link">
+                                    Danh sách
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.create') }}" class="nav-link">
+                                    Thêm mới
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
             </ul>
         </div>
         <!-- Sidebar -->
