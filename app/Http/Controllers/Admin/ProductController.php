@@ -46,99 +46,82 @@ class ProductController extends Controller
 
 // ...
 
-    public function store(Request $request)
+        public function store(Request $request)
     {
+        // === VALIDATION MỚI ===
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:products,name',
             'description' => 'nullable|string',
             'categories' => 'nullable|array',
-            'images' => 'required|array|min:1',
-            'images.*' => 'required|image|max:2048',
-            'price' => 'required_without:variants|nullable|numeric|min:0',
-            'stock' => 'required_without:variants|nullable|integer|min:0',
-            'variants' => 'nullable|array',
-            'variants.*.name' => 'required_with:variants|string|max:255',
-            'variants.*.price' => 'required_with:variants|numeric|min:0',
-            'variants.*.stock' => 'required_with:variants|integer|min:0',
-            'variants.*.attribute_value_ids' => 'nullable|array',
-            'variants.*.images' => 'nullable|array',
-            'variants.*.images.*' => 'image|max:2048',
+            'images' => 'required|array|min:1', // Bắt buộc có ảnh chính
+            'images.*' => 'image|max:2048',
+            'variants' => 'required|array|min:1', // Bắt buộc phải tạo ít nhất 1 biến thể
+            'variants.*.name' => 'required|string|max:255',
+            'variants.*.price' => 'required|numeric|min:0',
+            'variants.*.stock' => 'required|integer|min:0',
+            'variants.*.attribute_value_ids' => 'required|array',
+            'variants.*.image' => 'nullable|image|max:2048', // Ảnh biến thể là tùy chọn
         ], [
-            'images.required' => 'Bạn phải tải lên ít nhất một ảnh đại diện cho sản phẩm.',
-            'images.min' => 'Bạn phải tải lên ít nhất một ảnh đại diện cho sản phẩm.',
+            'images.required' => 'Bạn phải tải lên ít nhất một ảnh cho bộ sưu tập.',
+            'variants.required' => 'Bạn phải tạo ít nhất một phiên bản sản phẩm.',
         ]);
 
         DB::beginTransaction();
         try {
-            // 2. TẠO SẢN PHẨM CHÍNH
+            // 1. Tạo sản phẩm chính
             $product = Product::create([
                 'name' => $validated['name'],
                 'code' => 'SP-' . strtoupper(Str::random(6)),
                 'description' => $validated['description'] ?? null,
             ]);
 
-            // 3. GÁN DANH MỤC
+            // 2. Gán danh mục
             if (!empty($validated['categories'])) {
                 $product->categories()->sync($validated['categories']);
             }
 
-            // 4. LƯU ẢNH CHÍNH (VÀO BẢNG product_images)
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $key => $imageFile) {
-                    $path = $imageFile->store('products', 'public');
-                    // Tạo ảnh liên kết với sản phẩm, product_variant_id là null
-                    $image = $product->images()->create([
-                        'image_path' => $path,
-                        'is_main' => ($key == 0), // Ảnh đầu tiên là ảnh chính
-                    ]);
-
-                    // Cập nhật cột 'image' của sản phẩm bằng ảnh chính
-                    if ($key == 0) {
-                        $product->image = $path;
-                        $product->save();
-                    }
+            // 3. Lưu bộ sưu tập ảnh chính
+            foreach ($request->file('images') as $key => $imageFile) {
+                $path = $imageFile->store('products', 'public');
+                $image = $product->images()->create([
+                    'image_path' => $path,
+                    'is_main' => ($key == 0), // Ảnh đầu tiên là ảnh chính
+                ]);
+                // Cập nhật cột image chính của sản phẩm
+                if ($key == 0) {
+                    $product->image = $path;
+                    $product->save();
                 }
             }
 
-            // 5. XỬ LÝ BIẾN THỂ
-            if (!empty($validated['variants'])) {
-                // Trường hợp có biến thể
-                foreach ($request->variants as $key => $variantData) {
-                    $variant = $product->variants()->create([
-                        'name'  => $variantData['name'],
-                        'price' => $variantData['price'],
-                        'stock' => $variantData['stock'],
-                    ]);
-
-                    if (!empty($variantData['attribute_value_ids'])) {
-                        $variant->attributeValues()->sync($variantData['attribute_value_ids']);
-                    }
-
-                    // === LƯU ẢNH BIẾN THỂ (VÀO CÙNG BẢNG product_images) ===
-                    if ($request->hasFile("variants.{$key}.images")) {
-                        foreach ($request->file("variants.{$key}.images") as $variantImageFile) {
-                            $variantPath = $variantImageFile->store('products', 'public');
-                            // Tạo ảnh liên kết với cả sản phẩm và biến thể
-                            ProductImage::create([
-                                'product_id'         => $product->id,
-                                'product_variant_id' => $variant->id,
-                                'image_path'         => $variantPath,
-                                'is_main'            => false, // Ảnh biến thể không phải ảnh chính
-                            ]);
-                        }
-                    }
-                }
-            } else {
-                // Trường hợp sản phẩm thường (không có biến thể)
-                $product->variants()->create([
-                    'name'  => $product->name, // Tên mặc định
-                    'price' => $validated['price'] ?? 0,
-                    'stock' => $validated['stock'] ?? 0,
+            // 4. Lưu các biến thể và ảnh của chúng
+            foreach ($validated['variants'] as $key => $variantData) {
+                $variant = $product->variants()->create([
+                    'name'  => $variantData['name'],
+                    'price' => $variantData['price'],
+                    'stock' => $variantData['stock'],
                 ]);
+
+                $variant->attributeValues()->sync($variantData['attribute_value_ids']);
+
+                // === LƯU ẢNH RIÊNG CỦA BIẾN THỂ (NẾU CÓ) ===
+                if ($request->hasFile("variants.{$key}.image")) {
+                    $variantImageFile = $request->file("variants.{$key}.image");
+                    $variantPath = $variantImageFile->store('products', 'public');
+                    
+                    // Lưu vào cùng bảng product_images, nhưng gán variant_id
+                    ProductImage::create([
+                        'product_id'         => $product->id,
+                        'product_variant_id' => $variant->id,
+                        'image_path'         => $variantPath,
+                        'is_main'            => false,
+                    ]);
+                }
             }
 
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
+
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Lỗi khi thêm sản phẩm: ' . $e->getMessage() . ' tại dòng ' . $e->getLine() . ' trong file ' . $e->getFile());
@@ -277,6 +260,19 @@ class ProductController extends Controller
         }
     }
 
+    public function show(Product $product)
+    {
+        // Tải tất cả các mối quan hệ cần thiết để hiển thị chi tiết
+        $product->load([
+            'categories:name', // Chỉ lấy tên danh mục
+            'images',          // Lấy ảnh chính
+            'variants.attributeValues.attribute', // Lấy thuộc tính và giá trị của biến thể
+            'variants.images'  // Lấy ảnh của biến thể
+        ]);
+
+        // Trả về dữ liệu dưới dạng JSON
+        return response()->json($product);
+    }
 
     /**
      * Xóa mềm sản phẩm.

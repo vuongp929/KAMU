@@ -117,10 +117,11 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    {{-- <a class="nav-link menu-link" href="{{ route('admin.users.index') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('admin.attributes.index') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
-                        <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý người dùng</span>
-                    </a> --}}
+                        <i class="ri-price-tag-3-line"></i> <!-- Hoặc icon khác -->
+                        <span>Quản lý Thuộc tính</span>
+                    </a>
                 </li>
 
                 <li class="nav-item">
@@ -136,10 +137,10 @@
                 </li> 
 
                 <li class="nav-item">
-                    {{-- <a class="nav-link menu-link" href="{{ route('admin.client.home') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('home') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Trang chủ</span>
-                    </a> --}}
+                    </a>
                 </li>
             </ul>
         </div>

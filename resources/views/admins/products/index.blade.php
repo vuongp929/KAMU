@@ -64,7 +64,13 @@
                                 {{ $product->total_stock }}
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
+                                <button type="button" class="btn btn-sm btn-info view-product-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#productDetailModal"
+                                        data-url="{{ route('admin.products.show', $product->id) }}">
+                                    <i class="ri-eye-line"></i> Xem
+                                </button>
+                                                            <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
                                     <i class="ri-pencil-line"></i> Sửa
                                 </a>
                                 <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
@@ -94,4 +100,84 @@
         @endif
     </div>
 </div>
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productDetailModalLabel">Chi tiết sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="productDetailModalBody">
+                {{-- Nội dung chi tiết sẽ được tải vào đây bằng JavaScript --}}
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+@section('JS')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Lắng nghe sự kiện click trên tất cả các nút có class 'view-product-btn'
+    document.querySelectorAll('.view-product-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productUrl = this.dataset.url; // Lấy URL từ thuộc tính data-url
+            const modalBody = document.getElementById('productDetailModalBody');
+            
+            // Hiển thị spinner loading
+            modalBody.innerHTML = '<div class="text-center p-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+            // Gọi API để lấy dữ liệu JSON
+            fetch(productUrl)
+                .then(response => response.json())
+                .then(product => {
+                    // Xây dựng nội dung HTML từ dữ liệu JSON nhận được
+                    let html = `
+                        <h4>${product.name} (#${product.code})</h4>
+                        <hr>
+                        <h6>Mô tả:</h6>
+                        <div>${product.description || 'Không có mô tả.'}</div>
+                        <hr>
+                        <h6>Bộ sưu tập ảnh:</h6>
+                        <div class="d-flex flex-wrap gap-2 mb-3">`;
+                    
+                    product.images.forEach(image => {
+                        html += `<img src="/storage/${image.image_path}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">`;
+                    });
+
+                    html += `</div><hr><h6>Các phiên bản:</h6>`;
+
+                    if (product.variants.length > 0) {
+                        html += '<ul class="list-group">';
+                        product.variants.forEach(variant => {
+                            html += `
+                                <li class="list-group-item">
+                                    <strong>${variant.name}</strong><br>
+                                    Giá: <span class="text-danger fw-bold">${new Intl.NumberFormat('vi-VN').format(variant.price)} VNĐ</span><br>
+                                    Tồn kho: <span>${variant.stock}</span>
+                                </li>`;
+                        });
+                        html += '</ul>';
+                    } else {
+                        html += '<p>Sản phẩm này chưa có phiên bản nào.</p>';
+                    }
+
+                    // Đổ nội dung HTML vào modal body
+                    modalBody.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching product details:', error);
+                    modalBody.innerHTML = '<div class="alert alert-danger">Không thể tải dữ liệu chi tiết.</div>';
+                });
+        });
+    });
+});
+</script>
 @endsection

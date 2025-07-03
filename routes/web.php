@@ -9,8 +9,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ClientController;
 
 
 /*
@@ -20,9 +22,8 @@ use App\Http\Controllers\ProfileController;
 */
 
 // --- ROUTE CÔNG KHAI ---
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [ClientController::class, 'index'])->name('home');
+
 
 
 // --- ROUTE XÁC THỰC CỦA LARAVEL BREEZE ---
@@ -57,6 +58,7 @@ Route::group([
     // 2. QUẢN LÝ CRUD
     // Sử dụng Route::resource cho tất cả các tài nguyên
     Route::resource('products', ProductController::class);
+    Route::resource('attributes', AttributeController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('discounts', DiscountController::class);
     Route::resource('categories', CategoryController::class);
