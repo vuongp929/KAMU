@@ -44,11 +44,44 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
+                                    <label for="discount_type">Loại giảm giá</label>
+                                    <select class="form-control @error('discount_type') is-invalid @enderror" id="discount_type" name="discount_type">
+                                        <option value="percent" {{ old('discount_type', $discount->discount_type) == 'percent' ? 'selected' : '' }}>Phần trăm (%)</option>
+                                        <option value="amount" {{ old('discount_type', $discount->discount_type) == 'amount' ? 'selected' : '' }}>Số tiền (VNĐ)</option>
+                                    </select>
+                                    @error('discount_type')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
                                     <label for="discount_value">Giá trị giảm (%)</label>
                                     <input type="number" class="form-control @error('discount_value') is-invalid @enderror" id="discount_value" name="discount_value" min="0" max="100" value="{{ old('discount_value', $discount->discount) }}">
                                     @error('discount_value')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3 d-none" id="discount_amount_group">
+                                    <label for="amount">Số tiền giảm (VNĐ)</label>
+                                    <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" min="0" value="{{ old('amount', $discount->amount) }}">
+                                    @error('amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label>&nbsp;</label>
+                                    <div class="custom-control custom-checkbox mt-2">
+                                        <input type="checkbox" class="custom-control-input" id="once_per_order" name="once_per_order" {{ old('once_per_order', $discount->once_per_order) ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="once_per_order">Chỉ dùng 1 lần/đơn hàng</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -117,3 +150,15 @@
     <link rel="stylesheet" href="{{ asset('admins/css/style1.css') }}" />
     <link rel="stylesheet" href="{{ asset('admins/css/colors/default.css') }}" id="colorSkinCSS">
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function toggleDiscountFields() {
+        var type = document.getElementById('discount_type').value;
+        document.getElementById('discount_percent_group').classList.toggle('d-none', type !== 'percent');
+        document.getElementById('discount_amount_group').classList.toggle('d-none', type !== 'amount');
+    }
+    document.getElementById('discount_type').addEventListener('change', toggleDiscountFields);
+    toggleDiscountFields();
+});
+</script>

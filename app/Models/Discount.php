@@ -21,6 +21,9 @@ class Discount extends Model
         'applicable_user_ids',
         'applicable_category_ids',
         'is_active',
+        'discount_type',
+        'amount',
+        'once_per_order',
     ];
 
     protected $dates = [
@@ -44,5 +47,17 @@ class Discount extends Model
     public function incrementUsageCount()
     {
         $this->increment('used_count');
+    }
+
+    /**
+     * Lấy giá trị giảm giá thực tế dựa vào loại giảm giá
+     */
+    public function getDiscountValue($orderAmount)
+    {
+        if ($this->discount_type === 'amount') {
+            return min($this->amount, $orderAmount); // Không vượt quá tổng đơn
+        }
+        // Mặc định là percent
+        return $orderAmount * $this->discount / 100;
     }
 }
