@@ -103,70 +103,88 @@ h1, h2, h3, h4, h5, h6 {
 </style>
 <header>
     <!-- Phần trên cùng -->
-    <div class="header-top">
+     <div class="header-top py-2">
         <div class="container">
             <div class="row align-items-center">
                 <!-- Logo -->
                 <div class="col-md-3">
-                    <a href="{{ route('client.home') }}" class="logo">CHillFriend</a>
+                    <a href="{{ route('home') }}" class="logo">ChillFriend</a>
                 </div>
 
                 <!-- Thanh tìm kiếm -->
-                <div class="col-md-6">
-                    <form action="{{ route('client.search') }}" method="GET" class="search-form">
-                        <input type="text" name="query" placeholder="Tìm sản phẩm..." class="search-input" value="{{ request()->input('query') }}">
-                        <button type="submit" class="search-btn">Tìm kiếm</button>
+                <div class="col-md-5">
+                    <form action="#" method="GET" class="search-form">
+                        <input type="text" name="query" placeholder="Tìm kiếm gấu bông..." class="search-input">
+                        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
                     </form>
                 </div>
 
-                <!-- Nút đăng nhập/đăng ký và giỏ hàng -->
-                <div class="header-right">
-                    @if(auth()->check())
-                    
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-link">Đăng xuất</a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                        <a href="{{ route('client.orders.index') }}" class="btn btn-link">
-                            Đơn hàng
-                        </a>
+                <!-- Các nút chức năng -->
+                <div class="col-md-4 d-flex justify-content-end align-items-center">
+                    @guest
+                        <a href="{{ route('login') }}" class="btn btn-link text-decoration-none">Đăng nhập</a>
+                        <a href="{{ route('register') }}" class="btn btn-link text-decoration-none">Đăng ký</a>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-link">Đăng nhập</a>
-                        <a href="{{ route('register') }}" class="btn btn-link">Đăng ký</a>
-                    @endif
-                
+                        <div class="dropdown">
+                            <a href="#" class="btn btn-link dropdown-toggle text-decoration-none" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Chào, {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Tài khoản của tôi</a></li>
+                                <li><a class="dropdown-item" href="#">Đơn hàng của tôi</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Đăng xuất
+                                    </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    @endguest
+
                     <div class="cart-icon-wrapper">
-                        <a href="{{ route('cart.view') }}" class="cart-link">
+                        <a href="#" class="cart-link">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-count">{{ session('cart') ? count(session('cart')) : 0 }}</span>
+                            {{-- Sử dụng biến $cartCount từ View Composer --}}
+                            @if($cartCount > 0)
+                                <span class="cart-count">{{ $cartCount }}</span>
+                            @endif
                         </a>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>
 
     <!-- Menu danh mục -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav mx-auto">
+                    {{-- Dùng biến $categories từ View Composer --}}
                     @foreach($categories as $category)
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown{{ $category->id }}"
-                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 {{ $category->name }}
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown{{ $category->id }}">
-                                @foreach($category->children as $child)
-                                    <li><a class="dropdown-item" href="{{ route('client.category', $child->slug) }}">{{ $child->name }}</a></li>
-                                @endforeach
-                            </ul>
+                            {{-- Kiểm tra xem có danh mục con không --}}
+                            @if($category->children->isNotEmpty())
+                                <ul class="dropdown-menu">
+                                    @foreach($category->children as $child)
+                                        <li><a class="dropdown-item" href="#">{{ $child->name }}</a></li>
+                                    @endforeach
+                                </ul>
+                            @endif
                         </li>
                     @endforeach
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('client.contact') }}">Liên hệ</a>
+                        <a class="nav-link" href="#">Liên hệ</a>
                     </li>
                 </ul>
             </div>

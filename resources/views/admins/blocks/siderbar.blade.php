@@ -52,7 +52,7 @@
             <ul class="navbar-nav" id="navbar-nav">
                 <li class="menu-title"><span data-key="t-menu">Quản lý</span></li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('dashboard') }}">
+                    <a class="nav-link menu-link" href="{{ route('admin.dashboard') }}">
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                     </a>
                 </li>
@@ -64,12 +64,12 @@
                     <div class="collapse menu-dropdown" id="sidebarSanPham">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a href="{{ route('products.index') }}" class="nav-link">
+                                <a href="{{ route('admin.products.index') }}" class="nav-link">
                                     Danh sách
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('products.create') }}" class="nav-link">
+                                <a href="{{ route('admin.products.create') }}" class="nav-link">
                                     Thêm mới
                                 </a>
                             </li>
@@ -84,12 +84,12 @@
                     <div class="collapse menu-dropdown" id="sidebarDanhMuc">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a href="{{ route('category.index') }}" class="nav-link">
+                                <a href="{{ route('admin.categories.index') }}" class="nav-link">
                                     Danh sách
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('category.create') }}" class="nav-link">
+                                <a href="{{ route('admin.categories.create') }}" class="nav-link">
                                     Thêm mới
                                 </a>
                             </li>
@@ -104,12 +104,12 @@
                     <div class="collapse menu-dropdown" id="sidebarGiamGia">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a href="{{ route('offers.index') }}" class="nav-link">
+                                <a href="{{ route('admin.discounts.index') }}" class="nav-link">
                                     Danh sách
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('offers.create') }}" class="nav-link">
+                                <a href="{{ route('admin.discounts.create') }}" class="nav-link">
                                     Thêm mới
                                 </a>
                             </li>
@@ -117,30 +117,51 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('users.index') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('admin.attributes.index') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
-                        <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý người dùng</span>
+                        <i class="ri-price-tag-3-line"></i> <!-- Hoặc icon khác -->
+                        <span>Quản lý Thuộc tính</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('orders.index') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('admin.orders.index') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý đơn hàng</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('feedback.index') }}" role="button">
+                    <a class="nav-link menu-link" href="{{ route('admin.reviews.index') }}" role="button">
                         <i class="ri-message-2-line"></i> <span data-key="t-advance-ui">Quản lý phản hồi</span>
                     </a>
-                </li>
+                </li> 
 
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('client.home') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('home') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Trang chủ</span>
                     </a>
-                </li> --}}
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarUser" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarUser">
+                        <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý người dùng</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarUser">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.index') }}" class="nav-link">
+                                    Danh sách
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.create') }}" class="nav-link">
+                                    Thêm mới
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
             </ul>
         </div>
         <!-- Sidebar -->

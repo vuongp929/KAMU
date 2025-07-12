@@ -1,120 +1,86 @@
 @extends('layouts.client')
 
-@section('title', 'CHILL FRIEND')
-
-@section('CSS')
-    <link rel="stylesheet" href="{{ asset('assets/user/css/shop-index.css') }}">
-    <style>
-        .banner{
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
-@endsection
+@section('title', 'Trang chủ')
 
 @section('content')
+{{-- Phần slider của bạn giữ nguyên --}}
+<div class="page-slider margin-bottom-35">
+    {{-- Nội dung slider của bạn --}}
+</div>
 
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+<div class="main">
+    <div class="container">
+        <!-- SẢN PHẨM MỚI NHẤT -->
+        <div class="row margin-bottom-40">
+            <div class="col-md-12">
+                <h2>Sản phẩm mới nhất</h2>
+                <hr>
+            </div>
+            {{-- Dùng cấu trúc lưới của Bootstrap --}}
+            <div class="row product-list">
+                @forelse($newProducts->take(4) as $product) {{-- Chỉ lấy 4 sản phẩm cho hàng đầu tiên --}}
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        @include('clients.product-card', ['product' => $product])
+                    </div>
+                @empty
+                    <p class="text-center col-xs-12">Chưa có sản phẩm mới nào.</p>
+                @endforelse
+            </div>
+            {{-- Nếu bạn muốn có 2 hàng sản phẩm mới --}}
+            <div class="row product-list">
+                 @forelse($newProducts->skip(4)->take(4) as $product) {{-- Lấy 4 sản phẩm tiếp theo --}}
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        @include('clients.product-card', ['product' => $product])
+                    </div>
+                @empty
+                    {{-- Không cần hiển thị gì ở đây --}}
+                @endforelse
+            </div>
+        </div>
 
-<div class="container">
-    <div class="banner mb-5" data-copy-text="vuong" onclick="copyToClipboard(this)">
-        <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_DC.jpg" alt="Banner" class="img-fluid rounded" style="width:1200px">
-    </div>
-
-    <div class="featured-products">
-        <h2>Sản phẩm nổi bật</h2>
-        <div class="row">
-            @foreach($products as $product)
-                <div class="col-md-3">
-                    <a href="{{ route('product.show', $product->id) }}" class="text-decoration-none">
-                        <div class="card">
-                            <img src="{{ asset('storage/'.$product->image) }}" class="card-img-top" alt="{{ $product->name }}">
-                            <div class="card-body">
-                                <h5 class="card-title text-truncate" title="{{ $product->name }}">{{ $product->name }}</h5>
-                            </a>
-                                <form action="{{ route('cart.add') }}" method="POST" class="ajax-add-to-cart">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <input type="hidden" id="selected-size-{{ $product->id }}" name="size"
-                                           value="{{ optional($product->variants->first())->id ?? '' }}">
-                                    <div class="size-buttons">
-                                        @foreach ($product->variants as $variant)
-                                            <button type="button" class="size-button"
-                                                data-size-id="{{ $variant->id }}"
-                                                data-price="{{ $variant->price }}"
-                                                onclick="selectSize({{ $product->id }}, this)">
-                                                {{ $variant->size }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                    <p class="price mt-2">
-                                        Giá: <span id="product-price-{{ $product->id }}">{{ number_format(optional($product->variants->first())->price ?? 0) }} VND</span>
-                                    </p>
-                                    <button type="submit" class="btn btn-add btn-block mt-3">Thêm vào giỏ</button>
-                                </form>
+        <!-- KHÁM PHÁ DANH MỤC -->
+        <div class="row margin-bottom-35">
+             <div class="col-md-12">
+                <h2 class="text-center">Khám phá Danh mục</h2>
+                <hr>
+            </div>
+            @foreach($categories as $category)
+                <div class="col-md-4 col-sm-6 margin-bottom-20">
+                    <a href="#">
+                        {{-- Giữ nguyên cấu trúc này vì nó có vẻ phù hợp với template --}}
+                        <div class="img-hover-effect">
+                            <img src="{{ $category->image ? Storage::url($category->image) : 'https://via.placeholder.com/360x200' }}" class="img-responsive" alt="{{ $category->name }}">
+                            <div class="overlay">
+                                <h3>{{ $category->name }}</h3>
+                                <p>{{ $category->products_count }} sản phẩm</p>
                             </div>
                         </div>
-                    </div>
+                    </a>
+                </div>
             @endforeach
         </div>
+
+        <!-- SẢN PHẨM NỔI BẬT -->
+        <div class="row margin-bottom-40">
+             <div class="col-md-12">
+                <h2>Sản phẩm nổi bật</h2>
+                <hr>
+            </div>
+            <div class="row product-list">
+                 @forelse($featuredProducts as $product)
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        @include('clients.product-card', ['product' => $product])
+                    </div>
+                @empty
+                    <p class="text-center col-xs-12">Chưa có sản phẩm nổi bật nào.</p>
+                @endforelse
+            </div>
+        </div>
+        
     </div>
 </div>
 @endsection
 
-@section('JS')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    function copyToClipboard(element) {
-        const text = element.getAttribute('data-copy-text');
-        if (!text) return;
-
-        const tempInput = document.createElement('input');
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-
-        alert('Đã sao chép: ' + text);
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-    // Lấy tất cả các form trong trang có class 'ajax-form'
-    const ajaxForms = document.querySelectorAll('form.ajax-form');
-    
-    ajaxForms.forEach(form => {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            let form = $(this);
-            let formData = form.serialize();
-            let actionUrl = form.attr('action');
-
-            $.ajax({
-                url: actionUrl,
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        alert('Sản phẩm đã được thêm vào giỏ hàng!');
-                        $('.cart-count').text(response.cart_count);
-                    } else {
-                        alert(response.message || 'Có lỗi xảy ra.');
-                    }
-                },
-                error: function(xhr) {
-                    console.log(xhr.responseText);
-                    alert('Không thể thêm sản phẩm vào giỏ hàng!');
-                }
-            });
-        });
-    });
-    });
-</script>
-
+@section('page_scripts')
+{{-- Chúng ta không cần script cho Owl Carousel nữa --}}
 @endsection
