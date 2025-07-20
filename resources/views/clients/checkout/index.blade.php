@@ -1,122 +1,42 @@
 @extends('layouts.client')
 
 @section('content')
-<div class="container mt-5">
-    <h2>Thanh toán</h2>
+<div class="container">
+    <h2>Đơn hàng của bạn</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-
-        <h3>Thông tin giỏ hàng</h3>
+    @if($orders->isEmpty())
+        <p>Không có đơn hàng nào.</p>
+    @else
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Hình ảnh</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Size</th>
-                    <th>Giá</th>
+                    <th>Mã đơn hàng</th>
+                    <th>Tổng giá trị</th>
+                    <th>Trạng thái</th>
+                    <th>Trạng thái thanh toán</th>
+                    <th>Ngày tạo</th>
+                    <th>Chi tiết</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($cart as $item)
-                    <tr>
-                        <td>
-                            @if (isset($item['image']))
-                                <img src="{{ Storage::url($item['image']) }}" alt="Hình ảnh sản phẩm" width="100px">
-                            @else
-                                <img src="{{ asset('images/default-product.jpg') }}" alt="Hình ảnh mặc định" width="100px">
-                            @endif
-                        </td>
-
-                        <td>{{ $item['name'] }}</td>
-                        <td>{{ $item['quantity'] }}</td>
-                        <td>{{ $item['size'] }}</td>
-                        <td>{{ number_format($item['price'], 0, ',', '.') }} VND</td>
-                    </tr>
-                @endforeach
+                {{-- @foreach($orders as $order)
+                <tr>
+                    <td>{{ $order->id }}</td>
+                    <td>{{ number_format($order->total_price, 0, ',', '.') }} VND</td>
+                    <td>{{ $order->status }}</td>
+                    <td>{{ $order->payment_status }}</td>
+                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="{{ route('client.orders.show', $order->id) }}" class="btn btn-info">Xem chi tiết</a>
+                   
+                <!-- Hiển thị nút hủy nếu trạng thái là "Đang chờ xử lý" -->
+                <a href="{{ route('client.orders.cancel', $order->id) }}" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')">Hủy đơn hàng</a>
+        
+                    </td>
+                </tr>
+                @endforeach --}}
             </tbody>
         </table>
-
-        <h3 class="mt-4">Thông tin khách hàng</h3>
-        <h4 class="mt-4">Nhập mã giảm giá</h4>
-            <form action="{{ route('cart.apply-discount') }}" method="POST" class="d-flex">
-                @csrf
-                <input type="text" name="code" class="form-control me-2" placeholder="Nhập mã giảm giá" required>
-                <button type="submit" class="btn btn-success">Áp dụng</button>
-            </form>
-
-            @if(session('error'))
-                <div class="alert alert-danger mt-2">{{ session('error') }}</div>
-            @endif
-
-            @if(session('success'))
-                <div class="alert alert-success mt-2">{{ session('success') }}</div>
-            @endif
-
-            @if(session('discount'))
-                <h5 class="mt-3 text-success">Đã áp dụng mã giảm giá: Giảm {{ session('discount') }}%</h5>
-            @endif
-        <form action="{{ route('checkout.store') }}" method="POST">
-            @csrf
-
-            <div class="row">
-                <!-- Tên khách hàng -->
-                <div class="col-md-6 mb-3">
-                    <label for="name" class="form-label">Họ và tên</label>
-                    <input type="text" name="name" id="name" class="form-control"
-                        value="{{ old('name', optional($user)->name) }}" required>
-                </div>
-
-                <!-- Số điện thoại -->
-                <div class="col-md-6 mb-3">
-                    <label for="phone" class="form-label">Số điện thoại</label>
-                    <input type="text" name="phone" id="phone" class="form-control"
-                        value="{{ old('phone', optional($user)->phone) }}" required>
-                </div>
-
-                <!-- Email -->
-                <div class="col-md-6 mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" id="email" class="form-control"
-                        value="{{ old('email', optional($user)->email) }}" required>
-                </div>
-
-                <!-- Địa chỉ -->
-                <div class="col-md-6 mb-3">
-                    <label for="shipping_address" class="form-label">Địa chỉ</label>
-                    <input type="text" name="shipping_address" id="shipping_address" class="form-control"
-                        value="{{ old('shipping_address', optional($user)->shipping_address) }}" required>
-                </div>
-            </div>
-
-            <h4 class="mt-4">Phương thức thanh toán</h4>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_method" value="vnpay" id="vnpay" required checked>
-                <label class="form-check-label" for="vnpay" >
-                    Thanh toán qua VNPay
-                </label>
-            </div>
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="radio" name="payment_method" value="cod" id="cod" required>
-                <label class="form-check-label" for="cod">
-                    Thanh toán khi nhận hàng (COD)
-                </label>
-            </div>
-            <br>
-
-
-            <h4>Tổng cộng: {{ number_format($total_price) }} VND</h4>
-
-            @if(optional($order)->payment_status == 'paid')
-                <p>Đơn hàng của bạn đã được thanh toán và đang được xử lý.</p>
-            @else
-                <button type="submit" class="btn btn-primary mt-3">Đặt hàng</button>
-            @endif
-        </form>
-
-
+    @endif
 </div>
 @endsection
