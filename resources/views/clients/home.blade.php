@@ -1,86 +1,94 @@
 @extends('layouts.client')
 
-@section('title', 'Trang chủ')
+@section('title', 'Trang chủ - Ôm Là Yêu')
 
 @section('content')
-{{-- Phần slider của bạn giữ nguyên --}}
-<div class="page-slider margin-bottom-35">
-    {{-- Nội dung slider của bạn --}}
-</div>
-
-<div class="main">
-    <div class="container">
-        <!-- SẢN PHẨM MỚI NHẤT -->
-        <div class="row margin-bottom-40">
-            <div class="col-md-12">
-                <h2>Sản phẩm mới nhất</h2>
-                <hr>
-            </div>
-            {{-- Dùng cấu trúc lưới của Bootstrap --}}
-            <div class="row product-list">
-                @forelse($newProducts->take(4) as $product) {{-- Chỉ lấy 4 sản phẩm cho hàng đầu tiên --}}
-                    <div class="col-md-3 col-sm-6 col-xs-12">
-                        @include('clients.product-card', ['product' => $product])
-                    </div>
-                @empty
-                    <p class="text-center col-xs-12">Chưa có sản phẩm mới nào.</p>
-                @endforelse
-            </div>
-            {{-- Nếu bạn muốn có 2 hàng sản phẩm mới --}}
-            <div class="row product-list">
-                 @forelse($newProducts->skip(4)->take(4) as $product) {{-- Lấy 4 sản phẩm tiếp theo --}}
-                    <div class="col-md-3 col-sm-6 col-xs-12">
-                        @include('clients.product-card', ['product' => $product])
-                    </div>
-                @empty
-                    {{-- Không cần hiển thị gì ở đây --}}
-                @endforelse
-            </div>
-        </div>
-
-        <!-- KHÁM PHÁ DANH MỤC -->
-        <div class="row margin-bottom-35">
-             <div class="col-md-12">
-                <h2 class="text-center">Khám phá Danh mục</h2>
-                <hr>
-            </div>
-            @foreach($categories as $category)
-                <div class="col-md-4 col-sm-6 margin-bottom-20">
-                    <a href="#">
-                        {{-- Giữ nguyên cấu trúc này vì nó có vẻ phù hợp với template --}}
-                        <div class="img-hover-effect">
-                            <img src="{{ $category->image ? Storage::url($category->image) : 'https://via.placeholder.com/360x200' }}" class="img-responsive" alt="{{ $category->name }}">
-                            <div class="overlay">
-                                <h3>{{ $category->name }}</h3>
-                                <p>{{ $category->products_count }} sản phẩm</p>
-                            </div>
-                        </div>
-                    </a>
+<div class="main home-page">
+    <div class="container-fluid">
+        {{-- SECTION 1: BANNER CHÍNH & BANNER PHỤ --}}
+        <div class="row banner-section">
+            <div class="col-lg-8 col-md-12">
+                {{-- Banner lớn bên trái --}}
+                <div class="main-banner">
+                    {{-- Thay bằng ảnh banner thực tế của bạn --}}
+                    <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-1.jpg" alt="Gấu Bông An Toàn Cao Cấp Hot Trend" class="img-responsive">
                 </div>
-            @endforeach
+            </div>
+            <div class="col-lg-4 col-md-12">
+                {{-- Hai banner nhỏ bên phải --}}
+                <div class="side-banners">
+                    <div class="side-banner-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-2.jpg" alt="Điện Gấu Tận Nhà" class="img-responsive">
+                    </div>
+                    <div class="side-banner-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-3.jpg" alt="Teddy With Love" class="img-responsive">
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- SẢN PHẨM NỔI BẬT -->
-        <div class="row margin-bottom-40">
-             <div class="col-md-12">
-                <h2>Sản phẩm nổi bật</h2>
-                <hr>
-            </div>
-            <div class="row product-list">
-                 @forelse($featuredProducts as $product)
-                    <div class="col-md-3 col-sm-6 col-xs-12">
-                        @include('clients.product-card', ['product' => $product])
-                    </div>
-                @empty
-                    <p class="text-center col-xs-12">Chưa có sản phẩm nổi bật nào.</p>
-                @endforelse
+        {{-- SECTION 2: ICON DỊCH VỤ --}}
+        <div class="row services-section text-center">
+            <div class="container">
+                <div class="col-md-3 col-sm-6 service-item">
+                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-1-e1661254198715.png" alt="Giao Hàng Tận Nhà">
+                    <h4>GIAO HÀNG TẬN NHÀ</h4>
+                </div>
+                <div class="col-md-3 col-sm-6 service-item">
+                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-1.png" alt="Gói Quà Siêu Đẹp">
+                    <h4>GÓI QUÀ SIÊU ĐẸP</h4>
+                </div>
+                <div class="col-md-3 col-sm-6 service-item">
+                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-2-1.png" alt="Cách Giặt Gấu Bông">
+                    <h4>CÁCH GIẶT GẤU BÔNG</h4>
+                </div>
+                <div class="col-md-3 col-sm-6 service-item">
+                    <img src="https://teddy.vn/wp-content/uploads/2018/04/Artboard-16-copy-3-1.png" alt="Bảo Hành Gấu Bông">
+                    <h4>BẢO HÀNH GẤU BÔNG</h4>
+                </div>
             </div>
         </div>
-        
+    </div>
+
+    <div class="container">
+        {{-- SECTION 3: SẢN PHẨM MỚI (GẤU BÔNG HOT TREND) --}}
+        <div class="row product-section">
+            <div class="col-md-12 text-center">
+                <div class="section-title">
+                    <span>GẤU BÔNG HOT TREND</span>
+                </div>
+            </div>
+            
+            @forelse($newProducts as $product)
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    {{-- Sửa lại product-card để có thêm size --}}
+                    @include('clients.product-card', ['product' => $product])
+                </div>
+            @empty
+                <p class="text-center col-xs-12">Chưa có sản phẩm mới nào.</p>
+            @endforelse
+
+            <div class="col-md-12 text-center">
+                <a href="#" class="btn btn-view-more">XEM THÊM GẤU BÔNG HOT TREND <i class="fa fa-angle-double-right"></i></a>
+            </div>
+        </div>
+
+        {{-- SECTION 4: SẢN PHẨM NỔI BẬT (BST HOA GẤU BÔNG) --}}
+        <div class="row product-section">
+            <div class="col-md-12 text-center">
+                <div class="section-title">
+                    <span>BST HOA GẤU BÔNG</span>
+                </div>
+            </div>
+            
+            @forelse($featuredProducts as $product)
+                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    @include('clients.product-card', ['product' => $product])
+                </div>
+            @empty
+                <p class="text-center col-xs-12">Chưa có sản phẩm nổi bật nào.</p>
+            @endforelse
+        </div>
     </div>
 </div>
-@endsection
-
-@section('page_scripts')
-{{-- Chúng ta không cần script cho Owl Carousel nữa --}}
 @endsection

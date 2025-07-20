@@ -1,18 +1,30 @@
-@props(['product'])
-
-{{-- Component này sử dụng cấu trúc class của template gốc "metronic shop ui" --}}
-<div class="product-item">
-    <div class="pi-img-wrapper">
-        <img src="{{ $product->thumbnail_url }}" class="img-responsive" alt="{{ $product->name }}">
-        <div>
-            <a href="{{ $product->thumbnail_url }}" class="btn btn-default fancybox-fast-view">Phóng to</a>
-            {{-- Nút xem nhanh có thể cần JavaScript riêng để hoạt động --}}
-            <a href="#product-pop-up" class="btn btn-default fancybox-fast-view">Xem nhanh</a>
-        </div>
+{{-- File: resources/views/clients/product-card-v2.blade.php --}}
+<div class="product-card">
+    <div class="product-image-container">
+        <a href="{{ route('client.products.show', $product) }}">
+            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" class="img-responsive">
+            <div class="product-brand-icon">
+                <img src="https://teddy.vn/wp-content/uploads/2024/05/logo-Teddy-1.png" alt="brand icon">
+            </div>
+        </a>
     </div>
-    <h3><a href="#">{{ $product->name }}</a></h3>
-    <div class="pi-price">{{ $product->price_range }}</div>
-    <a href="javascript:;" class="btn btn-default add2cart">Thêm vào giỏ</a>
-    {{-- Nếu có sao đánh giá --}}
-    {{-- <div class="sticker sticker-new"></div> --}}
+    <div class="product-info">
+        <h4 class="product-name">
+            <a href="{{ route('client.products.show', $product) }}">{{ $product->name }}</a>
+        </h4>
+        <div class="product-price">
+            {{ $product->price_range }}
+        </div>
+        {{-- Hiển thị các size/biến thể --}}
+        @if($product->variants->isNotEmpty())
+            <div class="product-sizes">
+                @foreach($product->variants as $variant)
+                    {{-- Chỉ hiển thị 4 size đầu tiên để tránh quá dài --}}
+                    @if($loop->index < 4) 
+                        <span>{{ $variant->name }}</span>
+                    @endif
+                @endforeach
+            </div>
+        @endif
+    </div>
 </div>
