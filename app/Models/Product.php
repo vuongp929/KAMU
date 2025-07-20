@@ -62,6 +62,11 @@ class Product extends Model
     {
         return $this->hasOne(ProductImage::class)->oldestOfMany();
     }
+
+    public function cartItems()
+{
+    return $this->hasMany(CartItem::class);
+}
     // === KẾT THÚC PHẦN SỬA LỖI QUAN TRỌNG ===
 
     //======================================================================

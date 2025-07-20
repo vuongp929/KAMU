@@ -11,6 +11,7 @@ class ProductVariant extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $table = 'product_variants';
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
@@ -22,11 +23,11 @@ class ProductVariant extends Model
     ];
 
     // Quan hệ với sản phẩm
-    public function product()
+      public function product()
     {
         return $this->belongsTo(Product::class);
     }
-
+    
     // Quan hệ với chi tiết đơn hàng
     public function orderItems()
     {
@@ -43,6 +44,4 @@ class ProductVariant extends Model
     {
         return $this->belongsToMany(AttributeValue::class, 'product_variant_attribute_value');
     }
-
-
 }
