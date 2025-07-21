@@ -23,11 +23,12 @@ class ProductVariant extends Model
     ];
 
     // Quan hệ với sản phẩm
-      public function product()
+    public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id');
     }
-    
+
+
     // Quan hệ với chi tiết đơn hàng
     public function orderItems()
     {

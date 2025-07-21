@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
@@ -20,11 +21,11 @@ use App\Models\Cart;
 
 // === ROUTE CÔNG KHAI ===
 Route::get('/', [ClientController::class, 'index'])->name('home');
- Route::get('/cart', [ControllersCartController::class, 'index'])->name('cart');
+Route::get('/cart', [ControllersCartController::class, 'index'])->name('cart');
 
 //cart 
 Route::prefix('cart')->name('cart.')->group(function () {
-   
+
     Route::post('/update', [ControllersCartController::class, 'update'])->name('update');
     Route::post('/remove', [ControllersCartController::class, 'remove'])->name('remove');
     Route::post('/cart/remove', [ControllersCartController::class, 'remove'])->name('cart.remove');
@@ -36,14 +37,13 @@ Route::prefix('order')->name('order.')->group(function () {
     Route::post('/', [ControllersOrderController::class, 'store'])->name('store');
     Route::post('/order/store', [ControllersOrderController::class, 'store'])->name('order.store');
     Route::get('/order/success', [ControllersOrderController::class, 'success'])->name('success');
-
-  
-
 });
 Route::prefix('checkout')->middleware('auth')->group(function () {
     Route::get('/', [ControllersCheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/', [ControllersCheckoutController::class, 'store'])->name('checkout.store');
-    // Route::get('/success', [ControllersCheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('checkouts/{id}', [ControllersCheckoutController::class, 'show'])->name('client.checkouts.show');
+    Route::get('checkouts/{id}/cancel', [ControllersCheckoutController::class, 'cancel'])->name('client.checkouts.cancel');
+    Route::get('checkouts/{id}/restore', [ControllersCheckoutController::class, 'restore'])->name('client.checkouts.restore');
 });
 
 //apply-discount

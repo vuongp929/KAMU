@@ -32,4 +32,8 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'user_id'); // user_id là khóa ngoại trong bảng orders
     }
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
