@@ -3,27 +3,51 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cart extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'status',
-        'payment_status',
-        'total_price',
-        'shipping_address',
-        'payment_method',
-    ];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['user_id']; // Hoặc các trường khác nếu có
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-
-    // ✅ Định nghĩa quan hệ
-    public function items()
+    /**
+     * A cart has many items.
+     */
+    public function items(): HasMany
     {
         return $this->hasMany(CartItem::class);
     }
+    
+    // ==========================================================
+    // === BẮT ĐẦU PHẦN ACCESSOR TÍNH TOÁN ======================
+    // ==========================================================
+
+    /**
+     * Accessor để tính tổng tiền của giỏ hàng một cách linh động.
+     * Laravel sẽ tự động gọi hàm này khi bạn truy cập $cart->total_price trong Blade.
+     *
+     * @return float
+     */
+    public function getTotalPriceAttribute(): float
+    {
+        // 'reduce' là một cách an toàn để tính tổng trên một collection.
+        // Nó lặp qua từng $item trong $this->items (các sản phẩm trong giỏ).
+        return $this->items->reduce(function ($total, $item) {
+            // $total là tổng tích lũy, $item là sản phẩm hiện tại trong vòng lặp.
+            
+            // Lấy giá đã lưu tại thời điểm đặt hàng.
+            $price = $item->price_at_order ?? 0;
+            
+            // Cộng dồn vào tổng: (tổng cũ + số lượng * giá)
+            return $total + ($item->quantity * $price);
+        }, 0); // 0 là giá trị khởi tạo của $total.
+    }
+    
+    // ==========================================================
+    // === KẾT THÚC PHẦN ACCESSOR TÍNH TOÁN =======================
+    // ==========================================================
 }

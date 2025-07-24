@@ -15,39 +15,53 @@ class Product extends Model
     use HasFactory;
     use SoftDeletes;
 
+    /**
+     * Tên bảng trong database.
+     * @var string
+     */
     protected $table = 'products';
 
+    /**
+     * Các thuộc tính có thể gán hàng loạt.
+     * @var array<int, string>
+     */
     protected $fillable = [
         'code',
         'name',
         'description',
-        'image',
+        'image', // Cột này để lưu đường dẫn ảnh chính cho việc truy cập nhanh
     ];
 
     //======================================================================
     // MỐI QUAN HỆ (RELATIONSHIPS)
     //======================================================================
 
+    /**
+     * Lấy các danh mục của sản phẩm (Nhiều-Nhiều).
+     */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'product_category');
     }
 
+    /**
+     * Lấy tất cả các biến thể của sản phẩm (Một-Nhiều).
+     */
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
     }
 
+    /**
+     * Lấy các ảnh chung của sản phẩm (không bao gồm ảnh của biến thể).
+     */
     public function images(): HasMany
     {
-        // Thêm điều kiện whereNull để chỉ lấy các ảnh có product_variant_id là NULL
         return $this->hasMany(ProductImage::class)->whereNull('product_variant_id');
     }
 
     /**
-     * === BẮT ĐẦU PHẦN SỬA LỖI QUAN TRỌNG ===
-     * Định nghĩa mối quan hệ để lấy ảnh được đánh dấu là ảnh chính.
-     * Mối quan hệ này rất đơn giản và hoạt động tốt với with().
+     * Lấy ảnh được đánh dấu là ảnh chính (is_main = true).
      */
     public function mainImage(): HasOne
     {
@@ -55,31 +69,46 @@ class Product extends Model
     }
 
     /**
-     * Định nghĩa mối quan hệ để lấy ảnh đầu tiên (cũ nhất).
-     * Mối quan hệ này cũng rất đơn giản và hoạt động tốt với with().
+     * Lấy ảnh được upload đầu tiên.
      */
     public function firstImage(): HasOne
     {
         return $this->hasOne(ProductImage::class)->oldestOfMany();
     }
+    
+    /**
+     * Lấy các cart items liên quan đến sản phẩm này.
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
 
-    public function cartItems()
-{
-    return $this->hasMany(CartItem::class);
-}
-    // === KẾT THÚC PHẦN SỬA LỖI QUAN TRỌNG ===
+    /**
+     * Lấy các đánh giá/bình luận của sản phẩm.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(\App\Models\ProductReview::class);
+    }
 
     //======================================================================
     // THUỘC TÍNH ẢO (ACCESSORS)
     //======================================================================
 
+    /**
+     * Lấy khoảng giá của sản phẩm dưới dạng chuỗi đã định dạng.
+     * @return string
+     */
     public function getPriceRangeAttribute(): string
     {
         if (!$this->relationLoaded('variants') || $this->variants->isEmpty()) {
             return "Chưa có giá";
         }
+
         $minPrice = $this->variants->min('price');
         $maxPrice = $this->variants->max('price');
+
         if ($minPrice == $maxPrice) {
             return number_format($minPrice, 0, ',', '.') . ' VNĐ';
         }
@@ -87,30 +116,27 @@ class Product extends Model
     }
 
     /**
-     * Accessor 'thumbnail_url' giờ sẽ sử dụng các mối quan hệ đã được tách biệt.
+     * Lấy URL đầy đủ của ảnh đại diện.
+     * @return string
      */
     public function getThumbnailUrlAttribute(): string
     {
-        // Ưu tiên 1: Lấy từ cột 'image' đã lưu sẵn để có tốc độ nhanh nhất.
         if ($this->image) {
             return Storage::url($this->image);
         }
-
-        // Ưu tiên 2: Tìm ảnh chính thông qua mối quan hệ 'mainImage'.
-        // $this->mainImage sẽ gọi đến phương thức mainImage() và trả về kết quả.
         if ($this->mainImage) {
             return Storage::url($this->mainImage->image_path);
         }
-
-        // Ưu tiên 3: Nếu không có ảnh chính, lấy ảnh đầu tiên qua 'firstImage'.
         if ($this->firstImage) {
             return Storage::url($this->firstImage->image_path);
         }
-
-        // Trường hợp cuối cùng: Trả về ảnh mặc định.
-        return asset('images/default-placeholder.png');
+        return asset('images/default-placeholder.png'); // Tạo ảnh mặc định tại public/images
     }
 
+    /**
+     * Tính tổng tồn kho từ tất cả các biến thể.
+     * @return int
+     */
     public function getTotalStockAttribute(): int
     {
         if ($this->relationLoaded('variants') && $this->variants->isNotEmpty()) {

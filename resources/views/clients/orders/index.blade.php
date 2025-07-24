@@ -1,139 +1,147 @@
 @extends('layouts.client')
+@section('title', 'Đơn hàng của tôi')
+
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<style>
+    /* Custom CSS for Shopee-like Order Page */
+    body { background-color: #f5f5f5; }
+    .profile-layout { background-color: #fff; border-radius: 4px; box-shadow: 0 1px 2px 0 rgba(0,0,0,.13); }
+    /* Sidebar */
+    .profile-sidebar { padding: 25px; border-right: 1px solid #efefef; }
+    .user-info { display: flex; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #efefef; }
+    .user-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #eee; margin-right: 15px; text-align: center; line-height: 50px; font-size: 24px; color: #aaa; }
+    .user-name { font-weight: 600; color: #333; }
+    .user-edit a { font-size: 14px; color: #888; text-decoration: none; }
+    .user-edit a:hover { color: #007bff; }
+    .sidebar-nav { margin-top: 20px; }
+    .sidebar-nav .nav-link { color: #555; padding: 10px 0; font-size: 15px; display: flex; align-items: center; }
+    .sidebar-nav .nav-link i { margin-right: 10px; width: 20px; text-align: center; }
+    .sidebar-nav .nav-link.active, .sidebar-nav .nav-link:hover { color: #007bff; font-weight: 600; }
+    
+    /* Main Content */
+    .profile-content { padding: 0 30px 30px 30px; }
+    .order-tabs .nav-link { color: #666; font-size: 16px; border: none; border-bottom: 2px solid transparent; }
+    .order-tabs .nav-link.active { color: #007bff; border-bottom-color: #007bff; font-weight: 600; }
+    .order-card { background: #fff; border: 1px solid #e8e8e8; margin-bottom: 15px; border-radius: 4px; }
+    .order-header, .order-footer { padding: 15px 20px; background-color: #fafafa; }
+    .order-header { border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
+    .order-status { font-weight: 600; color: #007bff; text-transform: uppercase; }
+    .order-item { padding: 20px; display: flex; align-items: center; border-bottom: 1px solid #f0f0f0; }
+    .order-item:last-child { border-bottom: none; }
+    .order-item-img { width: 80px; height: 80px; margin-right: 15px; border: 1px solid #eee; }
+    .order-item-info { flex-grow: 1; }
+    .order-item-name { color: #333; font-weight: 500; margin-bottom: 5px; }
+    .order-item-variant, .order-item-qty { color: #777; font-size: 14px; }
+    .order-item-price { font-weight: 500; color: #333; }
+    .order-footer { text-align: right; border-top: 1px solid #e8e8e8; }
+    .total-price { font-size: 18px; font-weight: 600; color: #007bff; }
+    .order-actions .btn { margin-left: 10px; }
+</style>
+@endpush
 
 @section('content')
-    <div class="container mt-5">
-        <h2>Thanh toán</h2>
-
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-
-        <h3>Thông tin đơn hàng</h3>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sản phẩm</th>
-                    <th>Size</th>
-                    <th>Số lượng</th>
-                    <th>Giá</th>
-                    <th>Tổng</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($cart->items as $item)
-                    <tr>
-                        <td>{{ $item->variant->product->name ?? 'Không tồn tại' }}</td>
-
-                        <td>{{ $item->size }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>{{ number_format($item->variant->price ?? 0) }} VND</td>
-                        <td>{{ number_format($item->quantity * ($item->variant->price ?? 0)) }} VND</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        {{-- add mã giảm giá --}}
-        <h4 class="mt-4">Nhập mã giảm giá</h4>
-        <form action="{{ route('cart.apply-discount') }}" method="POST" class="d-flex">
-            @csrf
-            <input type="text" name="code" class="form-control me-2" placeholder="Nhập mã giảm giá" required>
-            <button type="submit" class="btn btn-success">Áp dụng</button>
-        </form>
-        @if (session('error'))
-            <div class="alert alert-danger mt-2">{{ session('error') }}</div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success mt-2">{{ session('success') }}</div>
-        @endif
-
-        @if (session('discount'))
-            <h5 class="mt-3 text-success">Đã áp dụng mã giảm giá: Giảm {{ session('discount') }}%</h5>
-        @endif
-
-
-    
-<form action="{{ route('order.store') }}" method="POST">
-    @csrf
-
-    {{-- THÔNG TIN KHÁCH HÀNG --}}
-    <h3 class="mt-4">Thông tin khách hàng</h3>
+<div class="container my-5">
     <div class="row">
-        <!-- Tên khách hàng -->
-        <div class="col-md-6 mb-3">
-            <label for="name" class="form-label">Họ và tên</label>
-            <input type="text" name="name" id="name" class="form-control"
-                   value="{{ old('name', optional($user)->name) }}" required>
+        {{-- Bắt đầu cột Sidebar bên trái --}}
+        <div class="col-md-3">
+            <div class="profile-sidebar">
+                <div class="user-info">
+                    <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="user-name">{{ Auth::user()->name }}</div>
+                        <div class="user-edit">
+                            <a href="{{ route('profile.edit') }}"><i class="fas fa-pencil-alt"></i> Sửa Hồ Sơ</a>
+                        </div>
+                    </div>
+                </div>
+                <ul class="nav flex-column sidebar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('profile.edit') }}"><i class="fas fa-user"></i> Tài Khoản Của Tôi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('client.orders.index') }}"><i class="fas fa-clipboard-list"></i> Đơn Mua</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-bell"></i> Thông Báo</a>
+                    </li>
+                </ul>
+            </div>
         </div>
+        {{-- Kết thúc cột Sidebar --}}
 
-        <!-- Số điện thoại -->
-        <div class="col-md-6 mb-3">
-            <label for="phone" class="form-label">Số điện thoại</label>
-            <input type="text" name="phone" id="phone" class="form-control"
-                   value="{{ old('phone', optional($user)->phone) }}" required>
+        {{-- Bắt đầu cột Nội dung chính bên phải --}}
+        <div class="col-md-9">
+            <div class="profile-content">
+                {{-- Các Tab lọc đơn hàng --}}
+                <ul class="nav nav-tabs order-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') == '' ? 'active' : '' }}" href="{{ route('client.orders.index') }}">Tất cả</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') == 'pending' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'pending']) }}">Chờ thanh toán</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') == 'processing' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'processing']) }}">Vận chuyển</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') == 'completed' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'completed']) }}">Hoàn thành</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') == 'cancelled' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'cancelled']) }}">Đã hủy</a>
+                    </li>
+                </ul>
+
+                <div class="mt-4">
+                    {{-- Lặp qua từng đơn hàng --}}
+                    @forelse($orders as $order)
+                        <div class="order-card">
+                            <div class="order-header">
+                                <span>Mã đơn hàng: #{{ $order->id }}</span>
+                                <span class="order-status">{{ $order->status }}</span>
+                            </div>
+                            <div class="order-body">
+                                {{-- Lặp qua từng sản phẩm trong đơn hàng --}}
+                                @foreach($order->orderItems as $item)
+                                    @if($item->productVariant && $item->productVariant->product)
+                                        <div class="order-item">
+                                            <img src="{{ optional($item->productVariant->product)->thumbnail_url }}" class="order-item-img" alt="">
+                                            <div class="order-item-info">
+                                                <div class="order-item-name">{{ $item->productVariant->product->name }}</div>
+                                                <div class="order-item-variant">Phân loại hàng: {{ $item->productVariant->name }}</div>
+                                                <div class="order-item-qty">x{{ $item->quantity }}</div>
+                                            </div>
+                                            <div class="order-item-price">{{ number_format($item->price, 0, ',', '.') }}đ</div>
+                                        </div>
+                                    @else
+                                        <div class="order-item">
+                                            <div class="order-item-info text-danger">
+                                                <p><strong>Sản phẩm này không còn tồn tại hoặc đã bị lỗi dữ liệu.</strong></p>
+                                                <small>(ID Biến thể: {{ $item->product_variant_id }})</small>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            <div class="order-footer">
+                                <span class="me-3">Thành tiền:</span>
+                                <span class="total-price">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center p-5">
+                            <p>Chưa có đơn hàng nào.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                {{-- Phân trang --}}
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $orders->appends(request()->query())->links() }}
+                </div>
+            </div>
         </div>
-
-        <!-- Email -->
-        <div class="col-md-6 mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" id="email" class="form-control"
-                   value="{{ old('email', optional($user)->email) }}" required>
-        </div>
-
-        <!-- Địa chỉ -->
-        <div class="col-md-6 mb-3">
-            <label for="shipping_address" class="form-label">Địa chỉ</label>
-            <input type="text" name="shipping_address" id="shipping_address" class="form-control"
-                   value="{{ old('shipping_address', optional($user)->address) }}" required>
-        </div>
+        {{-- Kết thúc cột Nội dung chính --}}
     </div>
-
-    {{-- PHƯƠNG THỨC THANH TOÁN --}}
-    <h4 class="mt-4">Phương thức thanh toán</h4>
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" name="payment_method" value="cod" id="cod" required checked>
-        <label class="form-check-label" for="cod">
-            Thanh toán khi nhận hàng (COD)
-        </label>
-    </div>
-    <div class="form-check mb-3">
-        <input class="form-check-input" type="radio" name="payment_method" value="vnpay" id="vnpay" required>
-        <label class="form-check-label" for="vnpay">
-            Thanh toán qua VNPay
-        </label>
-    </div>
-
-    {{-- DỮ LIỆU SẢN PHẨM (ẨN) --}}
-    @foreach ($cart->items as $item)
-        <input type="hidden" name="cart_items[{{ $loop->index }}][product_id]" value="{{ $item->variant->product->id }}">
-        <input type="hidden" name="cart_items[{{ $loop->index }}][product_variant_id]" value="{{ $item->variant->id }}">
-        <input type="hidden" name="cart_items[{{ $loop->index }}][quantity]" value="{{ $item->quantity }}">
-        <input type="hidden" name="cart_items[{{ $loop->index }}][price_at_order]" value="{{ $item->variant->price }}">
-        <input type="hidden" name="cart_items[{{ $loop->index }}][size]" value="{{ $item->size }}">
-    @endforeach
-
-    {{-- DỮ LIỆU ẨN BỔ SUNG --}}
-    <input type="hidden" name="user_id" value="{{ Auth::id() }}">
-    <input type="hidden" name="payment_status" value="paid">
-    <input type="hidden" name="status" value="pending">
-    <input type="hidden" name="total_price" value="{{ $total_price }}">
-
-    {{-- TỔNG GIÁ & NÚT SUBMIT --}}
-    <h4 class="mt-4">Tổng cộng: {{ number_format($total_price) }} VND</h4>
-    <button type="submit" class="btn btn-primary w-100 mt-3">
-        Đặt hàng
-    </button>
-</form>
-
-        {{-- @if (optional($order)->payment_status == 'paid')
-                <p>Đơn hàng của bạn đã được thanh toán và đang được xử lý.</p>
-            @else
-                <button type="submit" class="btn btn-primary mt-3">Đặt hàng</button>
-            @endif --}}
-
-
-    </div>
+</div>
 @endsection

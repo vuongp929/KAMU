@@ -44,4 +44,15 @@ class ProductReviewController extends Controller
         ]);
         return back()->with('success', 'Bình luận trả lời đã được gửi!');
     }
+
+    // Xóa đánh giá của user
+    public function destroy($productId, $reviewId)
+    {
+        $review = ProductReview::findOrFail($reviewId);
+        if ($review->user_id !== auth()->id()) {
+            abort(403, 'Bạn chỉ có thể xóa đánh giá của chính mình.');
+        }
+        $review->delete();
+        return response()->json(['success' => true]);
+    }
 } 

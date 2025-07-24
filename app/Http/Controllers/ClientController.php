@@ -20,15 +20,15 @@ class ClientController extends Controller
         $cartCount = count(session('cart', []));
 
         // 2. Lấy dữ liệu riêng cho trang chủ
-        $newProducts = Product::with(['mainImage', 'firstImage', 'variants:id,product_id,price'])
-                              ->latest()
-                              ->take(8)
-                              ->get();
+        $newProducts = Product::with(['mainImage', 'firstImage', 'variants'])
+                          ->latest()
+                          ->take(8)
+                          ->get();
 
-        $featuredProducts = Product::with(['mainImage', 'firstImage', 'variants:id,product_id,price'])
-                                   ->inRandomOrder()
-                                   ->take(4)
-                                   ->get();
+    $featuredProducts = Product::with(['mainImage', 'firstImage', 'variants'])
+                               ->inRandomOrder()
+                               ->take(4)
+                               ->get();
         
         // 3. Trả về view với TẤT CẢ dữ liệu
         return view('clients.home', [

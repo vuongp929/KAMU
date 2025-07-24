@@ -11,6 +11,7 @@ use App\Models\AttributeValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -154,23 +155,21 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         // 1. VALIDATION
-        // Sửa lại rule 'unique' để nó bỏ qua chính sản phẩm đang được sửa
         $validated = $request->validate([
+            // Rule 'unique' cần bỏ qua chính sản phẩm đang được sửa
             'name' => 'required|string|max:255|unique:products,name,' . $product->id,
             'description' => 'nullable|string',
             'categories' => 'nullable|array',
-            'categories.*' => 'exists:categories,id',
             'images' => 'nullable|array', // Ảnh mới không bắt buộc khi update
             'images.*' => 'image|max:2048',
-            'price' => 'required_without:variants|nullable|numeric|min:0',
-            'stock' => 'required_without:variants|nullable|integer|min:0',
-            'variants' => 'nullable|array',
-            'variants.*.name' => 'required_with:variants|string|max:255',
-            'variants.*.price' => 'required_with:variants|numeric|min:0',
-            'variants.*.stock' => 'required_with:variants|integer|min:0',
-            'variants.*.attribute_value_ids' => 'nullable|array',
-            'variants.*.images' => 'nullable|array',
-            'variants.*.images.*' => 'image|max:2048',
+            'variants' => 'required|array|min:1',
+            'variants.*.name' => 'required|string|max:255',
+            'variants.*.price' => 'required|numeric|min:0',
+            'variants.*.stock' => 'required|integer|min:0',
+            'variants.*.attribute_value_ids' => 'required|array',
+            'variants.*.image' => 'nullable|image|max:2048',
+        ], [
+            'variants.required' => 'Sản phẩm phải có ít nhất một phiên bản.',
         ]);
 
         DB::beginTransaction();
@@ -181,97 +180,92 @@ class ProductController extends Controller
                 'description' => $validated['description'] ?? null,
             ]);
 
-            // 3. CẬP NHẬT DANH MỤC
-            if ($request->has('categories')) {
-                $product->categories()->sync($validated['categories']);
-            } else {
-                // Nếu không có category nào được chọn, hãy xóa tất cả các liên kết cũ
-                $product->categories()->detach();
+            // 3. ĐỒNG BỘ DANH MỤC
+            $product->categories()->sync($validated['categories'] ?? []);
+
+            // 4. XỬ LÝ ẢNH
+            // Xóa tất cả ảnh cũ (cả ảnh chính và ảnh biến thể)
+            foreach ($product->images as $image) {
+                Storage::disk('public')->delete($image->image_path); // Xóa file vật lý
+                $image->delete(); // Xóa bản ghi trong DB
             }
 
-            // 4. THÊM ẢNH MỚI (nếu có)
+            // Thêm lại bộ sưu tập ảnh chính mới
+            $mainImagePath = null;
             if ($request->hasFile('images')) {
-                $isFirstNewImage = !$product->images()->where('is_main', true)->exists();
                 foreach ($request->file('images') as $key => $imageFile) {
                     $path = $imageFile->store('products', 'public');
-                    $isMain = $isFirstNewImage && ($key == 0); // Đánh dấu ảnh chính nếu chưa có
-
-                    $image = $product->images()->create([
+                    $product->images()->create([
                         'image_path' => $path,
-                        'is_main' => $isMain,
+                        'is_main' => ($key == 0),
                     ]);
-
-                    // Cập nhật lại cột 'image' của sản phẩm nếu vừa thêm ảnh chính mới
-                    if ($isMain) {
-                        $product->image = $path;
-                        $product->save();
+                    if ($key == 0) {
+                        $mainImagePath = $path;
                     }
                 }
             }
-            // Lưu ý: Logic xóa ảnh cũ cần một cơ chế riêng (ví dụ: nút xóa cho từng ảnh)
-            // và không nên thực hiện ở đây để tránh phức tạp.
+            // Cập nhật lại cột 'image' của sản phẩm
+            $product->image = $mainImagePath;
+            $product->save();
 
-            // 5. CẬP NHẬT BIẾN THỂ (THEO LOGIC XÓA CŨ - TẠO MỚI)
-            // Xóa tất cả các biến thể cũ và các mối quan hệ của chúng (ảnh, thuộc tính)
-            $product->variants()->each(function ($variant) {
-                $variant->delete(); // Sử dụng delete của model để kích hoạt các event (nếu có)
-            });
 
-            if (!empty($validated['variants'])) {
-                // Tái sử dụng logic từ hàm store để tạo lại các biến thể
-                foreach ($request->variants as $key => $variantData) {
-                    $variant = $product->variants()->create([
-                        'name'  => $variantData['name'],
-                        'price' => $variantData['price'],
-                        'stock' => $variantData['stock'],
-                    ]);
+            // 5. CẬP NHẬT BIẾN THỂ (XÓA CŨ - TẠO MỚI)
+            $product->variants()->each(fn($variant) => $variant->delete()); // Xóa tất cả biến thể cũ
 
-                    if (!empty($variantData['attribute_value_ids'])) {
-                        $variant->attributeValues()->sync($variantData['attribute_value_ids']);
-                    }
-
-                    if ($request->hasFile("variants.{$key}.images")) {
-                        foreach ($request->file("variants.{$key}.images") as $variantImageFile) {
-                            $variantPath = $variantImageFile->store('products', 'public');
-                            ProductImage::create([
-                                'product_id'         => $product->id,
-                                'product_variant_id' => $variant->id,
-                                'image_path'         => $variantPath,
-                                'is_main'            => false,
-                            ]);
-                        }
-                    }
-                }
-            } else {
-                // Nếu không có biến thể nào được gửi lên, tạo một biến thể mặc định
-                $product->variants()->create([
-                    'name'  => $product->name,
-                    'price' => $validated['price'] ?? 0,
-                    'stock' => $validated['stock'] ?? 0,
+            foreach ($validated['variants'] as $key => $variantData) {
+                $variant = $product->variants()->create([
+                    'name'  => $variantData['name'],
+                    'price' => $variantData['price'],
+                    'stock' => $variantData['stock'],
                 ]);
+
+                $variant->attributeValues()->sync($variantData['attribute_value_ids']);
+
+                if ($request->hasFile("variants.{$key}.image")) {
+                    $variantImageFile = $request->file("variants.{$key}.image");
+                    $variantPath = $variantImageFile->store('products', 'public');
+                    
+                    ProductImage::create([
+                        'product_id'         => $product->id,
+                        'product_variant_id' => $variant->id,
+                        'image_path'         => $variantPath,
+                    ]);
+                }
             }
 
             DB::commit();
-            return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công.');
+            return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Lỗi khi cập nhật sản phẩm ' . $product->id . ': ' . $e->getMessage() . ' tại dòng ' . $e->getLine() . ' trong file ' . $e->getFile());
-            return back()->with('error', 'Đã xảy ra lỗi không mong muốn khi cập nhật.')->withInput();
+            Log::error('Lỗi khi cập nhật sản phẩm ' . $product->id . ': ' . $e->getMessage());
+            return back()->with('error', 'Đã xảy ra lỗi khi cập nhật.')->withInput();
         }
     }
 
     public function show(Product $product)
     {
-        // Tải tất cả các mối quan hệ cần thiết để hiển thị chi tiết
-        $product->load([
-            'categories:name', // Chỉ lấy tên danh mục
-            'images',          // Lấy ảnh chính
-            'variants.attributeValues.attribute', // Lấy thuộc tính và giá trị của biến thể
-            'variants.images'  // Lấy ảnh của biến thể
-        ]);
+        // Tải trước các mối quan hệ cần thiết để tối ưu
+        $product->load(['images', 'variants', 'categories']);
 
-        // Trả về dữ liệu dưới dạng JSON
-        return response()->json($product);
+        // --- Logic lấy sản phẩm tương tự (giữ nguyên) ---
+        $firstCategoryId = $product->categories->first()->id ?? null;
+        $relatedProducts = collect();
+        if ($firstCategoryId) {
+            $relatedProducts = Product::whereHas('categories', function ($query) use ($firstCategoryId) {
+                $query->where('category_id', $firstCategoryId);
+            })
+            ->where('id', '!=', $product->id)
+            ->with(['thumbnail', 'variants'])
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+        }
+
+        return view('clients.products.show', compact(
+            'product', 
+            'relatedProducts', 
+            'cartCount'
+        ));
     }
 
     /**
