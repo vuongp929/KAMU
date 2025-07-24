@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
 
     // Nếu bạn muốn cho user thường xem order → giữ dòng này
     Route::resource('orders', OrderController::class);
+    Route::post('/products/{product}/reviews', [\App\Http\Controllers\ProductReviewController::class, 'store'])->name('products.reviews.store');
+    Route::post('/products/{product}/reviews/{review}/reply', [\App\Http\Controllers\ProductReviewController::class, 'reply'])->name('products.reviews.reply');
 });
 
 // === ROUTE ADMIN ===
