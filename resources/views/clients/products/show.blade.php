@@ -54,24 +54,40 @@
                         </table>
                     </div>
 
-                    {{-- Giá hiển thị động --}}
+                    {{-- Các nút bấm mua hàng --}}
+                    <form action="{{ route('client.cart.add') }}" method="POST">
+                    @csrf
+
+                    {{-- Lựa chọn biến thể (Màu, Size...) --}}
+                    <div class="variant-selector-form">
+                        <label>Lựa chọn phiên bản:</label>
+                        @if($product->variants->isNotEmpty())
+                            <select name="variant_id" class="form-control" id="variant-select" required>
+                                @foreach($product->variants as $variant)
+                                    <option value="{{ $variant->id }}" data-price="{{ $variant->price }}">
+                                        {{ $variant->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @else
+                            <p>Sản phẩm hiện chưa có phiên bản nào.</p>
+                        @endif
+                    </div>
+
                     <div class="price-display">
                         <span id="dynamic-price">{{ number_format($product->variants->first()->price ?? 0, 0, ',', '.') }}đ</span>
                     </div>
 
-                    {{-- Các nút bấm mua hàng --}}
-                    <div class="action-buttons">
-                        <div class="size-tags">
-                            @foreach($product->variants as $variant)
-                            <button class="btn btn-size" data-variant-price="{{ $variant->price }}">{{ $variant->name }}</button>
-                            @endforeach
+                    <div class="product-page-cart">
+                        <div class="product-quantity">
+                            <label for="product-quantity">Số lượng:</label>
+                            <input id="product-quantity" type="number" name="quantity" value="1" min="1" class="form-control input-sm">
                         </div>
-                        <button class="btn btn-add-to-cart">MUA HÀNG</button>
-                        <div class="quick-buy">
-                            <button class="btn btn-quick-buy">ĐẶT HÀNG NHANH</button>
-                            <input type="text" class="form-control" placeholder="Nhập số điện thoại">
-                        </div>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fa fa-shopping-cart"></i> THÊM VÀO GIỎ HÀNG
+                        </button>
                     </div>
+                </form>
 
                     {{-- Thông tin thêm và chính sách --}}
                     <div class="extra-info">

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Category;
+use App\Http\View\Composers\ClientLayoutComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
                 'categories' => $categories, // <-- Thêm biến mới vào đây
             ]);
         });
+
+        View::composer('layouts.client', ClientLayoutComposer::class);
 
         // ==========================================================
         // === KẾT THÚC PHẦN CODE VIEW COMPOSER =======================

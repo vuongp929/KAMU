@@ -15,9 +15,11 @@
     <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/clients/plugins/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/clients/plugins/fancybox/source/jquery.fancybox.css') }}" rel="stylesheet" type="text/css" />
-    {{-- Nếu bạn có dùng Owl Carousel, hãy thêm CSS của nó vào đây --}}
-    {{-- <link href="{{ asset('assets/clients/plugins/owl.carousel/assets/owl.carousel.css') }}" rel="stylesheet"> --}}
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.js" />
 
     <!-- THEME STYLES -->
     <link href="{{ asset('assets/clients/pages/css/components.css') }}" rel="stylesheet" type="text/css" />
