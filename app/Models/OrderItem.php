@@ -11,7 +11,7 @@ class OrderItem extends Model
 
     protected $fillable = [
         'order_id',
-          'product_id',
+        'product_id',
         'product_variant_id',
         'quantity',
         'price',
@@ -24,12 +24,14 @@ class OrderItem extends Model
     }
 
     // Quan hệ với biến thể sản phẩm
-    public function productVariant()
-    {
-        return $this->belongsTo(ProductVariant::class);
-    }
-    public function product()
+   public function productVariant()
 {
-    return $this->belongsTo(Product::class);
+    return $this->belongsTo(ProductVariant::class, 'product_variant_id');
 }
+
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

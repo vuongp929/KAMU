@@ -43,7 +43,9 @@ Route::prefix('order')->name('order.')->group(function () {
 Route::prefix('checkout')->middleware('auth')->group(function () {
     Route::get('/', [ControllersCheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/', [ControllersCheckoutController::class, 'store'])->name('checkout.store');
-    // Route::get('/success', [ControllersCheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('checkouts/{id}', [ControllersCheckoutController::class, 'show'])->name('client.checkouts.show');
+    Route::get('checkouts/{id}/cancel', [ControllersCheckoutController::class, 'cancel'])->name('client.checkouts.cancel');
+    Route::get('checkouts/{id}/restore', [ControllersCheckoutController::class, 'restore'])->name('client.checkouts.restore');
 });
 
 // === ROUTE XÁC THỰC (Laravel Breeze) ===
