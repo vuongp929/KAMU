@@ -88,4 +88,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(UserRole::class);
     }
+
+    public function cart()
+{
+    return $this->hasOne(Cart::class);
+}
+
 }
