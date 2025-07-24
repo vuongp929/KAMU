@@ -6,7 +6,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Danh sách Thuộc tính</h4>
-            <a href="{{ route('admin.attributes.create') }}" class="btn btn-primary">Thêm Thuộc tính</a>
+            <a href="{{ route('admins.attributes.create') }}" class="btn btn-primary">Thêm Thuộc tính</a>
         </div>
         <div class="card-body">
             @if(session('success'))
@@ -31,8 +31,8 @@
                                 @endforeach
                             </td>
                             <td>
-                                <a href="{{ route('admin.attributes.edit', $attribute) }}" class="btn btn-sm btn-warning">Sửa</a>
-                                <form action="{{ route('admin.attributes.destroy', $attribute) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                <a href="{{ route('admins.attributes.edit', $attribute) }}" class="btn btn-sm btn-warning">Sửa</a>
+                                <form action="{{ route('admins.attributes.destroy', $attribute) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Xoá</button>

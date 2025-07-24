@@ -32,8 +32,8 @@
                     <td>{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
                     <td>{{ $order->created_at->format('d-m-Y') }}</td>
                     <td>
-                        <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">Xem</a>
-                        <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" style="display: inline;">
+                        <a href="{{ route('admins.orders.show', $order->id) }}" class="btn btn-sm btn-info">Xem</a>
+                        <form action="{{ route('admins.orders.update', $order->id) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('PUT')
                             <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">

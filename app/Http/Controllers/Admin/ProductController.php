@@ -120,7 +120,7 @@ class ProductController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
+            return redirect()->route('admins.products.index')->with('success', 'Thêm sản phẩm thành công!');
 
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -252,7 +252,7 @@ class ProductController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công.');
+            return redirect()->route('admins.products.index')->with('success', 'Cập nhật sản phẩm thành công.');
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Lỗi khi cập nhật sản phẩm ' . $product->id . ': ' . $e->getMessage() . ' tại dòng ' . $e->getLine() . ' trong file ' . $e->getFile());
@@ -280,6 +280,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete(); // Sử dụng SoftDeletes
-        return redirect()->route('admin.products.index')->with('success', 'Đã xóa sản phẩm thành công.');
+        return redirect()->route('admins.products.index')->with('success', 'Đã xóa sản phẩm thành công.');
     }
 }

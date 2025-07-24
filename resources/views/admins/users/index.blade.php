@@ -11,7 +11,7 @@
                                 <h3 class="m-0">Danh sách người dùng</h3>
                             </div>
                             <div class="header_more_tool">
-                                <a href="{{ route('admin.users.create') }}" class="btn btn-primary">Thêm người dùng</a>
+                                <a href="{{ route('admins.users.create') }}" class="btn btn-primary">Thêm người dùng</a>
                             </div>
                         </div>
                     </div>
@@ -41,9 +41,9 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('admin.users.edit', $item->id) }}"
+                                                <a href="{{ route('admins.users.edit', $item->id) }}"
                                                     class="btn btn-sm btn-info">Sửa</a>
-                                                <form action="{{ route('admin.users.destroy', $item->id) }}"
+                                                <form action="{{ route('admins.users.destroy', $item->id) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')

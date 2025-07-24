@@ -8,7 +8,7 @@
         <div class="card-header bg-white">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Danh sách Sản phẩm</h4>
-                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                <a href="{{ route('admins.products.create') }}" class="btn btn-primary">
                     <i class="ri-add-line"></i> Thêm Sản phẩm
                 </a>
             </div>
@@ -67,13 +67,13 @@
                                 <button type="button" class="btn btn-sm btn-info view-product-btn" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#productDetailModal"
-                                        data-url="{{ route('admin.products.show', $product->id) }}">
+                                        data-url="{{ route('admins.products.show', $product->id) }}">
                                     <i class="ri-eye-line"></i> Xem
                                 </button>
-                                                            <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
+                                                            <a href="{{ route('admins.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
                                     <i class="ri-pencil-line"></i> Sửa
                                 </a>
-                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                <form action="{{ route('admins.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">

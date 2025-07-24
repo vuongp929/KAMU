@@ -11,7 +11,7 @@
                             <h3 class="m-0">Danh sách mã giảm giá</h3>
                         </div>
                         <div class="header_more_tool">
-                            <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">Thêm mã giảm giá</a>
+                            <a href="{{ route('admins.discounts.create') }}" class="btn btn-primary">Thêm mã giảm giá</a>
                         </div>
                     </div>
                 </div>
@@ -57,8 +57,8 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.discounts.edit', $discount->id) }}" class="btn btn-sm btn-info">Sửa</a>
-                                        <form action="{{ route('admin.discounts.destroy', $discount->id) }}" method="POST" class="d-inline">
+                                        <a href="{{ route('admins.discounts.edit', $discount->id) }}" class="btn btn-sm btn-info">Sửa</a>
+                                        <form action="{{ route('admins.discounts.destroy', $discount->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</button>

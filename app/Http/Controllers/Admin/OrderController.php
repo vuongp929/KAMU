@@ -38,7 +38,7 @@ class OrderController extends Controller
     {
         // Logic để admin tạo đơn hàng thủ công
         // ...
-        return redirect()->route('admin.orders.index')->with('success', 'Tạo đơn hàng thành công.');
+        return redirect()->route('admins.orders.index')->with('success', 'Tạo đơn hàng thành công.');
     }
 
     /**
@@ -80,7 +80,7 @@ class OrderController extends Controller
 
         // TODO: Thêm logic gửi email thông báo cho khách hàng về việc cập nhật đơn hàng.
 
-        return redirect()->route('admin.orders.index')->with('success', 'Đơn hàng #' . $order->id . ' đã được cập nhật.');
+        return redirect()->route('admins.orders.index')->with('success', 'Đơn hàng #' . $order->id . ' đã được cập nhật.');
     }
 
     /**
@@ -93,6 +93,6 @@ class OrderController extends Controller
         
         $order->delete(); // Giả sử model Order dùng SoftDeletes
 
-        return redirect()->route('admin.orders.index')->with('success', 'Đã xóa đơn hàng #' . $order->id);
+        return redirect()->route('admins.orders.index')->with('success', 'Đã xóa đơn hàng #' . $order->id);
     }
 }

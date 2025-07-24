@@ -18,8 +18,10 @@
     <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap.css.map') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
 
-    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
-    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
+    {{-- <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
+    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script> --}}
+    <link href="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}">
+
     {{-- corporate --}}
     <link rel="shortcut icon" href="{{ asset('assets/user/images/favicon.ico') }}">
     <link href="{{ asset('assets/clients/corporate/css/themes/blue.css') }}" rel="stylesheet" type="text/css">

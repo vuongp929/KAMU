@@ -29,7 +29,7 @@
                         </script>
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
                     @endif
-                    <form action="{{ route('admin.discounts.update', $discount->id) }}" method="POST">
+                    <form action="{{ route('admins.discounts.update', $discount->id) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="row">
@@ -131,7 +131,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
-                        <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Quay lại</a>
+                        <a href="{{ route('admins.discounts.index') }}" class="btn btn-secondary">Quay lại</a>
                     </form>
                 </div>
             </div>

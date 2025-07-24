@@ -103,7 +103,7 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
         $user->roles()->create(['role' => $data['role']]);
 
-        return redirect()->route('admin.users.index')->with('success', 'Tạo người dùng thành công !');
+        return redirect()->route('admins.users.index')->with('success', 'Tạo người dùng thành công !');
     }
 
     public function editUser($id)
@@ -137,7 +137,7 @@ class AuthController extends Controller
         $user->roles()->delete(); 
         $user->roles()->create(['role' => $data['role']]); 
 
-        return redirect()->route('admin.users.index')->with('success', 'Cập nhật người dùng thành công !');
+        return redirect()->route('admins.users.index')->with('success', 'Cập nhật người dùng thành công !');
     }
 
     public function deleteUser()
@@ -147,6 +147,6 @@ class AuthController extends Controller
             return redirect()->back()->withErrors(['error' => 'Bạn không thể xóa tài khoản của chính mình.']);
         }
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'Xóa người dùng thành công !');
+        return redirect()->route('admins.users.index')->with('success', 'Xóa người dùng thành công !');
     }
 }

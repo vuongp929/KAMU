@@ -51,7 +51,7 @@ class AttributeController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.attributes.index')->with('success', 'Thêm thuộc tính thành công!');
+            return redirect()->route('admins.attributes.index')->with('success', 'Thêm thuộc tính thành công!');
 
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -95,7 +95,7 @@ class AttributeController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.attributes.index')->with('success', 'Cập nhật thuộc tính thành công!');
+            return redirect()->route('admins.attributes.index')->with('success', 'Cập nhật thuộc tính thành công!');
 
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -111,6 +111,6 @@ class AttributeController extends Controller
         // Do đã thiết lập onDelete('cascade') trong migration,
         // khi xóa thuộc tính cha, các giá trị con cũng sẽ tự động bị xóa.
         $attribute->delete();
-        return redirect()->route('admin.attributes.index')->with('success', 'Xóa thuộc tính thành công!');
+        return redirect()->route('admins.attributes.index')->with('success', 'Xóa thuộc tính thành công!');
     }
 }

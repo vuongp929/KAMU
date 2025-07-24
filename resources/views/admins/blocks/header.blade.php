@@ -6,7 +6,7 @@
                 <!-- LOGO -->
                 <div class="navbar-brand-box horizontal-logo">
                     <!-- Logo phiên bản dark -->
-                    <a href="{{ route('admin.dashboard') }}" class="logo logo-dark">
+                    <a href="{{ route('admins.dashboard') }}" class="logo logo-dark">
                         <span class="logo-sm">
                             <img src="{{ asset('assets/admins/images/logo-sm.png') }}" alt="Logo Small" height="22">
                         </span>
@@ -15,7 +15,7 @@
                         </span>
                     </a>
                     <!-- Logo phiên bản light -->
-                    <a href="{{ route('admin.dashboard') }}" class="logo logo-light">
+                    <a href="{{ route('admins.dashboard') }}" class="logo logo-light">
                         <span class="logo-sm">
                             <img src="{{ asset('assets/admins/images/logo-sm.png') }}" alt="Logo Small" height="22">
                         </span>
