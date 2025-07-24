@@ -11,7 +11,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admins.dashboard');
         }
         return view('admins.auth.login');
     }
@@ -30,7 +30,7 @@ class AuthController extends Controller
     //         ]
     //     );
     //     if (Auth::attempt($request->only('email', 'password'))) {
-    //         return redirect()->route('admin.dashboard');
+    //         return redirect()->route('admins.dashboard');
     //     }
     //     return redirect()->back()->withErrors(['email' => 'Tài khoản mật khẩu không đúng.'])->withInput();
     // }
@@ -50,7 +50,7 @@ class AuthController extends Controller
         // So sánh mật khẩu thuần (KHÔNG mã hóa)
         if ($user && $user->password === $request->password) {
             Auth::login($user); // Không dùng attempt nữa
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admins.dashboard');
         }
 
         return redirect()->back()

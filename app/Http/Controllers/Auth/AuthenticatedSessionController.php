@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
 
     //     $request->session()->regenerate();
 
-    //     return redirect()->intended(route('admin.dashboard', absolute: false));
+    //     return redirect()->intended(route('admins.dashboard', absolute: false));
     // }
     public function store(Request $request): RedirectResponse
 {
@@ -56,7 +56,7 @@ class AuthenticatedSessionController extends Controller
     $request->session()->regenerate();
 
     // Chuyển hướng sau khi đăng nhập thành công
-    return redirect()->intended(route('admin.dashboard'));
+    return redirect()->intended(route('admins.dashboard'));
 }
 
 

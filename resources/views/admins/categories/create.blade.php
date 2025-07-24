@@ -20,7 +20,7 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
-                        <form action="{{ route('admins.categorys.store') }}" method="post" enctype="multipart/form-data">
+                        <form action="{{ route('admins.categories.store') }}" method="post" enctype="multipart/form-data">
                             @csrf
                         <div class="row">
 

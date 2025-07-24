@@ -77,7 +77,7 @@
 
                                                     {{-- Nút xóa --}}
                                                     <form method="POST" action="{{ route('admins.categories.destroy', $item) }}" 
-                                                        onsubmit="return confirm('Bạn có chắc muốn xoá không vậy đại ca?');">
+                                                        onsubmit="return confirm('Bạn có chắc muốn xoá không vậy ?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
