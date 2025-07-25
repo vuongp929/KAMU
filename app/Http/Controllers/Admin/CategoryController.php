@@ -17,7 +17,7 @@ class CategoryController extends Controller
     {
         // $listCategory = Category::orderByDesc('trang_thai')->get();
         $listCategory = Category::all();
-        return view('admins.categorys.index', compact( 'listCategory'));   
+        return view('admins.categories.index', compact( 'listCategory'));   
 
     }
 
@@ -26,7 +26,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admins.categorys.create');
+        return view('admins.categories.create');
     }
 
     /**
@@ -50,7 +50,7 @@ class CategoryController extends Controller
 
         Category::create($params);
 
-        return redirect()->route('admins.categorys.index')->with('success', 'Thêm danh mục thành công');
+        return redirect()->route('admins.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 }
 
@@ -68,7 +68,7 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         $Category = Category::findOrFail($id);
-        return view('admins.categorys.edit', compact('Category'));
+        return view('admins.categories.edit', compact('Category'));
     }
 
     /**
@@ -94,7 +94,7 @@ class CategoryController extends Controller
             // Cập nhật dữ liệu
             $Category->update($params);
     
-            return redirect()->route('admins.categorys.index')->with('success', 'Cập nhật danh mục thành công');
+            return redirect()->route('admins.categories.index')->with('success', 'Cập nhật danh mục thành công');
         }
     }
 
@@ -111,7 +111,7 @@ class CategoryController extends Controller
                 Storage::disk('public')->delete($Category->image);
             }
         }
-        return redirect()->route('admins.categorys.index')->with('success', 'Xoá danh mục thành công');
+        return redirect()->route('admins.categories.index')->with('success', 'Xoá danh mục thành công');
 
     }
 }

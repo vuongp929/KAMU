@@ -73,7 +73,7 @@
                                     </td>
                                     <td>{{ $review->created_at->format('d/m/Y') }}</td>
                                     <td>
-                                        <form action="{{ route('admin.reviews.toggleHide', $review->id) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('admins.reviews.toggleHide', $review->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-sm {{ $review->is_hidden ? 'btn-success' : 'btn-warning' }}">
                                                 {{ $review->is_hidden ? 'Hiện' : 'Ẩn' }}

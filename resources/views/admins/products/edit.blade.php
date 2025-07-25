@@ -4,7 +4,10 @@
 
 @section('content')
 <div class="container-fluid mt-4">
-    <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
+    {{-- Sử dụng route model binding, truyền thẳng object $product --}}
+    <form method="POST" action="{{ route('admins.products.update', $product) }}" enctype="multipart/form-data">
+    {{-- <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
+ origin/main --}}
         @csrf
         @method('PUT')
 
@@ -13,7 +16,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="mb-0">Chỉnh Sửa Sản Phẩm</h4>
                     <div>
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary"><i class="ri-arrow-left-line"></i> Quay lại</a>
+                        <a href="{{ route('admins.products.index') }}" class="btn btn-secondary"><i class="ri-arrow-left-line"></i> Quay lại</a>
                         <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Cập nhật</button>
                     </div>
                 </div>

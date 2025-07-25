@@ -11,7 +11,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admins.dashboard');
         }
         return view('admins.auth.login');
     }
@@ -30,7 +30,7 @@ class AuthController extends Controller
     //         ]
     //     );
     //     if (Auth::attempt($request->only('email', 'password'))) {
-    //         return redirect()->route('admin.dashboard');
+    //         return redirect()->route('admins.dashboard');
     //     }
     //     return redirect()->back()->withErrors(['email' => 'Tài khoản mật khẩu không đúng.'])->withInput();
     // }
@@ -50,7 +50,7 @@ class AuthController extends Controller
         // So sánh mật khẩu thuần (KHÔNG mã hóa)
         if ($user && $user->password === $request->password) {
             Auth::login($user); // Không dùng attempt nữa
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admins.dashboard');
         }
 
         return redirect()->back()
@@ -103,7 +103,7 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
         $user->roles()->create(['role' => $data['role']]);
 
-        return redirect()->route('admin.users.index')->with('success', 'Tạo người dùng thành công !');
+        return redirect()->route('admins.users.index')->with('success', 'Tạo người dùng thành công !');
     }
 
     public function editUser($id)
@@ -137,7 +137,7 @@ class AuthController extends Controller
         $user->roles()->delete(); 
         $user->roles()->create(['role' => $data['role']]); 
 
-        return redirect()->route('admin.users.index')->with('success', 'Cập nhật người dùng thành công !');
+        return redirect()->route('admins.users.index')->with('success', 'Cập nhật người dùng thành công !');
     }
 
     public function deleteUser()
@@ -147,6 +147,6 @@ class AuthController extends Controller
             return redirect()->back()->withErrors(['error' => 'Bạn không thể xóa tài khoản của chính mình.']);
         }
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'Xóa người dùng thành công !');
+        return redirect()->route('admins.users.index')->with('success', 'Xóa người dùng thành công !');
     }
 }

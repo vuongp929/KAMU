@@ -30,22 +30,34 @@
         {{-- SECTION 2: ICON DỊCH VỤ --}}
         <div class="row services-section text-center">
             <div class="container">
-                <div class="col-md-3 col-sm-6 service-item">
-                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-1-e1661254198715.png" alt="Giao Hàng Tận Nhà">
-                    <h4>GIAO HÀNG TẬN NHÀ</h4>
-                </div>
-                <div class="col-md-3 col-sm-6 service-item">
-                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-1.png" alt="Gói Quà Siêu Đẹp">
-                    <h4>GÓI QUÀ SIÊU ĐẸP</h4>
-                </div>
+              <a href="{{ url('giao-hang.html') }}" class="text-decoration-none text-dark">
+                    <div class="col-md-3 col-sm-6 service-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-1-e1661254198715.png" alt="Giao Hàng Tận Nhà">
+                        <h4>GIAO HÀNG TẬN NHÀ</h4>
+                    </div>
+                </a>
+                <a href="{{ url('dich-vu-goi-qua.html') }}" class="text-decoration-none text-dark">
+                    <div class="col-md-3 col-sm-6 service-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-1.png" alt="Gói Quà Siêu Đẹp">
+                        <h4>GÓI QUÀ SIÊU ĐẸP</h4>
+                    </div>
+                    </a>
+                <a href="{{ url('cach-giat-gau-bong.html') }}" class="text-decoration-none text-dark">
+
                 <div class="col-md-3 col-sm-6 service-item">
                     <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-2-1.png" alt="Cách Giặt Gấu Bông">
                     <h4>CÁCH GIẶT GẤU BÔNG</h4>
                 </div>
+                    </a>
+
+                <a href="{{ url('chinh-sach-doi-tra.html') }}" class="text-decoration-none text-dark">
+
                 <div class="col-md-3 col-sm-6 service-item">
                     <img src="https://teddy.vn/wp-content/uploads/2018/04/Artboard-16-copy-3-1.png" alt="Bảo Hành Gấu Bông">
                     <h4>BẢO HÀNH GẤU BÔNG</h4>
                 </div>
+                    </a>
+
             </div>
         </div>
     </div>

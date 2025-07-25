@@ -57,7 +57,7 @@ class DiscountController extends Controller
 
         Discount::create($data);
 
-        return redirect()->route('admin.discounts.index')
+        return redirect()->route('admins.discounts.index')
             ->with('success', 'Mã giảm giá đã được tạo thành công.');
     }
 
@@ -103,7 +103,7 @@ class DiscountController extends Controller
 
         $discount->update($data);
 
-        return redirect()->route('admin.discounts.index')
+        return redirect()->route('admins.discounts.index')
             ->with('success', 'Mã giảm giá đã được cập nhật thành công.');
     }
 
@@ -111,7 +111,7 @@ class DiscountController extends Controller
     {
         $discount->delete();
 
-        return redirect()->route('admin.discounts.index')
+        return redirect()->route('admins.discounts.index')
             ->with('success', 'Mã giảm giá đã được xóa thành công.');
     }
 

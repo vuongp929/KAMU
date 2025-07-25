@@ -36,8 +36,7 @@
                                 @if (isset($item['image']))
                                     <img src="{{ Storage::url($item['image']) }}" alt="Hình ảnh sản phẩm" width="100px">
                                 @else
-                                    <img src="{{ asset('images/default-product.jpg') }}" alt="Hình ảnh mặc định"
-                                        width="100px">
+                                    <img src="{{ asset('images/default-product.jpg') }}" alt="Hình ảnh mặc định" width="100px">
                                 @endif
                             </td>
                             <td>{{ $item['name'] }}</td>
@@ -52,9 +51,6 @@
             <p>Không có sản phẩm trong đơn hàng.</p>
         @endif
 
-        </tbody>
-        </table>
-
-        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">Quay lại</a>
+        <a href="{{ route('admins.orders.index') }}" class="btn btn-secondary">Quay lại</a>
     </div>
 @endsection

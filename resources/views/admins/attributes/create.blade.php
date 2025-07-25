@@ -14,7 +14,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.attributes.store') }}" method="POST">
+            <form action="{{ route('admins.attributes.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Tên Thuộc tính (ví dụ: Màu sắc, Kích cỡ)</label>
@@ -26,7 +26,7 @@
                     <div class="form-text">Nhập các giá trị, cách nhau bởi dấu phẩy. Ví dụ: Đỏ, Xanh, Vàng</div>
                 </div>
                 <button type="submit" class="btn btn-primary">Lưu Thuộc tính</button>
-                <a href="{{ route('admin.attributes.index') }}" class="btn btn-secondary">Hủy</a>
+                <a href="{{ route('admins.attributes.index') }}" class="btn btn-secondary">Hủy</a>
             </form>
         </div>
     </div>

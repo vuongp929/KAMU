@@ -1,8 +1,8 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 
 // === IMPORT CONTROLLERS ===
-// Đã sắp xếp lại và thêm DashboardController
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
@@ -27,17 +27,14 @@ use App\Http\Controllers\Client\ProductController as ClientProductController;
 
 // --- ROUTE CÔNG KHAI ---
 Route::get('/', [ClientController::class, 'index'])->name('home');
-
 Route::get('/products/{product}', [ClientProductController::class, 'show'])->name('client.products.show');
-
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [OrderController::class, 'applyDiscount'])->name('apply-discount');
 });
 
-// --- ROUTE XÁC THỰC CỦA LARAVEL BREEZE ---
-// Xử lý các trang /login, /register, /logout...
-require __DIR__.'/auth.php';
+// --- ROUTE XÁC THỰC (Laravel Breeze) ---
+require __DIR__ . '/auth.php';
 
 
 // --- ROUTE CHO NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP (KHÔNG PHẢI ADMIN) ---
@@ -46,17 +43,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
     // Nếu bạn muốn cho user thường xem order → giữ dòng này
     Route::resource('orders', OrderController::class);
     Route::post('/products/{product}/reviews', [\App\Http\Controllers\ProductReviewController::class, 'store'])->name('products.reviews.store');
     Route::post('/products/{product}/reviews/{review}/reply', [\App\Http\Controllers\ProductReviewController::class, 'reply'])->name('products.reviews.reply');
     Route::delete('/products/{product}/reviews/{review}', [\App\Http\Controllers\ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
 
+
     Route::prefix('cart')->name('client.cart.')->group(function () {
-        Route::get('/', [CartController::class, 'index'])->name('index'); // Tên: client.cart.index
-        Route::post('/add', [CartController::class, 'add'])->name('add'); // Tên: client.cart.add
-        Route::post('/update', [CartController::class, 'update'])->name('update'); // Tên: client.cart.update
-        Route::get('/remove/{cartItemId}', [CartController::class, 'remove'])->name('remove'); 
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add', [CartController::class, 'add'])->name('add');
+        Route::post('/update', [CartController::class, 'update'])->name('update');
+        Route::get('/remove/{cartItemId}', [CartController::class, 'remove'])->name('remove');
     });
 
     Route::prefix('checkout')->name('client.checkout.')->group(function () {
@@ -69,38 +68,29 @@ Route::middleware('auth')->group(function () {
 });
 
 
-//======================================================================
-// === TOÀN BỘ ROUTE CHO ADMIN (GỘP CHUNG VÀO MỘT NƠI) ===
-//======================================================================
+// === ROUTE CHO ADMIN ===
 Route::group([
     'prefix' => 'admin',
-    'as' => 'admin.',
+    'as' => 'admins.',
     'middleware' => ['auth', 'check.admin']
 ], function () {
-
-    // 1. DASHBOARD
-    // Logic đã được chuyển vào DashboardController
+    // 1. Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // 2. QUẢN LÝ CRUD
-    // Sử dụng Route::resource cho tất cả các tài nguyên
+    // 2. CRUD Resources
     Route::resource('products', ProductController::class);
-    // Dòng code sai đã được xóa khỏi đây.
-
     Route::resource('attributes', AttributeController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('discounts', DiscountController::class);
     Route::resource('categories', CategoryController::class);
 
-    // 3. QUẢN LÝ ĐÁNH GIÁ (PRODUCT REVIEWS)
-    // Vẫn dùng resource và bổ sung các route tùy chỉnh nếu cần
+    // 3. Product Reviews
     Route::resource('reviews', ProductReviewController::class)->except(['create', 'edit', 'show']);
     Route::post('/reviews/{id}/reply', [ProductReviewController::class, 'reply'])->name('reviews.reply');
     Route::post('/reviews/{id}/toggle-hide', [ProductReviewController::class, 'toggleHide'])->name('reviews.toggleHide');
 
-
-    // 4. QUẢN LÝ NGƯỜI DÙNG
-    Route::get( 'users', [AuthController::class, 'listUser'])->name('users.index');
+    // 4. Users
+    Route::get('users', [AuthController::class, 'listUser'])->name('users.index');
     Route::get('users/create', [AuthController::class, 'createUser'])->name('users.create');
     Route::post('users', [AuthController::class, 'storeUser'])->name('users.store');
     Route::get('users/{id}/edit', [AuthController::class, 'editUser'])->name('users.edit');
@@ -108,7 +98,7 @@ Route::group([
     Route::delete('users/{id}', [AuthController::class, 'deleteUser'])->name('users.destroy');
 });
 
-// === ROUTE DEBUG ===
+// === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {
     return config('cache.default');
 });

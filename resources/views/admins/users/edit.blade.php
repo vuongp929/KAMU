@@ -45,7 +45,7 @@
                         </script>
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
                     @endif
-                    <form action="{{ route('admin.users.update', ['id'=> $user->id]) }}" method="POST">
+                    <form action="{{ route('admins.users.update', ['id'=> $user->id]) }}" method="POST">
                         @csrf
                         @method('POST')
                         <div class="row">
@@ -95,7 +95,7 @@
                         </div>
                         
                         <button type="submit" class="btn btn-primary">Cập nhật người dùng</button>
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Quay lại</a>
+                        <a href="{{ route('admins.users.index') }}" class="btn btn-secondary">Quay lại</a>
                     </form>
                 </div>
             </div>
