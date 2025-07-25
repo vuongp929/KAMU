@@ -135,6 +135,110 @@
             </div>
         </div>
 
+        {{-- SECTION 2.5: ĐÁNH GIÁ & BÌNH LUẬN SẢN PHẨM --}}
+        <div class="row mt-5 mb-4">
+            <div class="col-md-12">
+                <div class="review-rating-section p-4 bg-white rounded shadow">
+                    <h2 class="h4 font-weight-bold mb-3 text-primary">Đánh giá & Bình luận sản phẩm</h2>
+                    @php
+                        $reviews = $product->reviews()->where('is_hidden', false)->whereNull('parent_id')->latest()->get();
+                        $reviewCount = $reviews->count();
+                        $avgStars = $reviews->avg('stars');
+                    @endphp
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="mr-3" style="font-size:2rem;color:#ffc107;">
+                            @if($avgStars)
+                                @for($i=1;$i<=5;$i++)
+                                    @if($i <= round($avgStars))
+                                        <i class="fa fa-star"></i>
+                                    @else
+                                        <i class="fa fa-star-o"></i>
+                                    @endif
+                                @endfor
+                            @else
+                                <span class="text-muted">Chưa có đánh giá</span>
+                            @endif
+                        </div>
+                        <div class="ml-2">
+                            <span class="h5 mb-0">{{ number_format($avgStars, 2) ?: '0.00' }}/5</span>
+                            <span class="text-muted">({{ $reviewCount }} đánh giá)</span>
+                        </div>
+                    </div>
+                    @if(session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    {{-- Danh sách đánh giá --}}
+                    <div class="review-list">
+                        @forelse($reviews as $review)
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="review-avatar">{{ mb_substr($review->user->name ?? 'Ẩn', 0, 1) }}</div>
+                                    <div class="review-meta">
+                                        <span class="review-name">{{ $review->user->name ?? 'Ẩn' }}</span>
+                                        <span class="review-stars">
+                                            @if($review->stars)
+                                                @for($i=1;$i<=5;$i++)
+                                                    @if($i <= $review->stars)
+                                                        <i class="fa fa-star"></i>
+                                                    @else
+                                                        <i class="fa fa-star-o"></i>
+                                                    @endif
+                                                @endfor
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <span class="review-time">{{ $review->created_at->format('d/m/Y H:i') }}</span>
+                                    @auth
+                                        @if($review->user_id === auth()->id())
+                                            <button class="btn btn-danger btn-sm ml-2 delete-review-btn" data-id="{{ $review->id }}">Xóa</button>
+                                        @endif
+                                    @endauth
+                                </div>
+                                <div class="review-content">{{ $review->content }}</div>
+                                <div class="review-actions">
+                                    @auth
+                                    <form action="{{ route('products.reviews.reply', [$product->id, $review->id]) }}" method="POST" style="flex:1;">
+                                        @csrf
+                                        <textarea name="content" class="form-control mb-1" rows="1" placeholder="Trả lời bình luận này..." required style="border-radius:8px;"></textarea>
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Trả lời</button>
+                                    </form>
+                                    @endauth
+                                </div>
+                                @if($review->replies()->where('is_hidden', false)->count())
+                                <div class="reply-list">
+                                    @foreach($review->replies()->where('is_hidden', false)->get() as $reply)
+                                        <div class="reply-item">
+                                            <div class="reply-header">
+                                                <div class="reply-avatar">{{ mb_substr($reply->user->name ?? 'Ẩn', 0, 1) }}</div>
+                                                <span class="reply-name">{{ $reply->user->name ?? 'Ẩn' }}</span>
+                                                <span class="reply-time">{{ $reply->created_at->format('d/m/Y H:i') }}</span>
+                                            </div>
+                                            <div class="reply-content">{{ $reply->content }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="text-center text-muted">Chưa có đánh giá nào cho sản phẩm này.</div>
+                        @endforelse
+                    </div>
+                    {{-- Nút mở popup đánh giá --}}
+                    @auth
+                        @if($canReview)
+                            <button type="button" class="btn btn-success mt-4" id="openReviewPopupBtn">
+                                <i class="fa fa-pencil"></i> Viết đánh giá
+                            </button>
+                        @else
+                            <div class="mt-4 text-info" style="font-size:1.08rem;">
+                                <i class="fa fa-info-circle"></i> Chỉ khách đã mua sản phẩm mới được đánh giá.
+                            </div>
+                        @endif
+                    @endauth
+                </div>
+            </div>
+        </div>
+
         {{-- SECTION 3: SẢN PHẨM TƯƠNG TỰ --}}
         <div class="row product-section">
             <div class="col-md-12 text-center">
@@ -155,44 +259,229 @@
 @endsection
 @push('scripts')
 <script>
-$(document).ready(function() {
-    // 1. Logic cho thư viện ảnh (gallery)
-    const mainImage = $('#main-product-image');
-    const thumbnails = $('.thumbnail-item');
+// Popup HTML
+const reviewPopupHtml = `
+<div id="reviewPopupOverlay" style="position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(30,41,59,0.45);display:flex;align-items:center;justify-content:center;">
+  <div id="reviewPopupCard" style="background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);max-width:420px;width:95vw;overflow:hidden;animation:popupIn .3s cubic-bezier(.4,2,.6,1);position:relative;">
+    <button id="closeReviewPopupBtn" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.5rem;color:#888;cursor:pointer;z-index:2;">&times;</button>
+    <div style="padding:32px 24px 24px 24px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:2rem;">
+          <i class="fa fa-user"></i>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:18px;">Chia sẻ trải nghiệm của bạn</div>
+          <div style="color:#64748b;font-size:13px;">Đánh giá & bình luận giúp cộng đồng</div>
+        </div>
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-weight:600;font-size:14px;color:#374151;">Đánh giá của bạn</label>
+        <div id="popupStars" style="display:flex;gap:8px;margin:10px 0 0 0;">
+          ${[1,2,3,4,5].map(i=>`<span class='popup-star' data-rating='${i}' style='font-size:2rem;cursor:pointer;color:#d1d5db;transition:.2s;'><i class=\"fa fa-star\"></i></span>`).join('')}
+        </div>
+        <div id="popupRatingBadge" style="display:none;margin-top:4px;font-size:12px;font-weight:500;color:#92400e;background:#fef3c7;border-radius:12px;padding:2px 10px;border:1px solid #fde68a;display:inline-block;"></div>
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-weight:600;font-size:14px;color:#374151;">Bình luận chi tiết</label>
+        <div style="position:relative;">
+          <textarea id="popupComment" maxlength="500" style="width:100%;min-height:90px;padding:12px 16px;border:2px solid #e5e7eb;border-radius:12px;font-size:14px;resize:none;outline:none;transition:.2s;"></textarea>
+          <div id="popupCharCounter" style="position:absolute;bottom:8px;right:14px;font-size:12px;color:#9ca3af;">0/500</div>
+        </div>
+      </div>
+      <button id="popupSubmitBtn" class="btn btn-primary w-100" style="padding:12px 0;font-weight:500;border-radius:12px;transition:.2s;">Gửi đánh giá</button>
+      <div id="popupSuccess" style="display:none;text-align:center;padding:24px 0 0 0;">
+        <div style="font-size:2.5rem;color:#10b981;"><i class="fa fa-heart"></i></div>
+        <div style="font-size:20px;font-weight:700;margin:8px 0 4px 0;">Cảm ơn bạn!</div>
+        <div style="color:#374151;">Đánh giá của bạn đã được gửi thành công</div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>@keyframes popupIn{0%{transform:scale(.8);opacity:0;}100%{transform:scale(1);opacity:1;}}</style>
+`;
 
-    thumbnails.first().addClass('active'); // Kích hoạt ảnh đầu tiên
-
-    thumbnails.on('click', function() {
-        // Lấy đường dẫn ảnh lớn từ data attribute
-        const largeSrc = $(this).find('img').data('large-src');
-        
-        // Thay đổi ảnh chính
-        mainImage.attr('src', largeSrc);
-        
-        // Cập nhật trạng thái active
-        thumbnails.removeClass('active');
-        $(this).addClass('active');
+function openReviewPopup() {
+  if(document.getElementById('reviewPopupOverlay')) return;
+  document.body.insertAdjacentHTML('beforeend', reviewPopupHtml);
+  let rating = 0;
+  const stars = document.querySelectorAll('.popup-star');
+  const badge = document.getElementById('popupRatingBadge');
+  const comment = document.getElementById('popupComment');
+  const charCounter = document.getElementById('popupCharCounter');
+  const submitBtn = document.getElementById('popupSubmitBtn');
+  const success = document.getElementById('popupSuccess');
+  const closeBtn = document.getElementById('closeReviewPopupBtn');
+  const badges = {5:'Tuyệt vời!',4:'Rất tốt!',3:'Ổn!',2:'Tạm được',1:'Cần cải thiện'};
+  function updateStars(val){
+    stars.forEach((s,i)=>{s.style.color=(i<val)?'#fbbf24':'#d1d5db';});
+    if(val>0){badge.textContent=badges[val];badge.style.display='inline-block';}else{badge.style.display='none';}
+  }
+  stars.forEach(s=>{
+    s.addEventListener('mouseenter',()=>updateStars(+s.dataset.rating));
+    s.addEventListener('mouseleave',()=>updateStars(rating));
+    s.addEventListener('click',()=>{rating=+s.dataset.rating;updateStars(rating);});
+  });
+  comment.addEventListener('input',()=>{charCounter.textContent=comment.value.length+'/500';});
+  submitBtn.addEventListener('click',function(){
+    if(rating===0||!comment.value.trim()){submitBtn.classList.add('shake');setTimeout(()=>submitBtn.classList.remove('shake'),300);return;}
+    submitBtn.disabled=true;submitBtn.textContent='Đang gửi...';
+    // AJAX gửi đánh giá
+    const productId = {{ $product->id }};
+    const url = `/products/${productId}/reviews`;
+    const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: {stars: rating, content: comment.value},
+      headers: {'X-CSRF-TOKEN': csrf},
+      success: function(res){
+        submitBtn.style.display='none';success.style.display='block';
+        setTimeout(()=>{closeBtn.click();window.location.reload();}, 1800);
+      },
+      error: function(xhr){
+        submitBtn.disabled=false;submitBtn.textContent='Gửi đánh giá';
+        alert('Có lỗi xảy ra khi gửi đánh giá!');
+      }
     });
-
-    // 2. Logic cập nhật giá khi chọn size
-    const priceDisplay = $('#dynamic-price');
-    const sizeButtons = $('.btn-size');
-
-    sizeButtons.first().addClass('active'); // Kích hoạt size đầu tiên
-
-    sizeButtons.on('click', function() {
-        const newPrice = $(this).data('variant-price');
-        
-        // Định dạng lại giá tiền
-        const formattedPrice = new Intl.NumberFormat('vi-VN').format(newPrice) + 'đ';
-        
-        // Cập nhật giá hiển thị
-        priceDisplay.text(formattedPrice);
-
-        // Cập nhật trạng thái active
-        sizeButtons.removeClass('active');
-        $(this).addClass('active');
+  });
+  closeBtn.addEventListener('click',()=>{
+    document.getElementById('reviewPopupOverlay').remove();
+  });
+}
+document.addEventListener('DOMContentLoaded',function(){
+  const btn = document.getElementById('openReviewPopupBtn');
+  if(btn) btn.addEventListener('click',openReviewPopup);
+});
+$(document).on('click', '.delete-review-btn', function() {
+    if (!confirm('Bạn chắc chắn muốn xóa đánh giá này?')) return;
+    var reviewId = $(this).data('id');
+    var productId = {{ $product->id }};
+    $.ajax({
+        url: `/products/${productId}/reviews/${reviewId}`,
+        type: 'DELETE',
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        success: function(res) {
+            if (res.success) location.reload();
+        },
+        error: function() {
+            alert('Không thể xóa đánh giá!');
+        }
     });
 });
 </script>
+@endpush
+@push('styles')
+<style>
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.review-item {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(30,41,59,0.08);
+    padding: 20px 24px 16px 24px;
+    position: relative;
+    transition: box-shadow .2s;
+}
+.review-item:hover {
+    box-shadow: 0 8px 32px rgba(30,41,59,0.14);
+}
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+}
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#e0e7ff 0%,#f0fdfa 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #6366f1;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+}
+.review-meta {
+    display: flex;
+    flex-direction: column;
+}
+.review-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1rem;
+}
+.review-stars {
+    color: #fbbf24;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+.review-time {
+    color: #94a3b8;
+    font-size: 0.92rem;
+    margin-left: 2px;
+}
+.review-content {
+    color: #334155;
+    font-size: 1.08rem;
+    margin: 8px 0 0 0;
+    word-break: break-word;
+}
+.review-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+.reply-list {
+    margin-top: 12px;
+    margin-left: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.reply-item {
+    background: #f8fafc;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(30,41,59,0.04);
+    padding: 12px 16px 10px 16px;
+    position: relative;
+}
+.reply-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2px;
+}
+.reply-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#f0fdfa 0%,#e0e7ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    color: #0ea5e9;
+    font-weight: 700;
+}
+.reply-name {
+    font-weight: 500;
+    color: #2563eb;
+    font-size: 0.98rem;
+}
+.reply-time {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+.reply-content {
+    color: #334155;
+    font-size: 1rem;
+    margin-top: 2px;
+}
+</style>
 @endpush
