@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -42,6 +43,14 @@ class ProductController extends Controller
             ->get();
         }
 
-        return view('clients.products.show', compact('product', 'relatedProducts'));
+        $canReview = false;
+        if (Auth::check()) {
+            $canReview = \App\Models\Order::where('user_id', Auth::id())
+                ->whereIn('status', ['completed', 'delivered'])
+                ->whereHas('orderItems', function($q) use ($product) {
+                    $q->where('product_id', $product->id);
+                })->exists();
+        }
+        return view('clients.products.show', compact('product', 'relatedProducts', 'canReview'));
     }
 }

@@ -84,6 +84,14 @@ class Product extends Model
         return $this->hasMany(CartItem::class);
     }
 
+    /**
+     * Lấy các đánh giá/bình luận của sản phẩm.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(\App\Models\ProductReview::class);
+    }
+
     //======================================================================
     // THUỘC TÍNH ẢO (ACCESSORS)
     //======================================================================
