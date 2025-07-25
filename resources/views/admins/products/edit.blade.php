@@ -4,12 +4,10 @@
 
 @section('content')
 <div class="container-fluid mt-4">
-<<<<<<< HEAD
     {{-- Sử dụng route model binding, truyền thẳng object $product --}}
     <form method="POST" action="{{ route('admins.products.update', $product) }}" enctype="multipart/form-data">
-=======
-    <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
->>>>>>> origin/main
+    {{-- <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
+ origin/main --}}
         @csrf
         @method('PUT')
 

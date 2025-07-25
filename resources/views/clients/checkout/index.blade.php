@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-<<<<<<< HEAD
-@section('content')
+
+{{-- @section('content')
     <div class="container">
         <h2>Đơn hàng của bạn</h2>
 
@@ -51,8 +51,7 @@
             </table>
         @endif
     </div>
-@endsection
-=======
+@endsection --}}
 @section('title', 'Thanh toán đơn hàng')
 
 @push('styles')
@@ -265,4 +264,3 @@
     </div>
 </div>
 @endsection
->>>>>>> origin/main

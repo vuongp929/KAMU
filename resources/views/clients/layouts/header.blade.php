@@ -86,7 +86,7 @@
     </div>
 
     <!-- Menu danh mục -->
-    <nav class="navbar navbar-expand-lg header-nav">
+    {{-- <nav class="navbar navbar-expand-lg header-nav">
         <div class="container">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
                 <span class="navbar-toggler-icon"></span>
@@ -94,7 +94,7 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Trang chủ</a></li>
-                    {{-- TODO: Logic hiển thị danh mục động --}}
+                   
                     @if(isset($categoriesForMenu))
                         @foreach($categoriesForMenu as $category)
                             <li class="nav-item dropdown">
@@ -113,7 +113,48 @@
                 </ul>
             </div>
         </div>
+    </nav> --}}
+        <nav class="navbar navbar-expand-lg header-nav">
+        <div class="container">
+            <button class="navbar-toggler d-lg-none ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('home') }}">Trang chủ</a>
+                    </li>
+
+                    @if(isset($categoriesForMenu))
+                        @foreach($categoriesForMenu as $category)
+                            @if($category->children->isNotEmpty())
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">{{ $category->name }}</a>
+                                    <ul class="dropdown-menu">
+                                        @foreach($category->children as $child)
+                                            <li>
+                                                <a class="dropdown-item" href="#">{{ $child->name }}</a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </li>
+                            @else
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">{{ $category->name }}</a>
+                                </li>
+                            @endif
+                        @endforeach
+                    @endif
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Tất cả sản phẩm</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
+
 </header>
 
 {{-- Script cần thiết cho dropdown của Bootstrap --}}

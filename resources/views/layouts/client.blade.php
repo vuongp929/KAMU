@@ -16,12 +16,9 @@
     <link href="{{ asset('assets/clients/plugins/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/clients/plugins/fancybox/source/jquery.fancybox.css') }}" rel="stylesheet" type="text/css" />
 
-<<<<<<< HEAD
     {{-- <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
     <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script> --}}
-    <link href="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}">
-
-    {{-- corporate --}}
+    {{-- <link href="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}">
     <link rel="shortcut icon" href="{{ asset('assets/user/images/favicon.ico') }}">
     <link href="{{ asset('assets/clients/corporate/css/themes/blue.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/corporate/css/themes/gray.css') }}" rel="stylesheet" type="text/css">
@@ -32,18 +29,17 @@
     <link href="{{ asset('assets/clients/corporate/css/custom.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/corporate/css/style-responsive.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/corporate/css/style.css') }}" rel="stylesheet" type="text/css">
-    {{-- pages --}}
     <link href="{{ asset('assets/clients/pages/css/style-header.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/animate.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/components.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/gallery.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/portfolio.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/slider.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('assets/clients/pages/css/style-shop.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('assets/clients/pages/css/style-shop.css') }}" rel="stylesheet" type="text/css"> --}}
     
     {{-- CSS riêng cho từng trang --}}
     @yield('CSS')
-=======
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
@@ -58,7 +54,6 @@
 
     {{-- CSS TÙY CHỈNH CHO TỪNG TRANG --}}
     @stack('styles')
->>>>>>> origin/main
 </head>
 <body class="ecommerce">
 
