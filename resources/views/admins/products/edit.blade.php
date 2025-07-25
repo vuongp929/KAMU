@@ -1,11 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Chỉnh Sửa Sản Phẩm: ' . $product->name)
+@section('title', 'Chỉnh Sửa: ' . $product->name)
 
 @section('content')
 <div class="container-fluid mt-4">
+<<<<<<< HEAD
     {{-- Sử dụng route model binding, truyền thẳng object $product --}}
     <form method="POST" action="{{ route('admins.products.update', $product) }}" enctype="multipart/form-data">
+=======
+    <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
+>>>>>>> origin/main
         @csrf
         @method('PUT')
 
@@ -21,15 +25,11 @@
             </div>
         </div>
 
-        {{-- Khối hiển thị lỗi --}}
         @if ($errors->any())
             <div class="alert alert-danger">
                 <strong>Rất tiếc! Đã có lỗi xảy ra.</strong>
                 <ul>@foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
             </div>
-        @endif
-        @if (session('error'))
-             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         <div class="row">
@@ -40,100 +40,43 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
-                            {{-- old('name', $product->name) sẽ ưu tiên dữ liệu cũ nếu validation lỗi --}}
                             <input type="text" id="name" name="name" class="form-control" value="{{ old('name', $product->name) }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label">Mô tả</label>
-                            <textarea id="description" name="description" class="form-control" rows="5">{{ old('description', $product->description) }}</textarea>
+                            <label for="product-description" class="form-label">Mô tả</label>
+                            <textarea id="product-description" name="description" class="form-control">{{ old('description', $product->description) }}</textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="card mb-3 shadow-sm">
-                    <div class="card-header bg-white"><h5 class="mb-0">Ảnh sản phẩm</h5></div>
+                    <div class="card-header bg-white"><h5 class="mb-0">Bộ sưu tập ảnh</h5></div>
                     <div class="card-body">
-                        <div class="mb-2">
-                            <label for="images" class="form-label">Tải lên ảnh mới (sẽ được thêm vào bộ sưu tập)</label>
-                            <input type="file" name="images[]" id="productImages" class="form-control" multiple>
-                        </div>
+                        <label class="form-label">Tải lên ảnh mới (sẽ thay thế toàn bộ ảnh cũ)</label>
+                        <input type="file" name="images[]" class="form-control" multiple>
                         <hr>
-                        <h6>Các ảnh hiện tại:</h6>
-                        <div id="existingImages" class="mt-2 d-flex flex-wrap gap-2">
-                            {{-- Hiển thị các ảnh đã có --}}
-                            @foreach($product->images as $image)
-                                <div class="position-relative">
-                                    <img src="{{ Storage::url($image->image_path) }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
-                                    {{-- TODO: Thêm nút xóa ảnh nếu bạn muốn có chức năng này --}}
-                                </div>
-                            @endforeach
+                        <h6>Ảnh hiện tại:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                             @forelse($product->images as $image)
+                                <img src="{{ Storage::url($image->image_path) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" title="Ảnh sản phẩm chính">
+                            @empty
+                                <p class="text-muted small">Chưa có ảnh chính.</p>
+                            @endforelse
                         </div>
                     </div>
                 </div>
 
                 <div class="card mb-3 shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Biến thể</h5>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-variant">+ Thêm biến thể</button>
-                    </div>
+                    <div class="card-header bg-white"><h5 class="mb-0">Các phiên bản sản phẩm</h5></div>
                     <div class="card-body">
-                        <p class="text-muted small">Lưu ý: Việc cập nhật sẽ xóa các biến thể cũ và tạo lại từ danh sách dưới đây.</p>
-                        <div id="variant-list">
-                            {{-- Hiển thị các biến thể đã có của sản phẩm --}}
-                            {{-- Hiển thị các biến thể đã có của sản phẩm --}}
-            @foreach($product->variants as $index => $variant)
-                <div class="card card-body mb-3" id="variant-wrapper-{{$index}}">
-                    <div class="d-flex justify-content-end mb-2">
-                        <button type="button" class="btn-close" aria-label="Xóa biến thể" onclick="document.getElementById('variant-wrapper-{{$index}}').remove();"></button>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 mb-2">
-                            <label class="form-label small">Tên biến thể <span class="text-danger">*</span></label>
-                            <input type="text" name="variants[{{$index}}][name]" class="form-control form-control-sm" value="{{ old("variants.$index.name", $variant->name) }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small">Giá <span class="text-danger">*</span></label>
-                            <input type="number" name="variants[{{$index}}][price]" class="form-control form-control-sm" value="{{ old("variants.$index.price", $variant->price) }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small">Tồn kho <span class="text-danger">*</span></label>
-                            <input type="number" name="variants[{{$index}}][stock]" class="form-control form-control-sm" value="{{ old("variants.$index.stock", $variant->stock) }}" required>
-                        </div>
-                    </div>
-                    <hr class="my-2">
-                    
-                    <div class="row mt-2">
-                        <label class="form-label small">Thuộc tính đã chọn</label>
-                        @foreach($attributes as $attribute)
-                            <div class="col-md-6 mb-2">
-                                <select name="variants[{{$index}}][attribute_value_ids][]" class="form-select form-select-sm">
-                                    <option value="">-- Chọn {{ $attribute->name }} --</option>
-                                    @foreach($attribute->values as $value)
-                                        <option value="{{ $value->id }}" 
-                                            {{ $variant->attributeValues->contains('id', $value->id) ? 'selected' : '' }}>
-                                            {{ $value->value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endforeach
-                    </div>
+                        <p class="text-muted small">Mở cửa sổ để chỉnh sửa thuộc tính. Việc tạo lại sẽ ghi đè lên danh sách hiện tại.</p>
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#attributesModal">
+                            <i class="ri-settings-3-line"></i> Chỉnh sửa thuộc tính & Tạo lại phiên bản
+                        </button>
+                        <hr>
+                        <h6>Danh sách phiên bản <span class="text-danger">*</span></h6>
+                        <div id="variant-combinations-list" class="table-responsive">
 
-                    <div class="mt-2">
-                        <label class="form-label small">Ảnh của biến thể (Tải lên ảnh mới sẽ ghi đè)</label>
-                        <input type="file" name="variants[{{$index}}][images][]" class="form-control form-control-sm" multiple>
-                        @if($variant->images->isNotEmpty())
-                            <div class="d-flex flex-wrap gap-2 mt-2">
-                                @foreach($variant->images as $image)
-                                    {{-- SỬA LẠI TỪ 'path' THÀNH 'image_path' CHO KHỚP VỚI DATABASE --}}
-                                    <img src="{{ Storage::url($image->image_path) }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-
-                </div>
-            @endforeach
                         </div>
                     </div>
                 </div>
@@ -141,11 +84,10 @@
 
             {{-- CỘT PHẢI --}}
             <div class="col-lg-4">
-                 <div class="card mb-3 shadow-sm">
+                <div class="card mb-3 shadow-sm">
                     <div class="card-header bg-white"><h5 class="mb-0">Phân loại</h5></div>
                     <div class="card-body">
-                        <label for="categories" class="form-label">Danh mục sản phẩm</label>
-                        {{-- old('categories', $product->categories->pluck('id')->toArray()) sẽ lấy danh sách category cũ --}}
+                        <label for="categories" class="form-label">Danh mục</label>
                         <select name="categories[]" id="categories" class="form-select" multiple>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" {{ in_array($cat->id, old('categories', $product->categories->pluck('id')->toArray())) ? 'selected' : '' }}>
@@ -153,68 +95,157 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="form-text">Giữ Ctrl hoặc Cmd để chọn nhiều mục.</div>
                     </div>
                 </div>
             </div>
         </div>
-
+        
         <div class="text-end mt-3">
              <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Cập nhật</button>
         </div>
     </form>
 </div>
+
+<div class="modal fade" id="attributesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Chọn thuộc tính</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                @forelse($attributes as $attribute)
+                    <div class="mb-3">
+                        <h6>{{ $attribute->name }}</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($attribute->values as $value)
+                                <div class="form-check">
+                                    <input class="form-check-input attribute-value-checkbox" type="checkbox" value="{{ $value->id }}" id="value-{{ $value->id }}" data-attribute-id="{{ $attribute->id }}">
+                                    <label class="form-check-label" for="value-{{ $value->id }}">{{ $value->value }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @empty
+                    <p>Chưa có thuộc tính nào được tạo.</p>
+                @endforelse
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="generate-variants-btn">Tạo lại các phiên bản</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('JS')
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/YOUR_API_KEY/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Khởi tạo TinyMCE
-    tinymce.init({
-        selector: 'textarea#description',
-        // ... các config khác của tinymce
+    const existingVariants = @json($product->variants->load('attributeValues', 'images'));
+    const allAttributes = @json($attributes);
+
+    tinymce.init({ selector: 'textarea#product-description', /* ... */ });
+    
+    const generateBtn = document.getElementById('generate-variants-btn');
+    const variantListContainer = document.getElementById('variant-combinations-list');
+    const modalElement = document.getElementById('attributesModal');
+    const attributesModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    function renderVariantTable(variantsData) {
+        variantListContainer.innerHTML = '';
+        if (!variantsData || variantsData.length === 0) {
+            variantListContainer.innerHTML = '<p class="text-muted">Chưa có phiên bản nào.</p>';
+            return;
+        }
+
+        const table = document.createElement('table');
+        table.className = 'table table-bordered';
+        table.innerHTML = `
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 30%;">Tên phiên bản</th>
+                    <th style="width: 25%;">Giá *</th>
+                    <th style="width: 20%;">Tồn kho *</th>
+                    <th style="width: 25%;">Ảnh đại diện</th>
+                </tr>
+            </thead>
+        `;
+        const tbody = document.createElement('tbody');
+        
+        variantsData.forEach((variant, index) => {
+            const variantName = variant.name || 'N/A';
+            const attributeValueIds = (variant.attribute_values || []).map(v => v.id);
+            const variantPrice = variant.price || '';
+            const variantStock = variant.stock || '';
+            const existingImage = (variant.images && variant.images.length > 0) ? variant.images[0] : null;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <strong>${variantName}</strong>
+                    ${attributeValueIds.map(id => `<input type="hidden" name="variants[${index}][attribute_value_ids][]" value="${id}">`).join('')}
+                    <input type="hidden" name="variants[${index}][name]" value="${variantName}">
+                </td>
+                <td><input type="number" name="variants[${index}][price]" class="form-control form-control-sm" value="${variantPrice}" required></td>
+                <td><input type="number" name="variants[${index}][stock]" class="form-control form-control-sm" value="${variantStock}" required></td>
+                <td>
+                    <input type="file" name="variants[${index}][image]" class="form-control form-control-sm">
+                    ${existingImage ? `<img src="/storage/${existingImage.image_path}" class="img-thumbnail mt-2" style="width: 40px; height: 40px; object-fit: cover;">` : ''}
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+        variantListContainer.appendChild(table);
+    }
+
+    modalElement.addEventListener('show.bs.modal', function() {
+        document.querySelectorAll('.attribute-value-checkbox').forEach(cb => cb.checked = false);
+        
+        const currentAttributeIds = new Set();
+        existingVariants.forEach(variant => {
+            variant.attribute_values.forEach(val => currentAttributeIds.add(val.id.toString()));
+        });
+
+        currentAttributeIds.forEach(id => {
+            const checkbox = document.getElementById(`value-${id}`);
+            if(checkbox) checkbox.checked = true;
+        });
     });
 
-    // 2. Xử lý thêm biến thể mới (tương tự trang create)
-    // Bắt đầu index từ số lượng biến thể đã có để không bị trùng
-    let variantIndex = {{ $product->variants->count() }};
-    const addBtn = document.getElementById('add-variant');
-    const variantList = document.getElementById('variant-list');
-
-    if (addBtn && variantList) {
-        addBtn.addEventListener('click', function () {
-            const variantId = `variant-wrapper-${variantIndex}`;
-            const wrapper = document.createElement('div');
-            wrapper.className = "card card-body mb-3";
-            wrapper.id = variantId;
-
-            // HTML cho biến thể mới hoàn toàn giống trang create
-            const html = `
-                <div class="d-flex justify-content-end mb-2">
-                    <button type="button" class="btn-close" aria-label="Xóa biến thể" onclick="document.getElementById('${variantId}').remove();"></button>
-                </div>
-                <div class="row">
-                    <div class="col-12 mb-2">
-                        <label class="form-label small">Tên biến thể <span class="text-danger">*</span></label>
-                        <input type="text" name="variants[${variantIndex}][name]" class="form-control form-control-sm" placeholder="Nhập tên cho biến thể mới" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small">Giá <span class="text-danger">*</span></label>
-                        <input type="number" name="variants[${variantIndex}][price]" class="form-control form-control-sm" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small">Tồn kho <span class="text-danger">*</span></label>
-                        <input type="number" name="variants[${variantIndex}][stock]" class="form-control form-control-sm" required>
-                    </div>
-                </div>
-            `;
-            wrapper.innerHTML = html;
-            variantList.appendChild(wrapper);
-            variantIndex++;
+    generateBtn.addEventListener('click', function() {
+        const selectedValues = {};
+        document.querySelectorAll('.attribute-value-checkbox:checked').forEach(checkbox => {
+            const attributeId = checkbox.dataset.attributeId;
+            if (!selectedValues[attributeId]) {
+                selectedValues[attributeId] = [];
+            }
+            selectedValues[attributeId].push({ id: checkbox.value, name: checkbox.nextElementSibling.textContent.trim() });
         });
+
+        const combinations = generateCombinations(Object.values(selectedValues));
+        const newVariantsData = combinations.map(combo => ({
+            name: combo.map(v => v.name).join(' / '),
+            price: '', // Giá và tồn kho để trống cho người dùng nhập
+            stock: '',
+            attribute_values: combo,
+            images: [], // Biến thể mới chưa có ảnh
+        }));
+        
+        renderVariantTable(newVariantsData);
+        attributesModal.hide();
+    });
+
+    // Hàm tạo tổ hợp (giữ nguyên)
+    function generateCombinations(arrays, index = 0, current = []) {
+        if (index === arrays.length) return [current];
+        let result = [];
+        arrays[index].forEach(item => {
+            result = result.concat(generateCombinations(arrays, index + 1, [...current, item]));
+        });
+        return result;
     }
+
+    renderVariantTable(existingVariants);
 });
 </script>
 @endsection
