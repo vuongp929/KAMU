@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 // === IMPORT CONTROLLERS ===
@@ -32,6 +34,19 @@ Route::get('/products/{product}', [ClientProductController::class, 'show'])->nam
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [OrderController::class, 'applyDiscount'])->name('apply-discount');
 });
+
+// Trang giao hàng
+Route::get('giao-hang', [PageController::class, 'giaoHang'])->name('giao-hang');
+Route::get('dich-vu-goi-qua', [PageController::class, 'goiQua'])->name('dich-vu-goi-qua');
+Route::get('cach-giat-gau-bong', [PageController::class, 'giatGau'])->name('cach-giat-gau-bong');
+Route::get('chinh-sach-doi-tra', [PageController::class, 'doiTra'])->name('chinh-sach-doi-tra');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wishlist',                 [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add',            [WishlistController::class, 'addWishlist'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{id}',  [WishlistController::class, 'removeWishlist'])->name('wishlist.remove');
+});
+Route::get('/search', [App\Http\Controllers\Client\ProductController::class, 'search'])->name('clients.search');
+
 
 // --- ROUTE XÁC THỰC (Laravel Breeze) ---
 require __DIR__ . '/auth.php';
@@ -66,7 +81,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
 });
-
 
 // === ROUTE CHO ADMIN ===
 Route::group([

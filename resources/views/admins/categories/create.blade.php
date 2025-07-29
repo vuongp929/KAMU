@@ -48,6 +48,16 @@
                                 <div>
 
                                     <label for="statu" class="form-label">Trạng thái</label>
+                                    <div class="mb-3">
+    <label for="parent_id" class="form-label">Danh mục cha (Tùy chọn)</label>
+    <select name="parent_id" id="parent_id" class="form-select">
+        <option value="">-- Không có --</option>
+        @foreach($listCategory as $cate)
+            <option value="{{ $cate->id }}">{{ $cate->name }}</option>
+        @endforeach
+    </select>
+</div>
+
                                     <div class="col-sm-10 mb-3 d-flex gap-2 ">
                                         
                                         <div class="form-check">

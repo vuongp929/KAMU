@@ -23,13 +23,13 @@
         <div class="row">
             @foreach($products as $product)
                 <div class="col-md-3" >
-                    <a href="{{ route('product.show', $product->id) }}" class="text-decoration-none">
+                    <a href="{{ route('client.products.show', $product->id) }}">
                     <div class="card">
                         <img src="{{ asset('storage/'.$product->image) }}" class="card-img-top" alt="{{ $product->name }}">
                         <div class="card-body">
                             <h5 class="card-title text-truncate" title="{{ $product->name }}">{{ $product->name }}</h5>
 
-                            <form action="{{ route('cart.add') }}" method="POST" onsubmit="return validateSizeSelection({{ $product->id }})">
+                            <form action="{{ route('client.cart.add') }}" method="POST" onsubmit="return validateSizeSelection({{ $product->id }})">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                                 <input type="hidden" id="selected-size-{{ $product->id }}" name="size" value="{{ $product->variants->first()->id }}">
@@ -62,7 +62,7 @@
 
         {{-- Phân trang --}}
         <div class="d-flex justify-content-center mt-3">
-            {{ $products->links() }}
+            {{ $products->appends(request()->input())->links() }}
         </div>
     @endif
 </div>

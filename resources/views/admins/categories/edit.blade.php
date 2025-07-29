@@ -38,6 +38,29 @@
                                         <p class="text-danger">{{ $message }}</p>
                                     @enderror
                                 </div>
+                                <div class="mb-3">
+                                    <label for="parent_id" class="form-label">Danh mục cha</label>
+                                    @php
+                                        $isRootCategory = is_null($Category->parent_id);
+                                    @endphp
+
+                                    <label for="parent_id" class="form-label">Danh mục cha</label>
+                                    <select name="parent_id" id="parent_id" class="form-select" {{ $isRootCategory ? 'disabled' : '' }}>
+                                        <option value="">-- Không có (danh mục gốc) --</option>
+                                        @foreach ($categories as $parent)
+                                            <option value="{{ $parent->id }}" {{ $Category->parent_id == $parent->id ? 'selected' : '' }}>
+                                                {{ $parent->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    @if($isRootCategory)
+                                        <p class="text-muted mt-1"><i>Danh mục gốc không thể chọn danh mục cha</i></p>
+                                    @endif
+
+
+                                </div>
+
                                 <div>
 
                                     <label for="statu" class="form-label">Trạng thái</label>

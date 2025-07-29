@@ -44,6 +44,9 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'product_category');
     }
 
+    public function reviews() {
+        return $this->hasMany(ProductReview::class);
+    }
     /**
      * Lấy tất cả các biến thể của sản phẩm (Một-Nhiều).
      */
