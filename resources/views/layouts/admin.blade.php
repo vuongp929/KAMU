@@ -1,105 +1,68 @@
 <!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
-
-
-<!-- Mirrored from themesbrand.com/velzon/html/master/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 29 Oct 2024 07:29:52 GMT -->
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
+      data-layout="vertical" 
+      data-topbar="light" 
+      data-sidebar="dark" 
+      data-sidebar-size="lg" 
+      data-sidebar-image="none" 
+      data-preloader="disable">
 
 <head>
     <meta charset="utf-8" />
+    <title>@yield('title') | Admin Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-
-    <title>@yield('title') - Admin Dashboard</title>
-    {{-- Điền các link CSS dùng chung --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ asset('assets/admins/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('assets_velzon/images/favicon.ico') }}">
 
-    <!-- jsvectormap css -->
-    <link href="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
+    {{-- 
+        Vite sẽ tự động nạp TẤT CẢ các file CSS và JS
+        mà chúng ta đã định nghĩa trong vite.config.js
+    --}}
+    @vite([
+        // CSS
+        'resources/assets_velzon/css/bootstrap.min.css',
+        'resources/assets_velzon/css/icons.min.css',
+        'resources/assets_velzon/css/app.min.css',
+        'resources/assets_velzon/css/custom.min.css',
+        'resources/js/app.js', // File JS chung của bạn, nạp ở đây để đảm bảo DOM sẵn sàng
 
-    <!--Swiper slider css-->
-    <link href="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
+        // JS
+        'resources/assets_velzon/libs/bootstrap/js/bootstrap.bundle.min.js',
+        'resources/assets_velzon/libs/simplebar/simplebar.min.js',
+        'resources/assets_velzon/libs/node-waves/waves.min.js',
+        'resources/assets_velzon/libs/feather-icons/feather.min.js',
+        'resources/assets_velzon/js/pages/plugins/lord-icon-2.1.0.js',
+        'resources/assets_velzon/js/plugins.js',
+        'resources/assets_velzon/js/app.js', // File app.js chính của Velzon
+    ])
 
-    <!-- Layout config Js -->
-    <script src="{{ asset('assets/admins/js/layout.js') }}"></script>
-    <!-- Bootstrap Css -->
-    <link href="{{ asset('assets/admins/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="{{ asset('assets/admins/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="{{ asset('assets/admins/css/app.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="{{ asset('assets/admins/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- Custom fonts -->
-    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-    <!-- Custom styles -->
-    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+    {{-- Điểm neo cho các trang con có thể thêm CSS riêng --}}
     @stack('styles')
 </head>
 
-<body id="page-top">
+<body>
+    <!-- Bắt đầu trang -->
     <div id="layout-wrapper">
 
         @include('admins.blocks.header')
 
         @include('admins.blocks.siderbar')
 
-        <div class="vertical-overlay"></div>
-
         <div class="main-content">
             <div class="page-content">
-
-                @yield('content')
-
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
             </div>
-
             @include('admins.blocks.footer')
-
         </div>
+
     </div>
+    <!-- KẾT THÚC layout-wrapper -->
 
-    {{-- Các đoạn script dùng chung --}}
-    <script src="{{ asset('assets/admins/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/simplebar/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/node-waves/waves.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/feather-icons/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
-    <script src="{{ asset('assets/admins/js/plugins.js') }}"></script>
-
-    <!-- apexcharts -->
-    <script src="{{ asset('assets/admins/libs/apexcharts/apexcharts.min.js') }}"></script>
-
-    <!-- Vector map-->
-    <script src="{{ asset('assets/admins/libs/jsvectormap/jsvectormap.min.js') }}"></script>
-    <script src="{{ asset('assets/admins/libs/jsvectormap/maps/world-merc.js') }}"></script>
-
-    <!--Swiper slider js-->
-    <script src="{{ asset('assets/admins/libs/swiper/swiper-bundle.min.js') }}"></script>
-
-    <!-- Dashboard init -->
-    <script src="{{ asset('assets/admins/js/pages/dashboard-ecommerce.init.js') }}"></script>
-
-    <!-- App js -->
-    <script src="{{ asset('assets/admins/js/app.js') }}"></script>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-
-    <!-- Custom scripts -->
-    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
-    @yield('JS')
+    {{-- Điểm neo cho các trang con có thể thêm JS riêng (ví dụ: trang chat) --}}
+    @stack('scripts')
 </body>
-
 </html>

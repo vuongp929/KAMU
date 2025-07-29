@@ -45,7 +45,7 @@
                         </script>
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
                     @endif
-                    <form action="{{ route('admins.discounts.store') }}" method="POST">
+                    <form action="{{ route('admin.discounts.store') }}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -146,7 +146,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Thêm mã giảm giá</button>
-                        <a href="{{ route('admins.discounts.index') }}" class="btn btn-secondary">Quay lại</a>
+                        <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Quay lại</a>
                     </form>
                 </div>
             </div>

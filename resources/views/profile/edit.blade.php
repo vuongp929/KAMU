@@ -1,29 +1,40 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('clients.account.layout')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+@section('title', 'Hồ Sơ Của Tôi')
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
+@section('account_content')
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+    {{-- Phần 1: Cập nhật thông tin hồ sơ --}}
+    <div class="profile-section">
+        @include('profile.partials.update-profile-information-form')
     </div>
-</x-app-layout>
+
+    <hr class="my-4"> {{-- Thêm đường kẻ ngang ngăn cách --}}
+
+    {{-- Phần 2: Cập nhật mật khẩu --}}
+    <div class="profile-section">
+        @include('profile.partials.update-password-form')
+    </div>
+
+    <hr class="my-4"> {{-- Thêm đường kẻ ngang ngăn cách --}}
+
+    {{-- Phần 3: Xóa tài khoản --}}
+    <div class="profile-section">
+        @include('profile.partials.delete-user-form')
+    </div>
+
+@endsection
+
+@push('styles')
+{{-- Thêm một chút CSS để các phần trông đẹp hơn --}}
+<style>
+    .profile-section header h5.card-title {
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: 600;
+    }
+    .profile-section header p {
+        font-size: 0.9rem;
+    }
+</style>
+@endpush

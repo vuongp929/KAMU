@@ -10,105 +10,120 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use App\Mail\OrderConfirmationMail;
+
 
 class CheckoutController extends Controller
 {
     /**
-     * Hiển thị trang checkout.
+     * Hiển thị trang checkout với thông tin giỏ hàng.
      */
-    public function index()
-    {
-        // Lấy giỏ hàng của người dùng đã đăng nhập
-        $cart = Cart::with('items.variant.product')
-                    ->where('user_id', Auth::id())
-                    ->latest()
-                    ->first();
+// trong app/Http\Controllers\Client\CheckoutController.php
 
-        // Nếu giỏ hàng rỗng, không cho vào checkout, chuyển về trang giỏ hàng
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('client.cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
-        }
+public function index()
+{
+    // === BẮT ĐẦU SỬA LỖI ===
+    // Thay thế 'thumbnail' bằng 'mainImage' và 'firstImage'
+    $cart = Cart::with([
+                    'items.variant.product.mainImage',
+                    'items.variant.product.firstImage'
+                ])
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->first();
+    // === KẾT THÚC SỬA LỖI ===
 
-        return view('clients.checkout.index', compact('cart'));
+    // Nếu giỏ hàng rỗng, không cho vào checkout, chuyển về trang giỏ hàng
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('client.cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
     }
+
+    return view('clients.checkout.index', compact('cart'));
+}
 
     /**
-     * Xử lý việc đặt hàng.
+     * Xử lý logic đặt hàng.
      */
     public function placeOrder(Request $request)
-    {
-        // 1. Validate thông tin giao hàng
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'payment_method' => 'required|string', // Ví dụ: 'cod', 'vnpay'
+{
+    // 1. Validate (Giữ nguyên)
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:20',
+        'address' => 'required|string|max:255',
+        'payment_method' => 'required|string|in:cod,vnpay',
+    ]);
+
+    $user = Auth::user();
+    $cart = Cart::with('items.variant.product')->where('user_id', $user->id)->latest()->first();
+
+    // 2. Kiểm tra lại giỏ hàng (Giữ nguyên)
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('home')->with('error', 'Giỏ hàng của bạn đã hết hạn. Vui lòng thử lại.');
+    }
+
+    DB::beginTransaction();
+    try {
+        // 3. Tạo đơn hàng (Giữ nguyên)
+        $order = Order::create([
+            'user_id' => $user->id,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'total_price' => $cart->total_price,
+            'status' => 'pending',
+            'payment_method' => $validated['payment_method'],
+            'payment_status' => 'unpaid',
         ]);
 
-        $user = Auth::user();
-        $cart = Cart::where('user_id', $user->id)->latest()->first();
-
-        // 2. Kiểm tra lại giỏ hàng một lần nữa
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('home')->with('error', 'Đã có lỗi xảy ra với giỏ hàng của bạn.');
-        }
-
-        DB::beginTransaction();
-        try {
-            // 3. Tạo đơn hàng (Order) mới
-            $order = Order::create([
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'address' => $validated['address'],
-                'total_price' => $cart->total_price, // Lấy tổng tiền từ accessor của Cart
-                'status' => 'pending', // Trạng thái ban đầu
-                'payment_method' => $validated['payment_method'],
-                'payment_status' => 'unpaid', // Trạng thái thanh toán ban đầu
+        // 4. Chuyển item và trừ tồn kho (Giữ nguyên)
+        foreach ($cart->items as $cartItem) {
+            $variant = $cartItem->variant;
+            if (!$variant || $variant->stock < $cartItem->quantity) {
+                throw new \Exception("Sản phẩm \"{$variant->product->name} - {$variant->name}\" không đủ số lượng tồn kho.");
+            }
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $variant->product_id,
+                'product_variant_id' => $cartItem->product_variant_id,
+                'quantity' => $cartItem->quantity,
+                'price' => $variant->price,
             ]);
-
-            // 4. Chuyển các sản phẩm từ CartItem sang OrderItem
-            foreach ($cart->items as $cartItem) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $cartItem->variant->product_id,
-                    'product_variant_id' => $cartItem->product_variant_id,
-                    'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->price_at_order ?? $cartItem->variant->price,
-                ]);
-                
-                 $variant = $cartItem->variant;
-                if ($variant->stock < $cartItem->quantity) {
-                    // Ném ra một Exception để hủy toàn bộ transaction
-                    throw new \Exception("Sản phẩm {$variant->product->name} - {$variant->name} không đủ tồn kho.");
-                }
-                $variant->stock -= $cartItem->quantity;
-                $variant->save();
-            }
-
-            // 5. Xóa giỏ hàng sau khi đã đặt hàng thành công
-            $cart->items()->delete();
-            $cart->delete();
-
-            DB::commit();
-
-            // 6. Xử lý sau khi đặt hàng
-            if ($order->payment_method == 'vnpay') {
-                // TODO: Chuyển hướng đến trang thanh toán VNPay
-                // return redirect()->route('payment.vnpay.create', ['order' => $order]);
-                return redirect()->route('home')->with('success', 'Chuyển đến trang thanh toán VNPay (chưa cài đặt).');
-            }
-            
-            // Mặc định là COD
-            // TODO: Gửi email xác nhận đơn hàng
-            return redirect()->route('home')->with('success', 'Đặt hàng thành công! Cảm ơn bạn đã mua sắm.');
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::error('Lỗi khi đặt hàng: ' . $e->getMessage());
-            return back()->with('error', 'Đã xảy ra lỗi không mong muốn khi đặt hàng. Vui lòng thử lại.')->withInput();
+            $variant->decrement('stock', $cartItem->quantity);
         }
+
+        // 5. Xóa giỏ hàng (Giữ nguyên)
+        $cart->delete();
+
+        DB::commit();
+
+        $order->load('items.variant.product');
+
+        
+        try {
+            // 1. Tạo URL xác nhận có chữ ký, hết hạn sau 48 giờ
+            $confirmationUrl = URL::temporarySignedRoute(
+                'client.orders.confirm', now()->addHours(48), ['order' => $order->id]
+            );
+
+            // 2. Gửi email với Mailable đã được cập nhật
+            Mail::to($order->email)->send(new OrderConfirmationMail($order, $confirmationUrl));
+
+        } catch (\Exception $e) {
+            Log::warning("Gửi email cho đơn hàng #{$order->id} thất bại: " . $e->getMessage());
+        }
+        
+        // Chuyển hướng người dùng
+        return redirect()->route('home')->with('success', 'Đặt hàng thành công! Vui lòng kiểm tra email để xác nhận đơn hàng của bạn.');
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        Log::error('Lỗi khi đặt hàng: ' . $e->getMessage());
+        return back()->with('error', $e->getMessage())->withInput();
     }
+}
 }

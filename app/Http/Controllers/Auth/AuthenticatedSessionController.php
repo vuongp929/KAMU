@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use App\Providers\RouteServiceProvider;   // Và dòng này
 
 class AuthenticatedSessionController extends Controller
 {
@@ -31,32 +33,15 @@ class AuthenticatedSessionController extends Controller
 
     //     return redirect()->intended(route('admins.dashboard', absolute: false));
     // }
-    public function store(Request $request): RedirectResponse
+public function store(LoginRequest $request): RedirectResponse
 {
-    // Validate đầu vào đơn giản
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    $request->authenticate();
 
-    // Tìm user theo email
-    $user = \App\Models\User::where('email', $request->email)->first();
-
-    // So sánh mật khẩu thường (plain text)
-    if (!$user || $request->password !== $user->password) {
-        return back()->withErrors([
-            'email' => 'Email hoặc mật khẩu không đúng.',
-        ]);
-    }
-
-    // Đăng nhập
-    Auth::login($user);
-
-    // Khởi tạo session mới
     $request->session()->regenerate();
 
-    // Chuyển hướng sau khi đăng nhập thành công
-    return redirect()->intended(route('admins.dashboard'));
+    // Sau khi đăng nhập thành công, sẽ chuyển hướng đến trang được định nghĩa trong RouteServiceProvider
+    // Mặc định là '/dashboard', nhưng chúng ta có thể tùy chỉnh sau
+    return redirect()->intended('/admin/dashboard');
 }
 
 

@@ -51,6 +51,6 @@
             <p>Không có sản phẩm trong đơn hàng.</p>
         @endif
 
-        <a href="{{ route('admins.orders.index') }}" class="btn btn-secondary">Quay lại</a>
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">Quay lại</a>
     </div>
 @endsection

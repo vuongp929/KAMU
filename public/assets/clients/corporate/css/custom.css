@@ -297,3 +297,108 @@
     padding: 20px;
     border-radius: 0 0 5px 5px;
 }
+#chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    max-width: 90%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+#chat-widget.collapsed .chat-body,
+#chat-widget.collapsed .chat-footer {
+    display: none;
+}
+.chat-header {
+    background-color: #ea73ac; /* Màu hồng chủ đạo */
+    color: white;
+    padding: 12px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.chat-header i {
+    margin-right: 10px;
+}
+#toggle-chat-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+.chat-body {
+    height: 300px;
+    padding: 10px;
+    overflow-y: auto;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+#chat-messages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#chat-messages li {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 80%;
+    word-wrap: break-word;
+    background-color: #f1f0f0;
+    align-self: flex-start;
+}
+#chat-messages li.my-message {
+    background-color: #ea73ac;
+    color: white;
+    margin-left: auto; /* Đẩy tin nhắn của mình sang phải */
+    text-align: right;
+}
+#chat-messages strong {
+    display: block;
+    font-size: 0.8em;
+    margin-bottom: 3px;
+    color: #555;
+}
+#chat-messages li.my-message strong {
+    color: #fde2f3;
+}
+.chat-footer {
+    display: flex;
+    align-items: center; /* Căn giữa theo chiều dọc */
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+#chat-input {
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 15px;
+    outline: none;
+    font-size: 14px;
+}
+#send-chat-btn {
+    background-color: #ea73ac;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+    cursor: pointer;
+    flex-shrink: 0; /* Ngăn nút bị co lại */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+#send-chat-btn:hover {
+    background-color: #d66095;
+}

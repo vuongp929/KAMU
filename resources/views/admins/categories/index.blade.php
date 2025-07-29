@@ -31,7 +31,7 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                             <h5 class="card-title mb-0 align-content-center "></h5>
-                            <a href="{{ route('admins.categories.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
                                 <i data-feather="plus-square"></i> Thêm danh mục
                             </a>
                         </div>
@@ -69,14 +69,14 @@
                                                 <td>
                                                 <div class="d-flex gap-2">
                                                     {{-- Nút sửa --}}
-                                                    <a href="{{ route('admins.categories.edit', $item) }}" 
+                                                    <a href="{{ route('admin.categories.edit', $item) }}" 
                                                     class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
                                                     title="Sửa">
                                                         <i class="bi bi-pencil-fill"></i>
                                                     </a>
 
                                                     {{-- Nút xóa --}}
-                                                    <form method="POST" action="{{ route('admins.categories.destroy', $item) }}" 
+                                                    <form method="POST" action="{{ route('admin.categories.destroy', $item) }}" 
                                                         onsubmit="return confirm('Bạn có chắc muốn xoá không vậy ?');">
                                                         @csrf
                                                         @method('DELETE')

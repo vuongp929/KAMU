@@ -7,8 +7,12 @@
     <meta name="author" content="ChillFriend">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'ChillFriend')</title>
+    @auth
+        <meta name="user-id" content="{{ Auth::id() }}">
+    @endauth
 
+    <title>@yield('title', 'ChillFriend')</title>
+    
     <!-- GOOGLE FONTS -->
     <link href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100" rel="stylesheet" type="text/css">
 
@@ -37,7 +41,8 @@
     <link href="{{ asset('assets/clients/pages/css/portfolio.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/slider.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/style-shop.css') }}" rel="stylesheet" type="text/css"> --}}
-    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     {{-- CSS riêng cho từng trang --}}
     @yield('CSS')
 
@@ -70,6 +75,8 @@
     {{-- Footer --}}
     @include('clients.layouts.footer')
 
+    @include('clients.layouts.chatbox')
+
     {{-- Div ẩn cho pop-up xem nhanh --}}
     <div id="product-pop-up" style="display: none; width: 700px;"></div>
 
@@ -92,13 +99,13 @@
 
     {{-- 4. Tải các script chính của template --}}
     <script src="{{ asset('assets/clients/corporate/scripts/layout.js') }}" type="text/javascript"></script>
-    <script type="text/javascript">
+    {{-- <script type="text/javascript">
         jQuery(document).ready(function() {
             Layout.init(); // Khởi tạo các chức năng cơ bản của layout
             // Layout.initOWL(); // Nếu bạn dùng Owl Carousel
             Layout.initFancybox(); // Kích hoạt chức năng phóng to ảnh mặc định của Fancybox
         });
-    </script>
+    </script> --}}
 
     {{-- 5. Vị trí để nhúng các script của từng trang riêng biệt --}}
     @stack('scripts')
