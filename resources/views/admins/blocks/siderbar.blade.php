@@ -29,7 +29,8 @@
         <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             <span class="d-flex align-items-center gap-2">
-                <img class="rounded header-profile-user" src="{{ asset('assets/admins/images/users/avatar-1.jpg') }}" alt="Header Avatar">
+                <img class="rounded header-profile-user" src="{{ asset('assets/admins/images/users/avatar-1.jpg') }}"
+                    alt="Header Avatar">
             </span>
         </button>
         <div class="dropdown-menu dropdown-menu-end">
@@ -56,7 +57,7 @@
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                     </a>
                 </li>
-            <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarSanPham" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý sản phẩm</span>
@@ -141,8 +142,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('home') }}" role="button"
-                        aria-expanded="false" aria-controls="sidebarSanPham">
+                    <a class="nav-link menu-link" href="{{ route('home') }}" role="button" aria-expanded="false"
+                        aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Trang chủ</span>
                     </a>
                 </li>

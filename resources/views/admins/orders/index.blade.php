@@ -83,6 +83,12 @@
                                             Đã hủy</option>
                                     </select>
                                 </form>
+                                @if ($order->status === 'completed')
+                                    <a href="{{ route('admin.invoices.show', $order->id) }}"
+                                        class="btn btn-sm btn-secondary">
+                                        🧾 Hóa đơn
+                                    </a>
+                                @endif
 
                             </div>
                         </td>
