@@ -36,10 +36,22 @@
                                 @foreach($discounts as $discount)
                                 <tr>
                                     <td>{{ $discount->code }}</td>
-                                    <td>{{ $discount->discount }}%</td>
+                                    <td>
+                                        @if($discount->discount_type === 'percent')
+                                            @if(is_numeric($discount->discount) && $discount->discount > 0)
+                                                {{ $discount->discount }}%
+                                            @else
+                                                N/A
+                                            @endif
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($discount->discount_type === 'amount' && $discount->amount)
                                             {{ number_format($discount->amount) }} VND
+                                        @elseif($discount->discount_type === 'percent' && (empty($discount->amount) || $discount->amount == 0))
+                                            N/A
                                         @else
                                             -
                                         @endif
