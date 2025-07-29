@@ -10,9 +10,23 @@ use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
     // Hiển thị danh sách đơn hàng
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('customer')->orderBy('created_at', 'desc')->paginate(10);
+        $query = Order::with('customer')->orderBy('created_at', 'desc');
+
+        if ($request->filled('keyword')) {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('id', 'like', "%{$keyword}%")
+                    ->orWhereHas('customer', function ($q2) use ($keyword) {
+                        $q2->where('name', 'like', "%{$keyword}%")
+                            ->orWhere('email', 'like', "%{$keyword}%");
+                    });
+            });
+        }
+
+        $orders = $query->paginate(10);
+
         return view('admins.orders.index', compact('orders'));
     }
 
@@ -39,6 +53,11 @@ class OrderController extends Controller
     {
         $order = Order::with('orderItems')->findOrFail($id);
 
+        // ✅ Ngăn cập nhật nếu đơn đã hoàn thành hoặc bị hủy
+        if (in_array($order->status, ['completed', 'cancelled'])) {
+            return redirect()->back()->with('error', '❌ Đơn hàng đã "' . ucfirst($order->status) . '" và không thể cập nhật nữa.');
+        }
+
         if ($request->has('status')) {
             $order->status = $request->status;
         }
@@ -47,6 +66,7 @@ class OrderController extends Controller
             $order->payment_status = $request->payment_status;
         }
 
+        // ✅ Cập nhật lại tổng tiền nếu cần
         $total = $order->orderItems->sum(function ($item) {
             return $item->quantity * $item->price;
         });
@@ -55,8 +75,10 @@ class OrderController extends Controller
 
         $order->save();
 
-        return redirect()->route('orders.index')->with('success', 'Thông tin đơn hàng đã được cập nhật.');
+        return redirect()->route('orders.index')->with('success', '✅ Thông tin đơn hàng đã được cập nhật thành công.');
     }
+
+
 
     // Đặt hàng mới
     public function placeOrder(Request $request)
