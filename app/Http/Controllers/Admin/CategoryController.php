@@ -7,51 +7,32 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
+
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-//  public function index(Request $request)
-// {
-//     $query = Category::with('parent');
+    public function index(Request $request)
+    {
+        // $query = Category::with('parent');
+        $query = Category::with('parent')->whereNull('parent_id'); 
 
-//     // Tìm kiếm theo tên
-//     if ($request->has('search') && $request->search !== '') {
-//         $query->where('name', 'like', '%' . $request->search . '%');
-//     }
+        // Tìm kiếm theo tên
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
 
-//     // Lọc theo trạng thái đúng cột 'statu'
-//     if ($request->has('statu') && $request->statu !== '') {
-//         $query->where('statu', $request->statu);
-//     }
+        // Lọc theo trạng thái
+        if ($request->filled('statu')) {
+            $query->where('statu', (int) $request->statu); // Ép kiểu INT để chắc chắn
+        }
 
-//     // Phân trang
-//     $listCategory = $query->paginate(10);
+        // Phân trang
+        $listCategory = $query->paginate(50)->appends($request->all()); // giữ lại các filter khi phân trang
 
-//     return view('admins.categories.index', compact('listCategory'));
-// }
-public function index(Request $request)
-{
-    // $query = Category::with('parent');
-    $query = Category::with('parent')->whereNull('parent_id'); 
-
-    // Tìm kiếm theo tên
-    if ($request->filled('search')) {
-        $query->where('name', 'like', '%' . $request->search . '%');
+        return view('admins.categories.index', compact('listCategory'));
     }
-
-    // Lọc theo trạng thái
-    if ($request->filled('statu')) {
-        $query->where('statu', (int) $request->statu); // Ép kiểu INT để chắc chắn
-    }
-
-    // Phân trang
-    $listCategory = $query->paginate(50)->appends($request->all()); // giữ lại các filter khi phân trang
-
-    return view('admins.categories.index', compact('listCategory'));
-}
 
     /**
      * Show the form for creating a new resource.
@@ -65,7 +46,7 @@ public function index(Request $request)
     /**
      * Store a newly created resource in storage.
      */
-   public function store(Request $request)
+   public function store(StoreCategoryRequest  $request)
 {
     $request->validate([
         'name' => 'required|unique:categories,name',
@@ -96,35 +77,6 @@ public function index(Request $request)
     return redirect()->route('admins.categories.index')->with('success', 'Thêm danh mục thành công');
 }
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|unique:categories,name',
-    //         'slug' => 'nullable|unique:categories,slug',
-    //         'parent_id' => 'nullable|exists:categories,id',
-    //     ]);
-
-    //     $slug = $request->slug ?? Str::slug($request->name);
-
-    //     // Đảm bảo slug là duy nhất
-    //     $originalSlug = $slug;
-    //     $i = 1;
-    //     while (Category::where('slug', $slug)->exists()) {
-    //         $slug = $originalSlug . '-' . $i++;
-    //     }
-
-    //     Category::create([
-    //         'name' => $request->name,
-    //         'slug' => $slug,
-    //         'statu' => $request->statu ?? 1,
-    //         'parent_id' => $request->parent_id,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Thêm danh mục thành công');
-    // }
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
@@ -149,7 +101,7 @@ public function index(Request $request)
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCategoryRequest  $request, string $id)
     {
          if ($request->isMethod('PUT')) {
             $params = $request->except('_token', '_method');
