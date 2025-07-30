@@ -27,6 +27,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ Route::is('client.rewards.index') ? 'active' : '' }}" href="{{ route('client.rewards.index') }}">
+                            <i class="fas fa-star"></i> Điểm Thưởng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ Route::is('client.rewards.discount-codes') ? 'active' : '' }}" href="{{ route('client.rewards.discount-codes') }}">
+                            <i class="fas fa-ticket-alt"></i> Mã Đổi Thưởng
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-bell"></i> Thông Báo</a>
                     </li>
                 </ul>

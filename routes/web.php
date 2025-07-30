@@ -19,6 +19,8 @@ use App\Http\Controllers\Client\MyOrderController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
+use App\Http\Controllers\Client\RewardController;
+use App\Http\Controllers\Client\PaymentController;
 
 
 /*
@@ -66,10 +68,27 @@ Route::middleware('auth')->group(function () {
     Route::prefix('checkout')->name('client.checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
         Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('placeOrder');
+        Route::post('/validate-discount', [CheckoutController::class, 'validateDiscount'])->name('validateDiscount');
     });
 
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
+    Route::post('/my-orders/{order}/complete', [MyOrderController::class, 'complete'])->name('client.orders.complete');
+
+    // Routes cho điểm thưởng
+    Route::prefix('rewards')->name('client.rewards.')->group(function () {
+        Route::get('/', [RewardController::class, 'index'])->name('index');
+        Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
+        Route::get('/history', [RewardController::class, 'history'])->name('history');
+        Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
+    });
+
+    // Routes cho thanh toán
+    Route::prefix('payment')->name('client.payment.')->group(function () {
+        Route::post('/success', [PaymentController::class, 'paymentSuccess'])->name('success');
+        Route::post('/failed', [PaymentController::class, 'paymentFailed'])->name('failed');
+        Route::post('/cod/{order}', [PaymentController::class, 'processCodPayment'])->name('cod');
+    });
 
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');
