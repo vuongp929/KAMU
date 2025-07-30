@@ -10,6 +10,7 @@ use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
 
 
@@ -68,3 +69,5 @@ Route::group([
     Route::post('/reviews/{id}/toggle-hide', [ProductReviewController::class, 'toggleHide'])->name('reviews.toggleHide');
 
 });
+Route::get('/test',[CheckoutController::class, 'test'])->name('test');
+Route::post('/momo_payment', [CheckoutController::class, 'momo_payment'])->name('momo_payment');
