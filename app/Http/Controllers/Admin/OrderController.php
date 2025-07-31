@@ -19,7 +19,12 @@ class OrderController extends Controller
     // Hiển thị chi tiết đơn hàng
     public function show($id)
     {
-        $order = Order::with(['orderItems.productVariant.product', 'customer'])->findOrFail($id);
+        $order = Order::with([
+            'orderItems.variant.product.mainImage',
+            'orderItems.variant.product.firstImage',
+            'customer'
+        ])->findOrFail($id);
+        
         return view('admins.orders.show', compact('order'));
     }
 
@@ -40,7 +45,24 @@ class OrderController extends Controller
         $order = Order::with('orderItems')->findOrFail($id);
 
         if ($request->has('status')) {
-            $order->status = $request->status;
+            $newStatus = $request->status;
+            $currentStatus = $order->status;
+            
+            // Kiểm tra logic chuyển trạng thái
+            $allowedTransitions = [
+                'pending' => ['processing', 'cancelled'],
+                'processing' => ['shipping', 'cancelled'],
+                'shipping' => ['delivered', 'cancelled'],
+                'delivered' => ['completed'],
+                'completed' => [], // Không thể chuyển từ completed
+                'cancelled' => [], // Không thể chuyển từ cancelled
+            ];
+            
+            if (isset($allowedTransitions[$currentStatus]) && in_array($newStatus, $allowedTransitions[$currentStatus])) {
+                $order->status = $newStatus;
+            } else {
+                return redirect()->route('admin.orders.index')->with('error', 'Không thể chuyển từ trạng thái "' . $currentStatus . '" sang "' . $newStatus . '".');
+            }
         }
 
         if ($request->has('payment_status')) {
@@ -55,7 +77,7 @@ class OrderController extends Controller
 
         $order->save();
 
-        return redirect()->route('orders.index')->with('success', 'Thông tin đơn hàng đã được cập nhật.');
+        return redirect()->route('admin.orders.index')->with('success', 'Thông tin đơn hàng đã được cập nhật.');
     }
 
     // Đặt hàng mới

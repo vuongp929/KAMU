@@ -32,7 +32,7 @@ Route::get('/', [ClientController::class, 'index'])->name('home');
 Route::get('/products/{product}', [ClientProductController::class, 'show'])->name('client.products.show');
 
 Route::prefix('cart')->name('cart.')->group(function () {
-    Route::post('/apply-discount', [OrderController::class, 'applyDiscount'])->name('apply-discount');
+    Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
 });
 
 // --- ROUTE XÁC THỰC (Laravel Breeze) ---
@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
+    Route::patch('/orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
 
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');

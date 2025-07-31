@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use App\Mail\OrderConfirmationMail;
+use App\Models\Discount;
 
 
 class CheckoutController extends Controller
@@ -24,6 +25,11 @@ class CheckoutController extends Controller
 
 public function index()
 {
+    // Kiểm tra user đã đăng nhập chưa
+    if (!Auth::check()) {
+        return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để tiếp tục.');
+    }
+
     // === BẮT ĐẦU SỬA LỖI ===
     // Thay thế 'thumbnail' bằng 'mainImage' và 'firstImage'
     $cart = Cart::with([
@@ -40,7 +46,13 @@ public function index()
         return redirect()->route('client.cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
     }
 
-    return view('clients.checkout.index', compact('cart'));
+    // Lấy các mã giảm giá đang hoạt động
+    $discounts = Discount::where('is_active', 1)
+        ->where('start_at', '<=', now())
+        ->where('end_at', '>=', now())
+        ->get();
+
+    return view('clients.checkout.index', compact('cart', 'discounts'));
 }
 
     /**
@@ -55,6 +67,9 @@ public function index()
         'phone' => 'required|string|max:20',
         'address' => 'required|string|max:255',
         'payment_method' => 'required|string|in:cod,vnpay',
+        'discount_code' => 'nullable|string',
+        'discount_value' => 'nullable|numeric|min:0',
+        'final_total' => 'nullable|numeric|min:0',
     ]);
 
     $user = Auth::user();
@@ -67,33 +82,49 @@ public function index()
 
     DB::beginTransaction();
     try {
-        // 3. Tạo đơn hàng (Giữ nguyên)
+        // 3. Tạo đơn hàng - sử dụng tổng tiền đã được giảm giá
+        $finalTotal = $validated['final_total'] ?? $cart->total_price;
+        $discountValue = $validated['discount_value'] ?? 0;
+        
+        // Kiểm tra và cập nhật mã giảm giá nếu có
+        $discountCode = $validated['discount_code'] ?? null;
+        $discount = null;
+        if ($discountCode) {
+            $discount = Discount::where('code', $discountCode)->first();
+            if ($discount && $discount->isValid()) {
+                // Tăng số lần sử dụng
+                $discount->incrementUsageCount();
+            }
+        }
+        
         $order = Order::create([
             'user_id' => $user->id,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'address' => $validated['address'],
-            'total_price' => $cart->total_price,
+            'total_price' => $finalTotal, // Sử dụng tổng tiền đã được giảm giá
             'status' => 'pending',
             'payment_method' => $validated['payment_method'],
             'payment_status' => 'unpaid',
+            'shipping_address' => $validated['address'], // Sử dụng shipping_address thay vì address
         ]);
 
         // 4. Chuyển item và trừ tồn kho (Giữ nguyên)
         foreach ($cart->items as $cartItem) {
             $variant = $cartItem->variant;
             if (!$variant || $variant->stock < $cartItem->quantity) {
-                throw new \Exception("Sản phẩm \"{$variant->product->name} - {$variant->name}\" không đủ số lượng tồn kho.");
+                $productName = $variant && $variant->product ? $variant->product->name : 'Sản phẩm không tồn tại';
+                $variantName = $variant ? $variant->name : 'N/A';
+                throw new \Exception("Sản phẩm \"{$productName} - {$variantName}\" không đủ số lượng tồn kho.");
             }
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $variant->product_id,
+                'product_id' => $variant->product_id ?? $cartItem->product_id,
                 'product_variant_id' => $cartItem->product_variant_id,
                 'quantity' => $cartItem->quantity,
-                'price' => $variant->price,
+                'price_at_order' => $cartItem->price_at_order, // Sử dụng giá đã lưu trong giỏ hàng
+                'price' => $variant->price ?? 0, // Giá hiện tại của variant
             ]);
-            $variant->decrement('stock', $cartItem->quantity);
+            if ($variant) {
+                $variant->decrement('stock', $cartItem->quantity);
+            }
         }
 
         // 5. Xóa giỏ hàng (Giữ nguyên)
@@ -110,20 +141,31 @@ public function index()
                 'client.orders.confirm', now()->addHours(48), ['order' => $order->id]
             );
 
-            // 2. Gửi email với Mailable đã được cập nhật
-            Mail::to($order->email)->send(new OrderConfirmationMail($order, $confirmationUrl));
+            // 2. Gửi email với Mailable đã được cập nhật - sử dụng email từ form
+            Mail::to($validated['email'])->send(new OrderConfirmationMail($order, $confirmationUrl));
 
         } catch (\Exception $e) {
             Log::warning("Gửi email cho đơn hàng #{$order->id} thất bại: " . $e->getMessage());
         }
         
-        // Chuyển hướng người dùng
-        return redirect()->route('home')->with('success', 'Đặt hàng thành công! Vui lòng kiểm tra email để xác nhận đơn hàng của bạn.');
+        // Chuyển hướng người dùng với thông báo chi tiết
+        $successMessage = "🎉 Đặt hàng thành công!\n\n";
+        $successMessage .= "📋 Mã đơn hàng: #{$order->id}\n";
+        $successMessage .= "💰 Tổng tiền: " . number_format($finalTotal, 0, ',', '.') . " VNĐ\n";
+        $successMessage .= "📧 Email xác nhận đã được gửi đến: {$validated['email']}\n\n";
+        $successMessage .= "📱 Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng!";
+        
+        return redirect()->route('home')->with('success', $successMessage);
 
     } catch (\Throwable $e) {
         DB::rollBack();
         Log::error('Lỗi khi đặt hàng: ' . $e->getMessage());
-        return back()->with('error', $e->getMessage())->withInput();
+        
+        $errorMessage = "❌ Đặt hàng thất bại!\n\n";
+        $errorMessage .= "🔍 Lỗi: " . $e->getMessage() . "\n\n";
+        $errorMessage .= "📞 Vui lòng liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.";
+        
+        return back()->with('error', $errorMessage)->withInput();
     }
 }
 }

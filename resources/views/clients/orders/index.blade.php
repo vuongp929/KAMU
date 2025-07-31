@@ -1,4 +1,21 @@
 @extends('layouts.client')
+
+@php
+    function getOrderStatusText($status) {
+        switch($status) {
+            case 'pending':
+                return 'CHỜ XỬ LÝ';
+            case 'processing':
+                return 'ĐANG XỬ LÝ';
+            case 'completed':
+                return 'HOÀN THÀNH';
+            case 'cancelled':
+                return 'ĐÃ HỦY';
+            default:
+                return strtoupper($status);
+        }
+    }
+@endphp
 @section('title', 'Đơn hàng của tôi')
 
 @push('styles')
@@ -33,11 +50,46 @@
     .order-item-info { flex-grow: 1; }
     .order-item-name { color: #333; font-weight: 500; margin-bottom: 5px; }
     .order-item-variant, .order-item-qty { color: #777; font-size: 14px; }
-    .order-item-price { font-weight: 500; color: #333; }
-    .order-footer { text-align: right; border-top: 1px solid #e8e8e8; }
+    .order-item-price { font-weight: 500; color: #333; text-align: right; }
+    .order-item-discount { font-size: 12px; }
+    .order-footer { border-top: 1px solid #e8e8e8; padding: 15px 20px; }
     .total-price { font-size: 18px; font-weight: 600; color: #007bff; }
     .order-actions .btn { margin-left: 10px; }
+    .text-decoration-line-through { text-decoration: line-through; }
+    .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-processing { background: #d1ecf1; color: #0c5460; }
+    .status-completed { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
 </style>
+
+<script>
+function confirmCancelOrder(orderId) {
+    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+        // Tạo form để submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("client.orders.cancel", ":orderId") }}'.replace(':orderId', orderId);
+        
+        // Thêm CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+        
+        // Thêm method override
+        const methodField = document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'PATCH';
+        form.appendChild(methodField);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
 @endpush
 
 @section('content')
@@ -98,20 +150,49 @@
                         <div class="order-card">
                             <div class="order-header">
                                 <span>Mã đơn hàng: #{{ $order->id }}</span>
-                                <span class="order-status">{{ $order->status }}</span>
+                                <span class="status-badge status-{{ $order->status }}">
+                                    {{ getOrderStatusText($order->status) }}
+                                </span>
                             </div>
                             <div class="order-body">
                                 {{-- Lặp qua từng sản phẩm trong đơn hàng --}}
+                                @php
+                                    $orderSubtotal = 0;
+                                    $orderDiscount = 0;
+                                @endphp
                                 @foreach($order->orderItems as $item)
                                     @if($item->productVariant && $item->productVariant->product)
+                                        @php
+                                            $originalPrice = $item->price ?? 0;
+                                            $orderPrice = $item->price_at_order ?? $originalPrice;
+                                            $itemTotal = $item->quantity * $orderPrice;
+                                            $itemDiscount = $item->quantity * ($originalPrice - $orderPrice);
+                                            $orderSubtotal += $itemTotal;
+                                            $orderDiscount += $itemDiscount;
+                                        @endphp
                                         <div class="order-item">
                                             <img src="{{ optional($item->productVariant->product)->thumbnail_url }}" class="order-item-img" alt="">
                                             <div class="order-item-info">
                                                 <div class="order-item-name">{{ $item->productVariant->product->name }}</div>
                                                 <div class="order-item-variant">Phân loại hàng: {{ $item->productVariant->name }}</div>
                                                 <div class="order-item-qty">x{{ $item->quantity }}</div>
+                                                @if($originalPrice > $orderPrice)
+                                                    <div class="order-item-discount text-success">
+                                                        <small>Giảm {{ number_format($originalPrice - $orderPrice, 0, ',', '.') }}đ/sản phẩm</small>
+                                                    </div>
+                                                @endif
                                             </div>
-                                            <div class="order-item-price">{{ number_format($item->price, 0, ',', '.') }}đ</div>
+                                            <div class="order-item-price">
+                                                @if($originalPrice > $orderPrice)
+                                                    <div class="text-decoration-line-through text-muted">
+                                                        <small>{{ number_format($originalPrice, 0, ',', '.') }}đ</small>
+                                                    </div>
+                                                @endif
+                                                <div class="fw-bold">{{ number_format($orderPrice, 0, ',', '.') }}đ</div>
+                                                <div class="text-end fw-bold text-primary">
+                                                    {{ number_format($itemTotal, 0, ',', '.') }}đ
+                                                </div>
+                                            </div>
                                         </div>
                                     @else
                                         <div class="order-item">
@@ -124,8 +205,41 @@
                                 @endforeach
                             </div>
                             <div class="order-footer">
-                                <span class="me-3">Thành tiền:</span>
-                                <span class="total-price">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Tạm tính:</span>
+                                            <span>{{ number_format($orderSubtotal, 0, ',', '.') }}đ</span>
+                                        </div>
+                                        @php
+                                            // Tính toán số tiền giảm giá từ tổng tiền gốc và tổng tiền cuối
+                                            $originalTotal = $orderSubtotal;
+                                            $finalTotal = $order->total_price;
+                                            $orderDiscount = $originalTotal - $finalTotal;
+                                        @endphp
+                                        @if($orderDiscount > 0)
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Giảm giá:</span>
+                                                <span class="text-success">-{{ number_format($orderDiscount, 0, ',', '.') }}đ</span>
+                                            </div>
+                                        @endif
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Phí vận chuyển:</span>
+                                            <span>Miễn phí</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <div class="total-price">
+                                            <span class="me-2">Tổng cộng:</span>
+                                            <span class="fw-bold">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-end">
+                                    <a href="{{ route('client.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @empty

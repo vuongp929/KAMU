@@ -4,7 +4,12 @@
 <div class="container-fluid">
     @if ($errors->any())
         <div id="error-alert" class="alert alert-danger animate__animated animate__slideInRight" style="position: relative; z-index: 9999; min-width: 300px;">
-            Thêm mã giảm giá bị lỗi
+            <strong>Thêm mã giảm giá bị lỗi:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
         <script>
             setTimeout(function() {
@@ -14,7 +19,7 @@
                     alert.classList.add('animate__slideOutUp');
                     setTimeout(() => alert.remove(), 1000);
                 }
-            }, 3000);
+            }, 8000);
         </script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     @endif
@@ -156,26 +161,56 @@
 @endsection
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('admins/css/bootstrap1.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/style1.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/colors/default.css') }}" id="colorSkinCSS">
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap1.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('admin/css/style1.css') }}" />
+    <link rel="stylesheet" href="{{ asset('admin/css/colors/default.css') }}" id="colorSkinCSS">
 @endsection
 
-@section('JS')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var discountType = document.getElementById('discount_type');
-    var percentGroup = document.getElementById('discount_percent_group');
-    var amountGroup = document.getElementById('discount_amount_group');
+// Script để toggle discount fields
+function toggleDiscountFields() {
+    const discountType = document.getElementById('discount_type');
+    const percentGroup = document.getElementById('discount_percent_group');
+    const amountGroup = document.getElementById('discount_amount_group');
+    
+    console.log('Toggle function called');
+    console.log('discountType value:', discountType ? discountType.value : 'null');
+    
     if (discountType && percentGroup && amountGroup) {
-        function toggleDiscountFields() {
-            var type = discountType.value;
-            percentGroup.classList.toggle('d-none', type !== 'percent');
-            amountGroup.classList.toggle('d-none', type !== 'amount');
+        if (discountType.value === 'amount') {
+            percentGroup.classList.add('d-none');
+            amountGroup.classList.remove('d-none');
+            console.log('Showing amount field, hiding percent field');
+        } else {
+            percentGroup.classList.remove('d-none');
+            amountGroup.classList.add('d-none');
+            console.log('Showing percent field, hiding amount field');
         }
-        discountType.addEventListener('change', toggleDiscountFields);
-        toggleDiscountFields();
+    } else {
+        console.error('Some elements not found:', {
+            discountType: !!discountType,
+            percentGroup: !!percentGroup,
+            amountGroup: !!amountGroup
+        });
+    }
+}
+
+// Chạy khi trang load xong
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing discount toggle');
+    
+    // Gọi lần đầu
+    toggleDiscountFields();
+    
+    // Thêm event listener
+    const discountType = document.getElementById('discount_type');
+    if (discountType) {
+        discountType.addEventListener('change', function() {
+            console.log('Discount type changed to:', this.value);
+            toggleDiscountFields();
+        });
+    } else {
+        console.error('discount_type element not found');
     }
 });
 </script>
-@endsection
