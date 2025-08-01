@@ -1,26 +1,29 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Thế giới thú bông!">
     <meta name="author" content="ChillFriend">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    @auth
+        <meta name="user-id" content="{{ Auth::id() }}">
+    @endauth
 
     <title>@yield('title', 'ChillFriend')</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- GOOGLE FONTS -->
+    <link href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100" rel="stylesheet" type="text/css">
 
-    {{-- Link các file CSS--}}
-    <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap-theme.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap-theme.css.map') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap-theme.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap.css.map') }}" rel="stylesheet" type="text/css" />
+    <!-- PLUGINS CSS -->
     <link href="{{ asset('assets/clients/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/clients/plugins/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/clients/plugins/fancybox/source/jquery.fancybox.css') }}" rel="stylesheet" type="text/css" />
 
-    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
-    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
-    {{-- corporate --}}
+    {{-- <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script>
+    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}"></script> --}}
+    {{-- <link href="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.css') }}">
     <link rel="shortcut icon" href="{{ asset('assets/user/images/favicon.ico') }}">
     <link href="{{ asset('assets/clients/corporate/css/themes/blue.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/corporate/css/themes/gray.css') }}" rel="stylesheet" type="text/css">
@@ -31,31 +34,43 @@
     <link href="{{ asset('assets/clients/corporate/css/custom.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/corporate/css/style-responsive.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/corporate/css/style.css') }}" rel="stylesheet" type="text/css">
-    {{-- pages --}}
     <link href="{{ asset('assets/clients/pages/css/style-header.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/animate.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/components.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/gallery.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/portfolio.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/clients/pages/css/slider.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('assets/clients/pages/css/style-shop.css') }}" rel="stylesheet" type="text/css">
-    
+    <link href="{{ asset('assets/clients/pages/css/style-shop.css') }}" rel="stylesheet" type="text/css"> --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     {{-- CSS riêng cho từng trang --}}
     @yield('CSS')
-</head>
 
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.js" />
+
+    <!-- THEME STYLES -->
+    <link href="{{ asset('assets/clients/pages/css/components.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/clients/corporate/css/style.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/clients/corporate/css/style-responsive.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/clients/corporate/css/themes/red.css') }}" rel="stylesheet" type="text/css" id="style-color" />
+    <link href="{{ asset('assets/clients/corporate/css/custom.css') }}" rel="stylesheet" type="text/css" />
+
+    {{-- CSS TÙY CHỈNH CHO TỪNG TRANG --}}
+    @stack('styles')
+</head>
+<body class="ecommerce">
 
     {{-- Header --}}
     @include('clients.layouts.header')
 
+    {{-- Thông báo --}}
+    @include('components.notification')
 
-    {{-- Nội dung chính --}}
-    <div class="main-content">
-        <div class="container">
-            @yield('content')
-        </div>
-    </div>
+    {{-- Nội dung chính của trang sẽ được chèn vào đây --}}
+    @yield('content')
 
     {{-- Pre-footer (nếu có) --}}
     @include('clients.layouts.pre-footer')
@@ -63,32 +78,40 @@
     {{-- Footer --}}
     @include('clients.layouts.footer')
 
-    {{-- Các script dùng chung --}}
-    <script src="{{ asset('assets/clients/bootstrap/js/bootstrap.js') }}"></script>
-    <script src="{{ asset('assets/clients/bootstrap/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/clients/bootstrap/js/npm.js') }}"></script>
+    @include('clients.layouts.chatbox')
 
-    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.js') }}"></script>
-    <script src="{{ asset('assets/clients/bootstrap/bootstrap-touchspin/bootstrap.touchspin.min.js') }}"></script>
+    {{-- Div ẩn cho pop-up xem nhanh --}}
+    <div id="product-pop-up" style="display: none; width: 700px;"></div>
 
 
+    <!-- ================================================== -->
+    <!--  BẮT ĐẦU KHỐI SCRIPT (QUAN TRỌNG) -->
+    <!-- ================================================== -->
 
+    {{-- 1. Tải jQuery LÊN ĐẦU TIÊN --}}
+    <script src="{{ asset('assets/clients/plugins/jquery.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/clients/plugins/jquery-migrate.min.js') }}" type="text/javascript"></script>
 
-    <script src="{{ asset('assets/clients/corporate/scripts/back-to-top.js') }}"></script>
-    <script src="{{ asset('assets/clients/corporate/scripts/layout.js') }}"></script>
+    {{-- 2. Tải Bootstrap JS --}}
+    <script src="{{ asset('assets/clients/plugins/bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
 
-    <script src="{{ asset('assets/clients/pages/scripts/bs-carousel.js') }}"></script>
-    <script src="{{ asset('assets/clients/pages/scripts/size-price.js') }}"></script>
-    <script src="{{ asset('assets/clients/pages/scripts/checkout.js') }}"></script>
-    <script src="{{ asset('assets/clients/pages/scripts/contact-us.js') }}"></script>
-    <script src="{{ asset('assets/clients/pages/scripts/portfolio.js') }}"></script>
+    {{-- 3. Tải các plugin khác --}}
+    <script src="{{ asset('assets/clients/plugins/fancybox/source/jquery.fancybox.pack.js') }}" type="text/javascript"></script>
+    {{-- Nếu bạn dùng Owl Carousel, hãy thêm JS của nó vào đây --}}
+    {{-- <script src="{{ asset('assets/clients/plugins/owl.carousel/owl.carousel.min.js') }}" type="text/javascript"></script> --}}
 
+    {{-- 4. Tải các script chính của template --}}
+    <script src="{{ asset('assets/clients/corporate/scripts/layout.js') }}" type="text/javascript"></script>
+    {{-- <script type="text/javascript">
+        jQuery(document).ready(function() {
+            Layout.init(); // Khởi tạo các chức năng cơ bản của layout
+            // Layout.initOWL(); // Nếu bạn dùng Owl Carousel
+            Layout.initFancybox(); // Kích hoạt chức năng phóng to ảnh mặc định của Fancybox
+        });
+    </script> --}}
 
+    {{-- 5. Vị trí để nhúng các script của từng trang riêng biệt --}}
+    @stack('scripts')
 
-
-
-    {{-- Script riêng cho từng trang --}}
-    @yield('JS')
 </body>
-
 </html>

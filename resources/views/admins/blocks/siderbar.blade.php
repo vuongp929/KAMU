@@ -56,7 +56,7 @@
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                     </a>
                 </li>
-                <li class="nav-item">
+            <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarSanPham" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý sản phẩm</span>
@@ -117,10 +117,11 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    {{-- <a class="nav-link menu-link" href="{{ route('admin.users.index') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('admin.attributes.index') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
-                        <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý người dùng</span>
-                    </a> --}}
+                        <i class="ri-price-tag-3-line"></i> <!-- Hoặc icon khác -->
+                        <span>Quản lý Thuộc tính</span>
+                    </a>
                 </li>
 
                 <li class="nav-item">
@@ -133,13 +134,37 @@
                     <a class="nav-link menu-link" href="{{ route('admin.reviews.index') }}" role="button">
                         <i class="ri-message-2-line"></i> <span data-key="t-advance-ui">Quản lý phản hồi</span>
                     </a>
-                </li> 
-
+                </li>
                 <li class="nav-item">
-                    {{-- <a class="nav-link menu-link" href="{{ route('admin.client.home') }}" role="button"
+                    <a class="nav-link menu-link" href="{{ route('admin.chat.index') }}" role="button">
+                        <i class="ri-message-2-line"></i> <span data-key="t-advance-ui">Hộp thư hỗ trợ</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('home') }}" role="button"
                         aria-expanded="false" aria-controls="sidebarSanPham">
                         <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Trang chủ</span>
-                    </a> --}}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarUser" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarUser">
+                        <i class="ri-stack-line"></i> <span data-key="t-advance-ui">Quản lý người dùng</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarUser">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.index') }}" class="nav-link">
+                                    Danh sách
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.create') }}" class="nav-link">
+                                    Thêm mới
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
             </ul>
         </div>

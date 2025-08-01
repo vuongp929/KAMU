@@ -14,17 +14,18 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Tạo 1 tài khoản admin mẫu
-        User::create([
+       User::firstOrCreate(
+        ['email' => 'admin@example.com'],
+        [
             'name' => 'Admin',
-            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
             'email_verified_at' => now(),
-            'password' => Hash::make('password'), // hoặc bcrypt('password')
-            'remember_token' => Str::random(10),
-        ]);
+            'role' => 'admin',
+
+        ]
+    );
 
         // Tạo thêm 5 user giả lập (nếu đã có UserFactory)
         User::factory(5)->create();
     }
 }
-

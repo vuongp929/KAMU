@@ -1,120 +1,106 @@
 @extends('layouts.client')
 
-@section('title', 'CHILL FRIEND')
-
-@section('CSS')
-    <link rel="stylesheet" href="{{ asset('assets/user/css/shop-index.css') }}">
-    <style>
-        .banner{
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
-@endsection
+@section('title', 'Trang chủ - Ôm Là Yêu')
 
 @section('content')
-
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-
-<div class="container">
-    <div class="banner mb-5" data-copy-text="vuong" onclick="copyToClipboard(this)">
-        <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_DC.jpg" alt="Banner" class="img-fluid rounded" style="width:1200px">
-    </div>
-
-    <div class="featured-products">
-        <h2>Sản phẩm nổi bật</h2>
-        <div class="row">
-            @foreach($products as $product)
-                <div class="col-md-3">
-                    <a href="{{ route('product.show', $product->id) }}" class="text-decoration-none">
-                        <div class="card">
-                            <img src="{{ asset('storage/'.$product->image) }}" class="card-img-top" alt="{{ $product->name }}">
-                            <div class="card-body">
-                                <h5 class="card-title text-truncate" title="{{ $product->name }}">{{ $product->name }}</h5>
-                            </a>
-                                <form action="{{ route('cart.add') }}" method="POST" class="ajax-add-to-cart">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <input type="hidden" id="selected-size-{{ $product->id }}" name="size"
-                                           value="{{ optional($product->variants->first())->id ?? '' }}">
-                                    <div class="size-buttons">
-                                        @foreach ($product->variants as $variant)
-                                            <button type="button" class="size-button"
-                                                data-size-id="{{ $variant->id }}"
-                                                data-price="{{ $variant->price }}"
-                                                onclick="selectSize({{ $product->id }}, this)">
-                                                {{ $variant->size }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                    <p class="price mt-2">
-                                        Giá: <span id="product-price-{{ $product->id }}">{{ number_format(optional($product->variants->first())->price ?? 0) }} VND</span>
-                                    </p>
-                                    <button type="submit" class="btn btn-add btn-block mt-3">Thêm vào giỏ</button>
-                                </form>
-                            </div>
-                        </div>
+<div class="main home-page">
+    <div class="container-fluid">
+        {{-- SECTION 1: BANNER CHÍNH & BANNER PHỤ --}}
+        <div class="row banner-section">
+            <div class="col-lg-8 col-md-12">
+                {{-- Banner lớn bên trái --}}
+                <div class="main-banner">
+                    {{-- Thay bằng ảnh banner thực tế của bạn --}}
+                    <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-1.jpg" alt="Gấu Bông An Toàn Cao Cấp Hot Trend" class="img-responsive">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+                {{-- Hai banner nhỏ bên phải --}}
+                <div class="side-banners">
+                    <div class="side-banner-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-2.jpg" alt="Điện Gấu Tận Nhà" class="img-responsive">
                     </div>
-            @endforeach
+                    <div class="side-banner-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-3.jpg" alt="Teddy With Love" class="img-responsive">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- SECTION 2: ICON DỊCH VỤ --}}
+        <div class="row services-section text-center">
+            <div class="container">
+              <a href="{{ url('giao-hang.html') }}" class="text-decoration-none text-dark">
+                    <div class="col-md-3 col-sm-6 service-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-1-e1661254198715.png" alt="Giao Hàng Tận Nhà">
+                        <h4>GIAO HÀNG TẬN NHÀ</h4>
+                    </div>
+                </a>
+                <a href="{{ url('dich-vu-goi-qua.html') }}" class="text-decoration-none text-dark">
+                    <div class="col-md-3 col-sm-6 service-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-1.png" alt="Gói Quà Siêu Đẹp">
+                        <h4>GÓI QUÀ SIÊU ĐẸP</h4>
+                    </div>
+                    </a>
+                <a href="{{ url('cach-giat-gau-bong.html') }}" class="text-decoration-none text-dark">
+
+                <div class="col-md-3 col-sm-6 service-item">
+                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-2-1.png" alt="Cách Giặt Gấu Bông">
+                    <h4>CÁCH GIẶT GẤU BÔNG</h4>
+                </div>
+                    </a>
+
+                <a href="{{ url('chinh-sach-doi-tra.html') }}" class="text-decoration-none text-dark">
+
+                <div class="col-md-3 col-sm-6 service-item">
+                    <img src="https://teddy.vn/wp-content/uploads/2018/04/Artboard-16-copy-3-1.png" alt="Bảo Hành Gấu Bông">
+                    <h4>BẢO HÀNH GẤU BÔNG</h4>
+                </div>
+                    </a>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {{-- SECTION 3: SẢN PHẨM MỚI (GẤU BÔNG HOT TREND) --}}
+        <div class="row product-section">
+            <div class="col-md-12 text-center">
+                <div class="section-title">
+                    <span>GẤU BÔNG HOT TREND</span>
+                </div>
+            </div>
+            
+            @forelse($newProducts as $product)
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    {{-- Sửa lại product-card để có thêm size --}}
+                    @include('clients.product-card', ['product' => $product])
+                </div>
+            @empty
+                <p class="text-center col-xs-12">Chưa có sản phẩm mới nào.</p>
+            @endforelse
+
+            <div class="col-md-12 text-center">
+                <a href="#" class="btn btn-view-more">XEM THÊM GẤU BÔNG HOT TREND <i class="fa fa-angle-double-right"></i></a>
+            </div>
+        </div>
+
+        {{-- SECTION 4: SẢN PHẨM NỔI BẬT (BST HOA GẤU BÔNG) --}}
+        <div class="row product-section">
+            <div class="col-md-12 text-center">
+                <div class="section-title">
+                    <span>BST HOA GẤU BÔNG</span>
+                </div>
+            </div>
+            
+            @forelse($featuredProducts as $product)
+                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    @include('clients.product-card', ['product' => $product])
+                </div>
+            @empty
+                <p class="text-center col-xs-12">Chưa có sản phẩm nổi bật nào.</p>
+            @endforelse
         </div>
     </div>
 </div>
-@endsection
-
-@section('JS')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    function copyToClipboard(element) {
-        const text = element.getAttribute('data-copy-text');
-        if (!text) return;
-
-        const tempInput = document.createElement('input');
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-
-        alert('Đã sao chép: ' + text);
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-    // Lấy tất cả các form trong trang có class 'ajax-form'
-    const ajaxForms = document.querySelectorAll('form.ajax-form');
-    
-    ajaxForms.forEach(form => {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            let form = $(this);
-            let formData = form.serialize();
-            let actionUrl = form.attr('action');
-
-            $.ajax({
-                url: actionUrl,
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        alert('Sản phẩm đã được thêm vào giỏ hàng!');
-                        $('.cart-count').text(response.cart_count);
-                    } else {
-                        alert(response.message || 'Có lỗi xảy ra.');
-                    }
-                },
-                error: function(xhr) {
-                    console.log(xhr.responseText);
-                    alert('Không thể thêm sản phẩm vào giỏ hàng!');
-                }
-            });
-        });
-    });
-    });
-</script>
-
 @endsection

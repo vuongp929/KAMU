@@ -19,7 +19,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('admins.auth.register');
+        return view('auth.register');
     }
 
     /**
@@ -38,8 +38,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            // 'password' => Hash::make($request->password),
-            'password' => $request->password
+            'password' => Hash::make($request->password), 
 
         ]);
 
@@ -47,6 +46,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('/admin/dashboard', absolute: false));
     }
 }
