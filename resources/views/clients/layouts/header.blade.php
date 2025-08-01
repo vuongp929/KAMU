@@ -31,10 +31,11 @@
 
                 <!-- Thanh tìm kiếm -->
                 <div class="col-lg-5 d-none d-lg-block">
-                    <form action="#" method="GET" class="search-form">
+                    <form action="{{ route('clients.search') }}" method="GET" class="search-form">
                         <input type="text" name="query" placeholder="Bạn đang tìm bé gấu nào?..." class="search-input">
                         <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
                     </form>
+
                 </div>
 
                 <!-- Nút chức năng -->
@@ -53,6 +54,7 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a></li>
                                 <li><a class="dropdown-item" href="{{ route('client.orders.index') }}">Đơn hàng của tôi</a></li>
+                                <li><a class="dropdown-item" href="{{ route('wishlist.index') }}">Sản phẩm yêu thích</a></li>
                                 @if(Auth::user()->isAdmin()) {{-- Giả sử có hàm isAdmin() trong model User --}}
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Trang quản trị</a></li>
@@ -127,12 +129,12 @@
                     </li>
 
                     @if(isset($categoriesForMenu))
-                        @foreach($categoriesForMenu as $category)
-                            @if($category->children->isNotEmpty())
+                        {{-- @foreach($categoriesForMenu as $category)
+                            @if($category->activeChildren->isNotEmpty())
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">{{ $category->name }}</a>
                                     <ul class="dropdown-menu">
-                                        @foreach($category->children as $child)
+                                        @foreach($category->activeChildren as $child)
                                             <li>
                                                 <a class="dropdown-item" href="#">{{ $child->name }}</a>
                                             </li>
@@ -144,7 +146,25 @@
                                     <a class="nav-link" href="#">{{ $category->name }}</a>
                                 </li>
                             @endif
+                        @endforeach --}}
+                        @foreach($categoriesForMenu as $category)
+                            @if($category->statu == 1)
+                                {{-- Render menu --}}
+                                @if($category->activeChildren->isNotEmpty())
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">{{ $category->name }}</a>
+                                        <ul class="dropdown-menu">
+                                            @foreach($category->activeChildren as $child)
+                                                <li><a class="dropdown-item" href="#">{{ $child->name }}</a></li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @else
+                                    <li class="nav-item"><a class="nav-link" href="#">{{ $category->name }}</a></li>
+                                @endif
+                            @endif
                         @endforeach
+
                     @endif
 
                     <li class="nav-item">

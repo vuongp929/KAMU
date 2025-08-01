@@ -28,12 +28,31 @@
 
             <div class="row">
                 <div class="col-xl-12">
+                    
                     <div class="card">
+                        
                         <div class="card-header d-flex justify-content-between">
-                            <h5 class="card-title mb-0 align-content-center "></h5>
-                            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
+                            <div>
+                                <h5 class="card-title mb-0 align-content-center "></h5>
+                            <a href="{{ route('admins.categories.create') }}" class="btn btn-primary">
                                 <i data-feather="plus-square"></i> Thêm danh mục
                             </a>
+                            </div>
+                            <div>
+                               <form method="GET" action="{{ route('admins.categories.index') }}" class="mb-3 d-flex gap-2">
+                                <input type="text" name="search" placeholder="Tìm kiếm theo tên..." value="{{ request('search') }}" class="form-control w-25">
+                                
+                                <select name="statu" class="form-select w-25" onchange="this.form.submit()">
+                                    <option value="">-- Tất cả trạng thái --</option>
+                                    <option value="1" {{ request('statu') === '1' ? 'selected' : '' }}>Hiển thị</option>
+                                    <option value="0" {{ request('statu') === '0' ? 'selected' : '' }}>Ẩn</option>
+                                </select>
+
+                                <button type="submit" class="btn btn-primary">Lọc</button>
+                            </form>
+
+                            </div>
+
                         </div>
 
                         <div class="card-body">
@@ -49,48 +68,74 @@
                                 <table id="allTable" class="datatable table table-striped mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Hình ảnh</th>
+                                            {{-- <th scope="col">Hình ảnh</th> --}}
                                             <th scope="col">Tên danh mục</th>
+                                            <th scope="col">Danh mục cha</th>
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col">Hành động</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                   <tbody>
                                         @foreach ($listCategory as $item)
+                                            {{-- DANH MỤC CHA --}}
                                             <tr>
-                                                <td>
-                                                    <img src="{{ Storage::url($item->image) }}" alt="Hình ảnh sản phẩm"
-                                                        width="100px" height="100px" style="object-fit: cover;">
-                                                </td>
                                                 <td>{{ $item->name }}</td>
+                                                <td>{{ $item->parent ? $item->parent->name : '---' }}</td>
                                                 <td class="{{ $item->statu ? 'text-success' : 'text-danger' }}">
                                                     {{ $item->statu ? 'Hiển thị' : 'Ẩn' }}
                                                 </td>
                                                 <td>
-                                                <div class="d-flex gap-2">
-                                                    {{-- Nút sửa --}}
-                                                    <a href="{{ route('admin.categories.edit', $item) }}" 
-                                                    class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
-                                                    title="Sửa">
-                                                        <i class="bi bi-pencil-fill"></i>
-                                                    </a>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('admins.categories.edit', $item->id) }}" 
+                                                        class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
+                                                        title="Sửa">
+                                                            <i class="bi bi-pencil-fill"></i>
+                                                        </a>
 
-                                                    {{-- Nút xóa --}}
-                                                    <form method="POST" action="{{ route('admin.categories.destroy', $item) }}" 
-                                                        onsubmit="return confirm('Bạn có chắc muốn xoá không vậy ?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" 
-                                                                class="btn btn-light btn-sm rounded-circle shadow-sm border border-danger text-danger" 
-                                                                title="Xoá">
-                                                            <i class="bi bi-trash3-fill"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-
-
+                                                        <form method="POST" action="{{ route('admins.categories.destroy', $item->id) }}" 
+                                                            onsubmit="return confirm('Bạn có chắc muốn xoá danh mục cha này không?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" 
+                                                                    class="btn btn-light btn-sm rounded-circle shadow-sm border border-danger text-danger" 
+                                                                    title="Xoá">
+                                                                <i class="bi bi-trash3-fill"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
                                             </tr>
+
+                                            {{-- DANH MỤC CON CỦA DANH MỤC CHA --}}
+                                            @foreach ($item->children as $child)
+                                                <tr>
+                                                    <td>-- {{ $child->name }}</td>
+                                                    <td>{{ $item->name }}</td> {{-- Hiển thị tên danh mục cha --}}
+                                                    <td class="{{ $child->statu ? 'text-success' : 'text-danger' }}">
+                                                        {{ $child->statu ? 'Hiển thị' : 'Ẩn' }}
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="{{ route('admins.categories.edit', $child->id) }}" 
+                                                            class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
+                                                            title="Sửa">
+                                                                <i class="bi bi-pencil-fill"></i>
+                                                            </a>
+
+                                                            <form method="POST" action="{{ route('admins.categories.destroy', $child->id) }}" 
+                                                                onsubmit="return confirm('Bạn có chắc muốn xoá danh mục con này không?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" 
+                                                                        class="btn btn-light btn-sm rounded-circle shadow-sm border border-danger text-danger" 
+                                                                        title="Xoá">
+                                                                    <i class="bi bi-trash3-fill"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
                                     </tbody>
                                 </table>
