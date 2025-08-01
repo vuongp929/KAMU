@@ -46,6 +46,16 @@ class Cart extends Model
             return $total + ($item->quantity * $price);
         }, 0); // 0 là giá trị khởi tạo của $total.
     }
+
+    /**
+     * Accessor để tính tổng số lượng sản phẩm trong giỏ hàng.
+     *
+     * @return int
+     */
+    public function getTotalQuantityAttribute(): int
+    {
+        return $this->items->sum('quantity');
+    }
     
     // ==========================================================
     // === KẾT THÚC PHẦN ACCESSOR TÍNH TOÁN =======================
