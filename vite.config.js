@@ -24,6 +24,7 @@ export default defineConfig({
 
                 // File JS tùy chỉnh của bạn
                 'resources/js/app.js', 
+                'resources/js/admin-chat.js',
             ],
             refresh: true,
         }),

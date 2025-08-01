@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use App\Mail\OrderConfirmationMail;
-use App\Models\Discount;
 
 
 class CheckoutController extends Controller
@@ -27,13 +26,10 @@ class CheckoutController extends Controller
 
 public function index()
 {
-    // Kiểm tra user đã đăng nhập chưa
     if (!Auth::check()) {
         return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để tiếp tục.');
     }
 
-    // === BẮT ĐẦU SỬA LỖI ===
-    // Thay thế 'thumbnail' bằng 'mainImage' và 'firstImage'
     $cart = Cart::with([
                     'items.variant.product.mainImage',
                     'items.variant.product.firstImage'
@@ -41,9 +37,7 @@ public function index()
                 ->where('user_id', Auth::id())
                 ->latest()
                 ->first();
-    // === KẾT THÚC SỬA LỖI ===
 
-    // Nếu giỏ hàng rỗng, không cho vào checkout, chuyển về trang giỏ hàng
     if (!$cart || $cart->items->isEmpty()) {
         return redirect()->route('client.cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
     }
@@ -68,7 +62,7 @@ public function index()
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
         'address' => 'required|string|max:255',
-        'payment_method' => 'required|string|in:cod,vnpay',
+        'payment_method' => 'required|string|in:cod,vnpay,momo',
         'discount_code' => 'nullable|string|max:255',
         'discount_value' => 'nullable|numeric|min:0',
         'final_total' => 'nullable|numeric|min:0',
@@ -114,11 +108,10 @@ public function index()
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
             ]),
-        // 3. Tạo đơn hàng - sử dụng tổng tiền đã được giảm giá
+        ]);
         $finalTotal = $validated['final_total'] ?? $cart->total_price;
         $discountValue = $validated['discount_value'] ?? 0;
         
-        // Kiểm tra và cập nhật mã giảm giá nếu có
         $discountCode = $validated['discount_code'] ?? null;
         $discount = null;
         if ($discountCode) {
@@ -142,8 +135,8 @@ public function index()
                 'product_id' => $variant->product_id ?? $cartItem->product_id,
                 'product_variant_id' => $cartItem->product_variant_id,
                 'quantity' => $cartItem->quantity,
-                'price_at_order' => $cartItem->price_at_order, // Sử dụng giá đã lưu trong giỏ hàng
-                'price' => $variant->price ?? 0, // Giá hiện tại của variant
+                'price_at_order' => $cartItem->price_at_order,
+                'price' => $variant->price ?? 0,
             ]);
             if ($variant) {
                 $variant->decrement('stock', $cartItem->quantity);
@@ -162,7 +155,12 @@ public function index()
         }
 
         DB::commit();
-
+        dd(
+            "Dữ liệu từ form:",
+            $request->all(), // Xem tất cả dữ liệu form gửi lên
+            "Phương thức thanh toán đã lưu vào đơn hàng:",
+            $order->payment_method
+        );
         $order->load('items.variant.product');
 
         

@@ -14,7 +14,6 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\ProductReviewController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Client\RewardController;
 use App\Http\Controllers\Client\PaymentController;
+
 
 
 /*
@@ -108,6 +108,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');
+
+    Route::post('/my-orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
+
 });
 
 // === ROUTE CHO ADMIN ===
@@ -148,9 +151,21 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
 
 });
 
+
+Route::prefix('payment')->name('payment.')->group(function () {
+    // VNPay Routes (nếu có)
+    // Route::get('/vnpay/create', [PaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
+    // Route::get('/vnpay/return', [PaymentController::class, 'returnVnpay'])->name('vnpay.return');
+
+    // Momo Routes
+    Route::get('/momo/create', [PaymentController::class, 'createMomo'])->name('momo.create')->middleware('auth'); // Chỉ người đã đăng nhập mới được tạo
+    Route::get('/momo/return', [PaymentController::class, 'returnMomo'])->name('momo.return');
+    Route::post('/momo/ipn', [PaymentController::class, 'ipnMomo'])->name('momo.ipn');
+
+    // Các trang thông báo chung
+    Route::get('/success', function () { /* ... */ })->name('success');
+    Route::get('/failed', function () { /* ... */ })->name('failed');
 });
-Route::get('/test',[CheckoutController::class, 'test'])->name('test');
-Route::post('/momo_payment', [CheckoutController::class, 'momo_payment'])->name('momo_payment');
 // === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {
     return config('cache.default');

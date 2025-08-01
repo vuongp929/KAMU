@@ -354,7 +354,8 @@ $(document).ready(function() {
                     </h4>
                     <div class="payment-methods">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            {{-- Tùy chọn 1: Thanh toán khi nhận hàng (COD) --}}
+                            <div class="col-md-4 mb-3">
                                 <div class="payment-option">
                                     <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="cod" checked>
                                     <label class="form-check-label payment-label" for="payment_cod">
@@ -364,13 +365,15 @@ $(document).ready(function() {
                                             </div>
                                             <div class="payment-info">
                                                 <div class="payment-title">Thanh toán khi nhận hàng</div>
-                                                <div class="payment-subtitle">COD - Cash on Delivery</div>
+                                                <div class="payment-subtitle">COD</div>
                                             </div>
                                         </div>
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
+
+                            {{-- Tùy chọn 2: Thanh toán qua VNPAY --}}
+                            <div class="col-md-4 mb-3">
                                 <div class="payment-option">
                                     <input class="form-check-input" type="radio" name="payment_method" id="payment_vnpay" value="vnpay">
                                     <label class="form-check-label payment-label" for="payment_vnpay">
@@ -381,6 +384,26 @@ $(document).ready(function() {
                                             <div class="payment-info">
                                                 <div class="payment-title">Thanh toán qua VNPAY</div>
                                                 <div class="payment-subtitle">QR Code / Thẻ ngân hàng</div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            {{-- === BẮT ĐẦU PHẦN THÊM MỚI === --}}
+                            {{-- Tùy chọn 3: Thanh toán qua Momo --}}
+                            <div class="col-md-4 mb-3">
+                                <div class="payment-option">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_momo" value="momo">
+                                    <label class="form-check-label payment-label" for="payment_momo">
+                                        <div class="payment-content">
+                                            <div class="payment-icon">
+                                                {{-- Sử dụng icon Momo --}}
+                                                <img src="https://developers.momo.vn/v3/vi/assets/images/logo.svg" alt="Momo" style="height: 24px;">
+                                            </div>
+                                            <div class="payment-info">
+                                                <div class="payment-title">Thanh toán qua Ví MoMo</div>
+                                                <div class="payment-subtitle">Quét mã QR</div>
                                             </div>
                                         </div>
                                     </label>
