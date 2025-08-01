@@ -87,31 +87,32 @@ class MyOrderController extends Controller
             ->with('info', 'Đơn hàng #' . $order->id . ' đã được xử lý trước đó.');
     }
 
-    public function cancel(Order $order)
+    /**
+     * Hoàn thành đơn hàng và cộng điểm thưởng
+     */
+    public function complete(Order $order)
     {
-        // Chính sách bảo mật: Đảm bảo người dùng chỉ có thể hủy đơn hàng của chính họ
+        // Kiểm tra quyền truy cập
         if ($order->user_id !== Auth::id()) {
-            abort(403, 'Bạn không có quyền hủy đơn hàng này.');
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
         }
 
-        // Kiểm tra xem đơn hàng có thể hủy không (chỉ đơn hàng pending mới có thể hủy)
-        if ($order->status !== 'pending') {
-            return redirect()->back()
-                ->with('error', 'Đơn hàng #' . $order->id . ' không thể hủy vì trạng thái hiện tại.');
-        }
+        // Kiểm tra trạng thái đơn hàng
+        if ($order->status === 'delivered') {
+            // Chuyển sang trạng thái completed và cộng điểm thưởng
+            $order->status = 'completed';
+            $order->save();
 
-        // Hủy đơn hàng
-        $order->status = 'cancelled';
-        $order->save();
+            // Cộng điểm thưởng cho người dùng
+            $user = Auth::user();
+            $user->reward_points += 20;
+            $user->save();
 
-        // Hoàn trả tồn kho nếu cần
-        foreach ($order->orderItems as $orderItem) {
-            if ($orderItem->variant) {
-                $orderItem->variant->increment('stock', $orderItem->quantity);
-            }
+            return redirect()->route('client.orders.index')
+                ->with('success', 'Đơn hàng #' . $order->id . ' đã hoàn thành! Bạn nhận được +20 điểm thưởng.');
         }
 
         return redirect()->route('client.orders.index')
-            ->with('success', 'Đơn hàng #' . $order->id . ' đã được hủy thành công!');
+            ->with('error', 'Đơn hàng phải ở trạng thái "Đã giao" để hoàn thành.');
     }
 }

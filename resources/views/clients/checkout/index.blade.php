@@ -160,7 +160,102 @@
         background-color: #d66095;
         color: white;
     }
+    .discount-section {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        background-color: #f9f9f9;
+    }
+    .discount-message {
+        font-size: 14px;
+        margin-top: 8px;
+    }
+    .discount-message.success {
+        color: #28a745;
+    }
+    .discount-message.error {
+        color: #dc3545;
+    }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    let originalTotal = {{ $cart->total_price }};
+    let appliedDiscount = 0;
+    
+    $('#apply-discount-btn').click(function() {
+        const discountCode = $('#discount-code-input').val().trim();
+        
+        if (!discountCode) {
+            showDiscountMessage('Vui lòng nhập mã giảm giá', 'error');
+            return;
+        }
+        
+        // Disable button while processing
+        $(this).prop('disabled', true).text('Đang xử lý...');
+        
+        // Gửi request kiểm tra mã giảm giá
+        $.ajax({
+            url: '{{ route("client.checkout.validateDiscount") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                discount_code: discountCode,
+                total_amount: originalTotal
+            },
+            success: function(response) {
+                if (response.success) {
+                    appliedDiscount = response.discount_amount;
+                    updateTotal();
+                    showDiscountMessage(response.message, 'success');
+                    $('#discount-row').show();
+                    $('#discount-amount').text('-' + formatCurrency(appliedDiscount));
+                } else {
+                    showDiscountMessage(response.message, 'error');
+                    resetDiscount();
+                }
+            },
+            error: function() {
+                showDiscountMessage('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                resetDiscount();
+            },
+            complete: function() {
+                $('#apply-discount-btn').prop('disabled', false).text('Áp dụng');
+            }
+        });
+    });
+    
+    function updateTotal() {
+        const finalTotal = originalTotal - appliedDiscount;
+        $('#final-total').text(formatCurrency(finalTotal));
+    }
+    
+    function resetDiscount() {
+        appliedDiscount = 0;
+        updateTotal();
+        $('#discount-row').hide();
+        $('#discount-amount').text('-0đ');
+    }
+    
+    function showDiscountMessage(message, type) {
+        $('#discount-message').html('<div class="discount-message ' + type + '">' + message + '</div>');
+    }
+    
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+    }
+    
+    // Reset discount when code input changes
+    $('#discount-code-input').on('input', function() {
+        if (appliedDiscount > 0) {
+            resetDiscount();
+            showDiscountMessage('', '');
+        }
+    });
+});
+</script>
 @endpush
 
 @section('content')
@@ -332,10 +427,33 @@
                             <span>Phí vận chuyển:</span>
                             <span>Miễn phí</span>
                         </div>
+                        
+                        {{-- Mã giảm giá --}}
+                        <div class="discount-section mt-3">
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="discount_code" 
+                                       class="form-control" 
+                                       placeholder="Nhập mã giảm giá"
+                                       value="{{ old('discount_code') }}"
+                                       id="discount-code-input">
+                                <button type="button" 
+                                        class="btn btn-outline-primary" 
+                                        id="apply-discount-btn">
+                                    Áp dụng
+                                </button>
+                            </div>
+                            <div id="discount-message" class="mt-2"></div>
+                        </div>
+                        
                         <hr>
+                        <div class="summary-row" id="discount-row" style="display: none;">
+                            <span>Giảm giá:</span>
+                            <span id="discount-amount" class="text-success">-0đ</span>
+                        </div>
                         <div class="summary-row summary-total">
                             <span>Tổng cộng:</span>
-                            <span id="total-amount">{{ number_format($cart->total_price, 0, ',', '.') }}đ</span>
+                            <span id="final-total">{{ number_format($cart->total_price, 0, ',', '.') }}đ</span>
                         </div>
 
                         <div class="d-grid mt-4">

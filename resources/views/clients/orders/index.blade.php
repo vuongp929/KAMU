@@ -115,6 +115,12 @@ function confirmCancelOrder(orderId) {
                         <a class="nav-link active" href="{{ route('client.orders.index') }}"><i class="fas fa-clipboard-list"></i> Đơn Mua</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('client.rewards.index') }}"><i class="fas fa-star"></i> Điểm Thưởng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('client.rewards.discount-codes') }}"><i class="fas fa-ticket-alt"></i> Mã Đổi Thưởng</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-bell"></i> Thông Báo</a>
                     </li>
                 </ul>
@@ -205,40 +211,29 @@ function confirmCancelOrder(orderId) {
                                 @endforeach
                             </div>
                             <div class="order-footer">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span>Tạm tính:</span>
-                                            <span>{{ number_format($orderSubtotal, 0, ',', '.') }}đ</span>
-                                        </div>
-                                        @php
-                                            // Tính toán số tiền giảm giá từ tổng tiền gốc và tổng tiền cuối
-                                            $originalTotal = $orderSubtotal;
-                                            $finalTotal = $order->total_price;
-                                            $orderDiscount = $originalTotal - $finalTotal;
-                                        @endphp
-                                        @if($orderDiscount > 0)
-                                            <div class="d-flex justify-content-between mb-1">
-                                                <span>Giảm giá:</span>
-                                                <span class="text-success">-{{ number_format($orderDiscount, 0, ',', '.') }}đ</span>
-                                            </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="me-3">Thành tiền:</span>
+                                        <span class="total-price">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
+                                        @if($order->payment_status == 'paid')
+                                            <span class="badge badge-success ml-2">
+                                                <i class="fas fa-star"></i> +20 điểm
+                                            </span>
                                         @endif
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span>Phí vận chuyển:</span>
-                                            <span>Miễn phí</span>
-                                        </div>
                                     </div>
-                                    <div class="col-md-4 text-end">
-                                        <div class="total-price">
-                                            <span class="me-2">Tổng cộng:</span>
-                                            <span class="fw-bold">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
-                                        </div>
+                                    <div class="order-actions">
+                                        @if($order->status == 'delivered')
+                                            <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check"></i> Hoàn Thành
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye"></i> Chi Tiết
+                                        </a>
                                     </div>
-                                </div>
-                                <div class="mt-3 text-end">
-                                    <a href="{{ route('client.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-2">
-                                        <i class="fas fa-eye me-1"></i>Xem chi tiết
-                                    </a>
                                 </div>
                             </div>
                         </div>
