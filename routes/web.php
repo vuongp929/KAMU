@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
@@ -133,6 +134,9 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
 
 });
 
+});
+Route::get('/test',[CheckoutController::class, 'test'])->name('test');
+Route::post('/momo_payment', [CheckoutController::class, 'momo_payment'])->name('momo_payment');
 // === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {
     return config('cache.default');
