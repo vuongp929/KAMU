@@ -3,37 +3,48 @@
 namespace App\Http\View\Composers;
 
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
-use App\Models\Cart;
+use Illuminate\Support\Facades\Cache; // Import Cache facade
 
 class ClientLayoutComposer
 {
     /**
-     * Bind data to the view.
+     * Dữ liệu danh mục được lưu cache.
+     * @var \Illuminate\Database\Eloquent\Collection
+     */
+    protected $categories;
+
+    /**
+     * Khởi tạo composer, lấy dữ liệu danh mục từ cache nếu có.
+     */
+    public function __construct()
+    {
+        // Cache danh mục trong 60 phút để tránh truy vấn DB liên tục
+        // 'categories_menu' là key của cache
+        $this->categories = Cache::remember('categories_menu', 60 * 60, function () {
+            return Category::whereNull('parent_id')
+                           ->with('children') // Tải sẵn các danh mục con
+                           ->get();
+        });
+    }
+
+    /**
+     * Gắn dữ liệu vào view.
      *
      * @param  \Illuminate\View\View  $view
      * @return void
      */
     public function compose(View $view)
     {
-        // 1. Lấy tất cả danh mục cha và các con của chúng cho menu
-        $categoriesForMenu = Category::whereNull('parent_id')
-                                     ->with('children') // Tải trước các danh mục con để tối ưu
-                                     ->get();
+        // --- LOGIC TÍNH TOÁN SỐ LƯỢNG GIỎ HÀNG ---
+        // Giả sử giỏ hàng lưu trong session
+        $cart = session()->get('cart', []);
+        $cartCount = count($cart);
 
-        // 2. Lấy số lượng sản phẩm trong giỏ hàng
-        $cartCount = 0;
-        if (Auth::check()) { // Chỉ kiểm tra khi người dùng đã đăng nhập
-            $cart = Cart::where('user_id', Auth::id())->withCount('items')->first();
-            if ($cart) {
-                // withCount('items') sẽ tạo ra một thuộc tính 'items_count'
-                $cartCount = $cart->items_count;
-            }
-        }
-
-        // 3. Gắn các biến này vào view
-        $view->with('categoriesForMenu', $categoriesForMenu);
-        $view->with('cartCount', $cartCount);
+        // Gắn tất cả các biến cần thiết vào view
+        $view->with([
+            'categoriesForMenu' => $this->categories,
+            'cartCount' => $cartCount,
+        ]);
     }
 }

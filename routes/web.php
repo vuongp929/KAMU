@@ -14,11 +14,16 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Client\MyOrderController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Admin\ChatController as AdminChatController;
+use App\Http\Controllers\Client\RewardController;
+use App\Http\Controllers\Client\PaymentController;
 
 
 /*
@@ -32,7 +37,7 @@ Route::get('/', [ClientController::class, 'index'])->name('home');
 Route::get('/products/{product}', [ClientProductController::class, 'show'])->name('client.products.show');
 
 Route::prefix('cart')->name('cart.')->group(function () {
-    Route::post('/apply-discount', [OrderController::class, 'applyDiscount'])->name('apply-discount');
+    Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
 });
 
 // Trang giao hàng
@@ -64,6 +69,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/{product}/reviews', [\App\Http\Controllers\ProductReviewController::class, 'store'])->name('products.reviews.store');
     Route::post('/products/{product}/reviews/{review}/reply', [\App\Http\Controllers\ProductReviewController::class, 'reply'])->name('products.reviews.reply');
     Route::delete('/products/{product}/reviews/{review}', [\App\Http\Controllers\ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
+    Route::get('/orders/{order}/confirm', [MyOrderController::class, 'confirm'])
+    ->name('client.orders.confirm')
+    ->middleware('signed');
 
 
     Route::prefix('cart')->name('client.cart.')->group(function () {
@@ -76,42 +84,73 @@ Route::middleware('auth')->group(function () {
     Route::prefix('checkout')->name('client.checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
         Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('placeOrder');
+        Route::post('/validate-discount', [CheckoutController::class, 'validateDiscount'])->name('validateDiscount');
     });
 
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
+    Route::post('/my-orders/{order}/complete', [MyOrderController::class, 'complete'])->name('client.orders.complete');
+
+    // Routes cho điểm thưởng
+    Route::prefix('rewards')->name('client.rewards.')->group(function () {
+        Route::get('/', [RewardController::class, 'index'])->name('index');
+        Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
+        Route::get('/history', [RewardController::class, 'history'])->name('history');
+        Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
+    });
+
+    // Routes cho thanh toán
+    Route::prefix('payment')->name('client.payment.')->group(function () {
+        Route::post('/success', [PaymentController::class, 'paymentSuccess'])->name('success');
+        Route::post('/failed', [PaymentController::class, 'paymentFailed'])->name('failed');
+        Route::post('/cod/{order}', [PaymentController::class, 'processCodPayment'])->name('cod');
+    });
+
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');
 });
 
 // === ROUTE CHO ADMIN ===
-Route::group([
-    'prefix' => 'admin',
-    'as' => 'admins.',
-    'middleware' => ['auth', 'check.admin']
-], function () {
-    // 1. Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
 
-    // 2. CRUD Resources
-    Route::resource('products', ProductController::class);
-    Route::resource('attributes', AttributeController::class);
-    Route::resource('orders', OrderController::class);
-    Route::resource('discounts', DiscountController::class);
-    Route::resource('categories', CategoryController::class);
 
-    // 3. Product Reviews
-    Route::resource('reviews', ProductReviewController::class)->except(['create', 'edit', 'show']);
-    Route::post('/reviews/{id}/reply', [ProductReviewController::class, 'reply'])->name('reviews.reply');
-    Route::post('/reviews/{id}/toggle-hide', [ProductReviewController::class, 'toggleHide'])->name('reviews.toggleHide');
+    // 1. DASHBOARD
+    // Tên đầy đủ được đặt trực tiếp ở đây
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // 4. Users
-    Route::get('users', [AuthController::class, 'listUser'])->name('users.index');
-    Route::get('users/create', [AuthController::class, 'createUser'])->name('users.create');
-    Route::post('users', [AuthController::class, 'storeUser'])->name('users.store');
-    Route::get('users/{id}/edit', [AuthController::class, 'editUser'])->name('users.edit');
-    Route::post('users/{id}', [AuthController::class, 'updateUser'])->name('users.update');
-    Route::delete('users/{id}', [AuthController::class, 'deleteUser'])->name('users.destroy');
+    // 2. QUẢN LÝ CRUD
+    // Sử dụng ->name() để gán tiền tố tên cho resource routes
+    Route::resource('products', ProductController::class)->names('admin.products');
+    Route::resource('attributes', AttributeController::class)->names('admin.attributes');
+    Route::resource('orders', OrderController::class)->names('admin.orders');
+    Route::resource('discounts', DiscountController::class)->names('admin.discounts');
+    Route::resource('categories', CategoryController::class)->names('admin.categories');
+
+    // 3. QUẢN LÝ ĐÁNH GIÁ (PRODUCT REVIEWS)
+    Route::resource('reviews', ProductReviewController::class)
+        ->except(['create', 'edit', 'show'])
+        ->names('admin.reviews'); // Đặt tên cho resource
+        
+    // Đặt tên đầy đủ cho các route tùy chỉnh
+    Route::post('/reviews/{id}/reply', [ProductReviewController::class, 'reply'])->name('admin.reviews.reply');
+    Route::post('/reviews/{id}/toggle-hide', [ProductReviewController::class, 'toggleHide'])->name('admin.reviews.toggleHide');
+
+    // 4. QUẢN LÝ NGƯỜI DÙNG
+    Route::get('users', [AuthController::class, 'listUser'])->name('admin.users.index');
+    Route::get('users/create', [AuthController::class, 'createUser'])->name('admin.users.create');
+    Route::post('users', [AuthController::class, 'storeUser'])->name('admin.users.store');
+    Route::get('users/{id}/edit', [AuthController::class, 'editUser'])->name('admin.users.edit');
+    Route::post('users/{id}', [AuthController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('users/{id}', [AuthController::class, 'deleteUser'])->name('admin.users.destroy');
+
+    Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');
+    Route::get('/chat/search-users', [AdminChatController::class, 'searchUsers'])->name('admin.chat.searchUsers');
+
 });
 
+});
+Route::get('/test',[CheckoutController::class, 'test'])->name('test');
+Route::post('/momo_payment', [CheckoutController::class, 'momo_payment'])->name('momo_payment');
 // === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {
     return config('cache.default');

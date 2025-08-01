@@ -11,7 +11,7 @@
                             <h3 class="m-0">Danh sách mã giảm giá</h3>
                         </div>
                         <div class="header_more_tool">
-                            <a href="{{ route('admins.discounts.create') }}" class="btn btn-primary">Thêm mã giảm giá</a>
+                            <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">Thêm mã giảm giá</a>
                         </div>
                     </div>
                 </div>
@@ -36,10 +36,22 @@
                                 @foreach($discounts as $discount)
                                 <tr>
                                     <td>{{ $discount->code }}</td>
-                                    <td>{{ $discount->discount }}%</td>
+                                    <td>
+                                        @if($discount->discount_type === 'percent')
+                                            @if(is_numeric($discount->discount) && $discount->discount > 0)
+                                                {{ $discount->discount }}%
+                                            @else
+                                                N/A
+                                            @endif
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($discount->discount_type === 'amount' && $discount->amount)
                                             {{ number_format($discount->amount) }} VND
+                                        @elseif($discount->discount_type === 'percent' && (empty($discount->amount) || $discount->amount == 0))
+                                            N/A
                                         @else
                                             -
                                         @endif
@@ -47,18 +59,34 @@
                                     <td>{{ number_format($discount->min_order_amount) }} VND</td>
                                     <td>{{ $discount->start_at ? (\Carbon\Carbon::parse($discount->start_at)->format('d/m/Y H:i')) : '' }}</td>
                                     <td>{{ $discount->end_at ? (\Carbon\Carbon::parse($discount->end_at)->format('d/m/Y H:i')) : '' }}</td>
-                                    <td>{{ $discount->max_uses }}</td>
-                                    <td>{{ $discount->used_count }}</td>
                                     <td>
-                                        @if($discount->is_active)
-                                            <span class="badge bg-success">Hoạt động</span>
+                                        @if($discount->max_uses !== null)
+                                            {{ number_format($discount->max_uses) }}
                                         @else
-                                            <span class="badge bg-danger">Không hoạt động</span>
+                                            <span class="text-muted">Không giới hạn</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admins.discounts.edit', $discount->id) }}" class="btn btn-sm btn-info">Sửa</a>
-                                        <form action="{{ route('admins.discounts.destroy', $discount->id) }}" method="POST" class="d-inline">
+                                        {{ number_format($discount->used_count) }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $status = $discount->getStatus();
+                                            $statusLabels = [
+                                                'active' => ['Hoạt động', 'bg-success'],
+                                                'disabled' => ['Vô hiệu hóa', 'bg-danger'],
+                                                'expired' => ['Hết hạn', 'bg-secondary'],
+                                                'not_started' => ['Chưa bắt đầu', 'bg-info'],
+                                                'used_up' => ['Hết số lượng', 'bg-warning']
+                                            ];
+                                            $label = $statusLabels[$status] ?? ['Không xác định', 'bg-secondary'];
+                                        @endphp
+                                        
+                                        <span class="badge {{ $label[1] }}">{{ $label[0] }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.discounts.edit', $discount->id) }}" class="btn btn-sm btn-info">Sửa</a>
+                                        <form action="{{ route('admin.discounts.destroy', $discount->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</button>
@@ -94,7 +122,7 @@
 @endsection
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('admins/css/bootstrap1.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/style1.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/colors/default.css') }}" id="colorSkinCSS">
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap1.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('admin/css/style1.css') }}" />
+    <link rel="stylesheet" href="{{ asset('admin/css/colors/default.css') }}" id="colorSkinCSS">
 @endsection

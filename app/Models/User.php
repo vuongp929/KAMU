@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable, HasFactory;
@@ -23,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'address',
         'password',
+        'reward_points',
     ];
 
     /**
@@ -94,4 +96,58 @@ class User extends Authenticatable implements MustVerifyEmail
     return $this->hasOne(Cart::class);
 }
 
+    /**
+     * Lấy các đơn hàng của người dùng
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Cộng điểm thưởng cho người dùng
+     */
+    public function addRewardPoints(int $points)
+    {
+        $this->increment('reward_points', $points);
+    }
+
+    /**
+     * Trừ điểm thưởng của người dùng
+     */
+    public function deductRewardPoints(int $points)
+    {
+        if ($this->reward_points >= $points) {
+            $this->decrement('reward_points', $points);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra xem người dùng có đủ điểm để quy đổi không
+     */
+    public function hasEnoughPoints(int $requiredPoints): bool
+    {
+        return $this->reward_points >= $requiredPoints;
+    }
+
+    /**
+     * Lấy các mã giảm giá của người dùng
+     */
+    public function discountCodes()
+    {
+        return $this->hasMany(UserDiscountCode::class);
+    }
+
+    /**
+     * Lấy các mã giảm giá còn hiệu lực
+     */
+    public function activeDiscountCodes()
+    {
+        return $this->discountCodes()
+            ->where('is_used', false)
+            ->where('expires_at', '>', now())
+            ->orderBy('created_at', 'desc');
+    }
 }
