@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->integer('discount')->unsigned();
+            $table->integer('discount')->unsigned()->nullable();
             
             $table->dateTime('start_at')->nullable();   
             $table->dateTime('end_at')->nullable();  
@@ -24,6 +24,10 @@ return new class extends Migration {
             $table->json('applicable_category_ids')->nullable();
             
             $table->boolean('is_active')->default(true);
+            
+            $table->string('discount_type')->default('percent');
+            $table->decimal('amount', 15, 2)->nullable();
+            $table->boolean('once_per_order')->default(false);
             
             $table->timestamps();
         });

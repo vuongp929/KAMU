@@ -4,7 +4,12 @@
 <div class="container-fluid">
     @if ($errors->any())
         <div id="error-alert" class="alert alert-danger animate__animated animate__slideInRight" style="position: relative; z-index: 9999; min-width: 300px;">
-            Thêm mã giảm giá bị lỗi
+            <strong>Thêm mã giảm giá bị lỗi:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
         <script>
             setTimeout(function() {
@@ -14,7 +19,7 @@
                     alert.classList.add('animate__slideOutUp');
                     setTimeout(() => alert.remove(), 1000);
                 }
-            }, 3000);
+            }, 8000);
         </script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     @endif
@@ -57,13 +62,41 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mb-3">
+                                    <label for="discount_type">Loại giảm giá</label>
+                                    <select class="form-control @error('discount_type') is-invalid @enderror" id="discount_type" name="discount_type">
+                                        <option value="percent" {{ old('discount_type') == 'percent' ? 'selected' : '' }}>Phần trăm (%)</option>
+                                        <option value="amount" {{ old('discount_type') == 'amount' ? 'selected' : '' }}>Số tiền (VNĐ)</option>
+                                    </select>
+                                    @error('discount_type')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3" id="discount_percent_group">
                                     <label for="discount_value">Giá trị giảm (%)</label>
                                     <input type="number" class="form-control @error('discount_value') is-invalid @enderror" id="discount_value" name="discount_value" min="0" max="100" value="{{ old('discount_value') }}">
                                     @error('discount_value')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+                                <div class="form-group mb-3 d-none" id="discount_amount_group">
+                                    <label for="amount">Số tiền giảm (VNĐ)</label>
+                                    <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" min="0" value="{{ old('amount') }}">
+                                    @error('amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label>&nbsp;</label>
+                                    <div class="custom-control custom-checkbox mt-2">
+                                        <input type="checkbox" class="custom-control-input" id="once_per_order" name="once_per_order" {{ old('once_per_order') ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="once_per_order">Chỉ dùng 1 lần/đơn hàng</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +161,56 @@
 @endsection
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('admins/css/bootstrap1.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/style1.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admins/css/colors/default.css') }}" id="colorSkinCSS">
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap1.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('admin/css/style1.css') }}" />
+    <link rel="stylesheet" href="{{ asset('admin/css/colors/default.css') }}" id="colorSkinCSS">
 @endsection
+
+<script>
+// Script để toggle discount fields
+function toggleDiscountFields() {
+    const discountType = document.getElementById('discount_type');
+    const percentGroup = document.getElementById('discount_percent_group');
+    const amountGroup = document.getElementById('discount_amount_group');
+    
+    console.log('Toggle function called');
+    console.log('discountType value:', discountType ? discountType.value : 'null');
+    
+    if (discountType && percentGroup && amountGroup) {
+        if (discountType.value === 'amount') {
+            percentGroup.classList.add('d-none');
+            amountGroup.classList.remove('d-none');
+            console.log('Showing amount field, hiding percent field');
+        } else {
+            percentGroup.classList.remove('d-none');
+            amountGroup.classList.add('d-none');
+            console.log('Showing percent field, hiding amount field');
+        }
+    } else {
+        console.error('Some elements not found:', {
+            discountType: !!discountType,
+            percentGroup: !!percentGroup,
+            amountGroup: !!amountGroup
+        });
+    }
+}
+
+// Chạy khi trang load xong
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing discount toggle');
+    
+    // Gọi lần đầu
+    toggleDiscountFields();
+    
+    // Thêm event listener
+    const discountType = document.getElementById('discount_type');
+    if (discountType) {
+        discountType.addEventListener('change', function() {
+            console.log('Discount type changed to:', this.value);
+            toggleDiscountFields();
+        });
+    } else {
+        console.error('discount_type element not found');
+    }
+});
+</script>

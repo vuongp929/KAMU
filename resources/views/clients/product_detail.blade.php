@@ -94,6 +94,67 @@
         <p class="mt-4 text-gray-600">{{ $product->description }}</p>
     </div>
 </div>
+
+{{-- Đánh giá & Bình luận sản phẩm --}}
+<div class="mt-10">
+    <h2 class="text-2xl font-bold mb-4 text-blue-700">Đánh giá & Bình luận</h2>
+    @if(session('success'))
+        <div class="alert alert-success mb-4">{{ session('success') }}</div>
+    @endif
+    {{-- Form gửi đánh giá --}}
+    @auth
+    <form action="{{ route('products.reviews.store', $product->id) }}" method="POST" class="mb-6 bg-gray-50 p-4 rounded-lg shadow">
+        @csrf
+        <div class="flex items-center mb-2">
+            <label class="mr-2 font-semibold">Số sao:</label>
+            <select name="stars" class="border rounded p-1">
+                <option value="">-- Chọn --</option>
+                @for($i=1;$i<=5;$i++)
+                    <option value="{{ $i }}">{{ $i }} ★</option>
+                @endfor
+            </select>
+        </div>
+        <textarea name="content" class="form-control w-full border rounded p-2 mb-2" rows="2" placeholder="Nhập bình luận..." required></textarea>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Gửi đánh giá</button>
+    </form>
+    @else
+    <div class="mb-4">
+        <a href="{{ route('login') }}" class="text-blue-600 underline">Đăng nhập để đánh giá</a>
+    </div>
+    @endauth
+
+    {{-- Danh sách đánh giá --}}
+    <div class="space-y-4">
+        @foreach($product->reviews()->where('is_hidden', false)->whereNull('parent_id')->latest()->get() as $review)
+            <div class="bg-white p-4 rounded shadow">
+                <div class="flex items-center mb-1">
+                    <span class="font-semibold text-gray-800">{{ $review->user->name ?? 'Ẩn' }}</span>
+                    @if($review->stars)
+                        <span class="ml-2 text-yellow-500">{{ str_repeat('★', $review->stars) }}</span>
+                    @endif
+                    <span class="ml-2 text-gray-400 text-xs">{{ $review->created_at->format('d/m/Y H:i') }}</span>
+                </div>
+                <div class="mb-2">{{ $review->content }}</div>
+                {{-- Trả lời bình luận --}}
+                @auth
+                <form action="{{ route('products.reviews.reply', [$product->id, $review->id]) }}" method="POST" class="mb-2">
+                    @csrf
+                    <textarea name="content" class="form-control w-full border rounded p-1 mb-1" rows="1" placeholder="Trả lời bình luận này..." required></textarea>
+                    <button type="submit" class="text-xs bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">Trả lời</button>
+                </form>
+                @endauth
+                {{-- Hiển thị các trả lời --}}
+                @foreach($review->replies()->where('is_hidden', false)->get() as $reply)
+                    <div class="ml-6 mt-2 p-2 bg-gray-50 border-l-4 border-blue-200 rounded">
+                        <span class="font-semibold text-blue-700">{{ $reply->user->name ?? 'Ẩn' }}</span>
+                        <span class="ml-2 text-gray-400 text-xs">{{ $reply->created_at->format('d/m/Y H:i') }}</span>
+                        <div>{{ $reply->content }}</div>
+                    </div>
+                @endforeach
+            </div>
+        @endforeach
+    </div>
+</div>
 @endsection
 @section('JS')
 <script>
