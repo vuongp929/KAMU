@@ -19,6 +19,29 @@ class Order extends Model
         'shipping_address',
     ];
 
+    protected $casts = [
+        'shipping_address' => 'array',
+    ];
+
+     public function getNameAttribute()
+    {
+        return $this->shipping_address['name'] ?? 'N/A';
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->shipping_address['email'] ?? 'N/A';
+    }
+    
+    public function getPhoneAttribute()
+    {
+        return $this->shipping_address['phone'] ?? 'N/A';
+    }
+
+    public function getAddressAttribute()
+    {
+        return $this->shipping_address['address'] ?? 'N/A';
+    }
     // Quan hệ với khách hàng
     public function user()
     {
