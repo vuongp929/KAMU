@@ -1,13 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-// === IMPORT CONTROLLERS ===
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
+
+// === IMPORT CONTROLLERS ===
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\CartController;
@@ -15,8 +17,10 @@ use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Client\MyOrderController;
+use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
+
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
@@ -33,8 +37,21 @@ Route::get('/', [ClientController::class, 'index'])->name('home');
 Route::get('/products/{product}', [ClientProductController::class, 'show'])->name('client.products.show');
 
 Route::prefix('cart')->name('cart.')->group(function () {
-    Route::post('/apply-discount', [OrderController::class, 'applyDiscount'])->name('apply-discount');
+    Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
 });
+
+// Trang giao hàng
+Route::get('giao-hang', [PageController::class, 'giaoHang'])->name('giao-hang');
+Route::get('dich-vu-goi-qua', [PageController::class, 'goiQua'])->name('dich-vu-goi-qua');
+Route::get('cach-giat-gau-bong', [PageController::class, 'giatGau'])->name('cach-giat-gau-bong');
+Route::get('chinh-sach-doi-tra', [PageController::class, 'doiTra'])->name('chinh-sach-doi-tra');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wishlist',                 [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add',            [WishlistController::class, 'addWishlist'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{id}',  [WishlistController::class, 'removeWishlist'])->name('wishlist.remove');
+});
+Route::get('/search', [App\Http\Controllers\Client\ProductController::class, 'search'])->name('clients.search');
+
 
 // --- ROUTE XÁC THỰC (Laravel Breeze) ---
 require __DIR__ . '/auth.php';
@@ -67,15 +84,34 @@ Route::middleware('auth')->group(function () {
     Route::prefix('checkout')->name('client.checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
         Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('placeOrder');
+        Route::post('/validate-discount', [CheckoutController::class, 'validateDiscount'])->name('validateDiscount');
     });
 
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
+    Route::post('/my-orders/{order}/complete', [MyOrderController::class, 'complete'])->name('client.orders.complete');
+
+    // Routes cho điểm thưởng
+    Route::prefix('rewards')->name('client.rewards.')->group(function () {
+        // Route::get('/', [RewardController::class, 'index'])->name('index');
+        // Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
+        // Route::get('/history', [RewardController::class, 'history'])->name('history');
+        // Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
+    });
+
+    // Routes cho thanh toán
+    Route::prefix('payment')->name('client.payment.')->group(function () {
+        Route::post('/success', [PaymentController::class, 'paymentSuccess'])->name('success');
+        Route::post('/failed', [PaymentController::class, 'paymentFailed'])->name('failed');
+        Route::post('/cod/{order}', [PaymentController::class, 'processCodPayment'])->name('cod');
+    });
 
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');
-});
 
+    Route::post('/my-orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
+
+});
 
 // === ROUTE CHO ADMIN ===
 Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
@@ -117,6 +153,21 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
     Route::get('admin/invoices/{order}', [InvoiceController::class, 'show'])->name('admin.invoices.show');
 });
 
+
+Route::prefix('payment')->name('payment.')->group(function () {
+    // VNPay Routes (nếu có)
+    // Route::get('/vnpay/create', [PaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
+    // Route::get('/vnpay/return', [PaymentController::class, 'returnVnpay'])->name('vnpay.return');
+
+    // Momo Routes
+    Route::get('/momo/create', [PaymentController::class, 'createMomo'])->name('momo.create')->middleware('auth'); // Chỉ người đã đăng nhập mới được tạo
+    Route::get('/momo/return', [PaymentController::class, 'returnMomo'])->name('momo.return');
+    Route::post('/momo/ipn', [PaymentController::class, 'ipnMomo'])->name('momo.ipn');
+
+    // Các trang thông báo chung
+    Route::get('/success', function () { /* ... */ })->name('success');
+    Route::get('/failed', function () { /* ... */ })->name('failed');
+});
 // === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {
     return config('cache.default');

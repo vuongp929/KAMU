@@ -31,6 +31,13 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
+
+    public function activeChildren()
+    {
+        return $this->hasMany(Category::class, 'parent_id')->where('statu', 1);
+    }
+
+
     
     public function products()
     {

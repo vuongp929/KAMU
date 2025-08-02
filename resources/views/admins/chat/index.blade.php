@@ -86,11 +86,5 @@
 @endpush
 
 @push('scripts')
-{{-- JavaScript cho trang chat admin --}}
-    <script>
-        window.adminId = {{ Auth::id() }};
-    </script>
-    <script src="{{ asset('js/admin-chat-custom.js') }}"></script>
     @vite(['resources/js/admin-chat.js'])
-
 @endpush

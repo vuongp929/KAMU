@@ -66,6 +66,9 @@
     {{-- Header --}}
     @include('clients.layouts.header')
 
+    {{-- Thông báo --}}
+    @include('components.notification')
+
     {{-- Nội dung chính của trang sẽ được chèn vào đây --}}
     @yield('content')
 

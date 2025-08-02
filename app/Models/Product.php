@@ -44,6 +44,9 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'product_category');
     }
 
+    public function reviews() {
+        return $this->hasMany(ProductReview::class);
+    }
     /**
      * Lấy tất cả các biến thể của sản phẩm (Một-Nhiều).
      */
@@ -87,10 +90,6 @@ class Product extends Model
     /**
      * Lấy các đánh giá/bình luận của sản phẩm.
      */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(\App\Models\ProductReview::class);
-    }
 
     //======================================================================
     // THUỘC TÍNH ẢO (ACCESSORS)

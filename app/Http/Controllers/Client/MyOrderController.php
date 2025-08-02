@@ -86,4 +86,33 @@ class MyOrderController extends Controller
         return redirect()->route('client.orders.index')
             ->with('info', 'Đơn hàng #' . $order->id . ' đã được xử lý trước đó.');
     }
+
+    /**
+     * Hoàn thành đơn hàng và cộng điểm thưởng
+     */
+    public function complete(Order $order)
+    {
+        // Kiểm tra quyền truy cập
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
+        // Kiểm tra trạng thái đơn hàng
+        if ($order->status === 'delivered') {
+            // Chuyển sang trạng thái completed và cộng điểm thưởng
+            $order->status = 'completed';
+            $order->save();
+
+            // Cộng điểm thưởng cho người dùng
+            $user = Auth::user();
+            $user->reward_points += 20;
+            $user->save();
+
+            return redirect()->route('client.orders.index')
+                ->with('success', 'Đơn hàng #' . $order->id . ' đã hoàn thành! Bạn nhận được +20 điểm thưởng.');
+        }
+
+        return redirect()->route('client.orders.index')
+            ->with('error', 'Đơn hàng phải ở trạng thái "Đã giao" để hoàn thành.');
+    }
 }
