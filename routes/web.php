@@ -24,6 +24,11 @@ use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Admin\ChatController as AdminChatController;
+use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
+use App\Http\Controllers\Client\RewardController;
+use App\Http\Controllers\Client\PaymentController;
+
 
 
 /*
@@ -164,6 +169,11 @@ Route::prefix('payment')->name('payment.')->group(function () {
     Route::get('/momo/return', [PaymentController::class, 'returnMomo'])->name('momo.return');
     Route::post('/momo/ipn', [PaymentController::class, 'ipnMomo'])->name('momo.ipn');
 
+    Route::get('/vnpay/create', [ClientPaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
+    
+    // Route VNPAY
+    Route::get('/vnpay/return', [ClientPaymentController::class, 'returnVnpay'])->name('vnpay.return');
+    Route::get('/vnpay/ipn', [ClientPaymentController::class, 'ipnVnpay'])->name('vnpay.ipn');
     // Các trang thông báo chung
     Route::get('/success', function () { /* ... */ })->name('success');
     Route::get('/failed', function () { /* ... */ })->name('failed');

@@ -54,53 +54,51 @@ public function index()
     /**
      * Xử lý logic đặt hàng.
      */
+    /**
+     * Xử lý logic đặt hàng, tạo đơn hàng và chuyển hướng thanh toán.
+     */
     public function placeOrder(Request $request)
-{
-    // 1. Validate
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'phone' => 'required|string|max:20',
-        'address' => 'required|string|max:255',
-        'payment_method' => 'required|string|in:cod,vnpay,momo',
-        'discount_code' => 'nullable|string|max:255',
-        'discount_value' => 'nullable|numeric|min:0',
-        'final_total' => 'nullable|numeric|min:0',
-    ]);
+    {
+        // 1. Validate dữ liệu người dùng nhập từ form
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+            'payment_method' => 'required|string|in:cod,vnpay,momo',
+            'discount_code' => 'nullable|string|max:255',
+        ]);
 
-    $user = Auth::user();
-    $cart = Cart::with('items.variant.product')->where('user_id', $user->id)->latest()->first();
+        $user = Auth::user();
+        $cart = Cart::with('items.variant.product')->where('user_id', $user->id)->latest()->first();
 
-    // 2. Kiểm tra lại giỏ hàng
-    if (!$cart || $cart->items->isEmpty()) {
-        return redirect()->route('home')->with('error', 'Giỏ hàng của bạn đã hết hạn. Vui lòng thử lại.');
-    }
-
-    // 3. Xử lý mã giảm giá nếu có
-    $discountAmount = 0;
-    $discountCode = null;
-    $finalTotal = $cart->total_price;
-
-    if (!empty($validated['discount_code'])) {
-        $discountResult = $this->applyDiscountCode($validated['discount_code'], $user, $cart->total_price);
-        
-        if ($discountResult['success']) {
-            $discountAmount = $discountResult['discount_amount'];
-            $discountCode = $discountResult['discount_code'];
-            $finalTotal = $cart->total_price - $discountAmount;
-        } else {
-            return back()->with('error', $discountResult['message'])->withInput();
+        // 2. Kiểm tra lại giỏ hàng để đảm bảo an toàn
+        if (!$cart || $cart->items->isEmpty()) {
+            return redirect()->route('home')->with('error', 'Giỏ hàng của bạn đã hết hạn hoặc có lỗi. Vui lòng thử lại.');
         }
-    }
 
-    DB::beginTransaction();
-    try {
-        // 4. Tạo đơn hàng
-        $order = Order::create([
+        // 3. Tính toán lại tổng tiền cuối cùng dựa trên mã giảm giá (nếu có)
+        $finalTotal = $cart->total_price;
+        if (!empty($validated['discount_code'])) {
+            $discountResult = $this->applyDiscountCode($validated['discount_code'], $user, $cart->total_price);
+            
+            // Nếu mã không hợp lệ, quay lại với thông báo lỗi
+            if (!$discountResult['success']) {
+                return back()->with('error', $discountResult['message'])->withInput();
+            }
+            // Nếu hợp lệ, cập nhật tổng tiền cuối cùng
+            $finalTotal = $cart->total_price - $discountResult['discount_amount'];
+        }
+
+        // Bắt đầu một transaction để đảm bảo tất cả các thao tác đều thành công
+        DB::beginTransaction();
+        try {
+            // 4. Tạo bản ghi đơn hàng (Order) trong database
+            $order = Order::create([
             'user_id' => $user->id,
-            'total_price' => $finalTotal, // Sử dụng giá sau khi áp dụng mã giảm giá
+            'total_price' => $finalTotal,
             'status' => 'pending',
-            'payment_method' => $validated['payment_method'],
+            'payment_method' => trim($validated['payment_method']),
             'payment_status' => 'unpaid',
             'shipping_address' => json_encode([
                 'name' => $validated['name'],
@@ -108,95 +106,80 @@ public function index()
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
             ]),
+            'discount_code' => !empty($validated['discount_code']) ? $validated['discount_code'] : null,
         ]);
-        $finalTotal = $validated['final_total'] ?? $cart->total_price;
-        $discountValue = $validated['discount_value'] ?? 0;
-        
-        $discountCode = $validated['discount_code'] ?? null;
-        $discount = null;
-        if ($discountCode) {
-            $discount = Discount::where('code', $discountCode)->first();
-            if ($discount && $discount->isValid()) {
-                // Tăng số lần sử dụng
-                $discount->incrementUsageCount();
-            }
-        }
 
-        // 5. Chuyển item và trừ tồn kho
-        foreach ($cart->items as $cartItem) {
-            $variant = $cartItem->variant;
-            if (!$variant || $variant->stock < $cartItem->quantity) {
-                $productName = $variant && $variant->product ? $variant->product->name : 'Sản phẩm không tồn tại';
-                $variantName = $variant ? $variant->name : 'N/A';
-                throw new \Exception("Sản phẩm \"{$productName} - {$variantName}\" không đủ số lượng tồn kho.");
-            }
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $variant->product_id ?? $cartItem->product_id,
-                'product_variant_id' => $cartItem->product_variant_id,
-                'quantity' => $cartItem->quantity,
-                'price_at_order' => $cartItem->price_at_order,
-                'price' => $variant->price ?? 0,
-            ]);
-            if ($variant) {
+            // 5. Chuyển các sản phẩm từ giỏ hàng sang chi tiết đơn hàng (OrderItem)
+            foreach ($cart->items as $cartItem) {
+                $variant = $cartItem->variant;
+                // Kiểm tra tồn kho
+                if (!$variant || $variant->stock < $cartItem->quantity) {
+                    throw new \Exception("Sản phẩm \"{$variant->product->name} - {$variant->name}\" không đủ số lượng tồn kho.");
+                }
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $variant->product_id,
+                    'product_variant_id' => $cartItem->product_variant_id,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $variant->price, // Lấy giá hiện tại để đảm bảo chính xác
+                ]);
+                
+                // Trừ tồn kho
                 $variant->decrement('stock', $cartItem->quantity);
             }
-        }
 
-        // 6. Xóa giỏ hàng
-        $cart->delete();
-
-        // 7. Đánh dấu mã giảm giá đã sử dụng nếu có
-        if ($discountCode) {
-            $userDiscountCode = UserDiscountCode::where('discount_code', $discountCode)->first();
-            if ($userDiscountCode) {
-                $userDiscountCode->markAsUsed();
+            // 6. Cập nhật trạng thái mã giảm giá (nếu có)
+            if (!empty($validated['discount_code'])) {
+                $discount = Discount::where('code', $validated['discount_code'])->first();
+                if ($discount) $discount->increment('used_count');
+                
+                $userDiscountCode = UserDiscountCode::where('discount_code', $validated['discount_code'])->where('user_id', $user->id)->first();
+                if ($userDiscountCode) $userDiscountCode->markAsUsed();
             }
+
+            // Nếu tất cả các bước trên thành công, lưu lại transaction
+            DB::commit();
+
+            // ==========================================================
+            // === LOGIC PHÂN LUỒNG SAU KHI TẠO ĐƠN HÀNG THÀNH CÔNG ===
+            // ==========================================================
+
+            $paymentMethod = $order->payment_method;
+
+            // Chuyển hướng thanh toán online
+            if ($paymentMethod === 'vnpay') {
+                    // dd('Đã vào đúng khối IF của VNPay. Chuẩn bị chuyển hướng.', $order->toArray());
+
+                return redirect()->route('payment.vnpay.create', ['orderId' => $order->id]);
+            }
+            if ($paymentMethod === 'momo') {
+                
+                return redirect()->route('payment.momo.create', ['orderId' => $order->id]);
+            }
+
+            // --- Mặc định là xử lý cho COD ---
+            $order->status = 'processing';
+            $order->save();
+            $cart->delete(); // Xóa giỏ hàng ngay lập tức cho COD
+
+            // Gửi email xác nhận
+            try {
+                $order->load('items.variant.product');
+                $confirmationUrl = URL::temporarySignedRoute('client.orders.confirm', now()->addHours(48), ['order' => $order->id]);
+                Mail::to($order->email)->send(new OrderConfirmationMail($order, $confirmationUrl));
+            } catch (\Exception $e) {
+                Log::warning("Gửi email cho đơn hàng COD #{$order->id} thất bại: " . $e->getMessage());
+            }
+            
+            return redirect()->route('client.orders.show', $order)->with('success', 'Đặt hàng COD thành công! Vui lòng kiểm tra email để xác nhận.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack(); // Hoàn tác tất cả các thay đổi trong DB nếu có lỗi
+            Log::error('Lỗi khi đặt hàng: ' . $e->getMessage());
+            return back()->with('error', "Đã xảy ra lỗi: " . $e->getMessage())->withInput();
         }
-
-        DB::commit();
-        dd(
-            "Dữ liệu từ form:",
-            $request->all(), // Xem tất cả dữ liệu form gửi lên
-            "Phương thức thanh toán đã lưu vào đơn hàng:",
-            $order->payment_method
-        );
-        $order->load('items.variant.product');
-
-        
-        try {
-            // 1. Tạo URL xác nhận có chữ ký, hết hạn sau 48 giờ
-            $confirmationUrl = URL::temporarySignedRoute(
-                'client.orders.confirm', now()->addHours(48), ['order' => $order->id]
-            );
-
-            // 2. Gửi email với Mailable đã được cập nhật
-            Mail::to($order->customer_email)->send(new OrderConfirmationMail($order, $confirmationUrl));
-
-        } catch (\Exception $e) {
-            Log::warning("Gửi email cho đơn hàng #{$order->id} thất bại: " . $e->getMessage());
-        }
-        
-        // Chuyển hướng người dùng với thông báo chi tiết
-        $successMessage = "🎉 Đặt hàng thành công!\n\n";
-        $successMessage .= "📋 Mã đơn hàng: #{$order->id}\n";
-        $successMessage .= "💰 Tổng tiền: " . number_format($finalTotal, 0, ',', '.') . " VNĐ\n";
-        $successMessage .= "📧 Email xác nhận đã được gửi đến: {$validated['email']}\n\n";
-        $successMessage .= "📱 Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng!";
-        
-        return redirect()->route('home')->with('success', $successMessage);
-
-    } catch (\Throwable $e) {
-        DB::rollBack();
-        Log::error('Lỗi khi đặt hàng: ' . $e->getMessage());
-        
-        $errorMessage = "❌ Đặt hàng thất bại!\n\n";
-        $errorMessage .= "🔍 Lỗi: " . $e->getMessage() . "\n\n";
-        $errorMessage .= "📞 Vui lòng liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.";
-        
-        return back()->with('error', $errorMessage)->withInput();
     }
-}
 
     /**
      * Validate mã giảm giá (AJAX)
