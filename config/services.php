@@ -35,8 +35,14 @@ return [
         ],
     ],
     'vnpay' => [
-    'tmn_code' => env('VNPAY_TMN_CODE'),
-    'hash_secret' => env('VNPAY_HASH_SECRET'),
-    'url' => env('VNPAY_URL'),
-],
+        'tmn_code' => env('VNPAY_TMN_CODE'),
+        'hash_secret' => env('VNPAY_HASH_SECRET'),
+        'url' => env('VNPAY_URL'),
+    ],
+    'momo' => [
+        'endpoint' => env('MOMO_ENDPOINT'),
+        'partner_code' => env('MOMO_PARTNER_CODE'),
+        'access_key' => env('MOMO_ACCESS_KEY'),
+        'secret_key' => env('MOMO_SECRET_KEY'),
+    ],
 ];
