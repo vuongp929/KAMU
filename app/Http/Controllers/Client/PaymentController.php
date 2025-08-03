@@ -164,13 +164,21 @@ class PaymentController extends Controller
         }
 
         $orderInfo = "Thanh toan don hang #" . $order->id;
-        $amount = "10000"; // tiền này ko dc để là .00 100.000 thì phải là 100000
+        // Chuyển đổi tổng tiền thành chuỗi không có dấu phẩy và không có phần thập phân
+        $amount = (string)intval($order->total_price);
         $orderIdMomo = $order->id . '_' . uniqid();
         $redirectUrl = route('payment.momo.return');
         $ipnUrl = route('payment.momo.ipn');
         $requestId = time() . "";
         $requestType = "payWithATM";
         $extraData = "";
+        
+        // Thêm thông tin về mã giảm giá vào extraData nếu có
+        if (!empty($order->discount_code)) {
+            $extraData = json_encode([
+                'discount_code' => $order->discount_code
+            ]);
+        }
 
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderIdMomo . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
         $signature = hash_hmac("sha256", $rawHash, $secretKey);

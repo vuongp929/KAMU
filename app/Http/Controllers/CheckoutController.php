@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
-    public function test(){
+    public function test()
+    {
         return view('test');
     }
     public function execPostRequest($url, $data)
@@ -36,17 +37,37 @@ class CheckoutController extends Controller
     {
         $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
 
-
         $partnerCode = 'MOMOBKUN20180529';
         $accessKey = 'klm05TvNBzhg7h7j';
         $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
 
+        // Lấy tổng tiền từ request
+        $finalTotal = $request->input('final_total', 0);
+        
+        // Nếu có mã giảm giá, lấy thông tin mã giảm giá
+        $discountCode = $request->input('discount_code', '');
+        $discountValue = $request->input('discount_value', 0);
+        
         $orderInfo = "Thanh toán qua MoMo";
-        $amount = "10000"; // giá tiền của đơn hàng $_POST['..']
+        if (!empty($discountCode)) {
+            $orderInfo .= " (Mã giảm giá: $discountCode)";
+        }
+        
+        // Chuyển đổi tổng tiền thành chuỗi không có dấu phẩy và không có phần thập phân
+        $amount = (string)intval($finalTotal);
+        
         $orderId = time() . "";
-        $redirectUrl = "http://127.0.0.1:8000/test"; // URL redirect khi thanh toán xong
-        $ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b"; // URL api để momo gửi dữ liệu json khi thanh toán thành công(có thể tạo ra 1 api để tự cập nhật trạng thái của đơn hàng)
+        $redirectUrl = route('payment.momo.return'); // URL redirect khi thanh toán xong
+        $ipnUrl = route('payment.momo.ipn'); // URL api để momo gửi dữ liệu json khi thanh toán thành công
         $extraData = "";
+
+        // Thêm thông tin về mã giảm giá vào extraData nếu có
+        if (!empty($discountCode)) {
+            $extraData = json_encode([
+                'discount_code' => $discountCode,
+                'discount_value' => $discountValue
+            ]);
+        }
 
         $requestId = time() . "";
         $requestType = "payWithATM";
@@ -70,7 +91,16 @@ class CheckoutController extends Controller
         );
         $result = $this->execPostRequest($endpoint, json_encode($data));
         $jsonResult = json_decode($result, true);  // decode json
-        //muốn lấy dữ liệu cho vào db sau khi thanh toán xong thì lấy như thế này $jsonResult['amount']
+        
+        // Lưu thông tin đơn hàng vào session để có thể truy xuất sau khi thanh toán
+        session(['momo_order_info' => [
+            'amount' => $amount,
+            'order_id' => $orderId,
+            'discount_code' => $discountCode,
+            'discount_value' => $discountValue,
+            'final_total' => $finalTotal
+        ]]);
+        
         return redirect()->to($jsonResult['payUrl']);
     }
 }
