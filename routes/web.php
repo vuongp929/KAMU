@@ -169,8 +169,8 @@ Route::prefix('payment')->name('payment.')->group(function () {
     Route::get('/vnpay/return', [ClientPaymentController::class, 'returnVnpay'])->name('vnpay.return');
     Route::get('/vnpay/ipn', [ClientPaymentController::class, 'ipnVnpay'])->name('vnpay.ipn');
     // Các trang thông báo chung
-    Route::get('/success', function () { /* ... */ })->name('success');
-    Route::get('/failed', function () { /* ... */ })->name('failed');
+    Route::get('/success', function () { return view('clients.payment.success'); })->name('success');
+    Route::get('/failed', function () { return view('clients.payment.failed'); })->name('failed');
 });
 // === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {

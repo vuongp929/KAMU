@@ -135,7 +135,7 @@ class PaymentController extends Controller
     // === PHẦN TÍCH HỢP THANH TOÁN MOMO ========================
     // ==========================================================
     
-    public function createMomo(Request $request)
+        public function createMomo(Request $request)
     {
         $order = Order::findOrFail($request->query('orderId'));
         if ($order->user_id !== Auth::id()) { abort(403); }
@@ -146,27 +146,37 @@ class PaymentController extends Controller
         $secretKey = config('services.momo.secret_key');
 
         if (!$partnerCode || !$accessKey || !$secretKey) {
-            Log::error('Lỗi cấu hình Momo: Thiếu thông tin trong file .env hoặc config/services.php');
-            return redirect()->route('client.checkout.index')->with('error', 'Hệ thống thanh toán đang được bảo trì.');
+            Log::error('Lỗi cấu hình Momo: Thiếu thông tin.');
+            return redirect()->route('client.checkout.index')->with('error', 'Hệ thống thanh toán Momo đang bảo trì.');
         }
         
         $orderInfo = "Thanh toan don hang #" . $order->id;
-        $amount = (string)$order->total_price;
+        $amount = (string)(int)$order->total_price;
         $orderIdMomo = $order->id . '_' . uniqid();
+        $requestId = time() . "";
+        $requestType = "payWithMethod";
+        $extraData = "";
         $redirectUrl = route('payment.momo.return');
         $ipnUrl = route('payment.momo.ipn');
-        $requestId = time() . "";
-        $requestType = "captureWallet";
-        $extraData = "";
-
+        
+        // Chuỗi để tạo chữ ký cho payWithMethod KHÔNG BAO GỒM paymentOptions
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderIdMomo . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
+        
         $signature = hash_hmac("sha256", $rawHash, $secretKey);
-
+        
+        // Dữ liệu cuối cùng gửi đi, KHÔNG có paymentOptions
         $data = [
-            'partnerCode' => $partnerCode, 'requestId' => $requestId, 'amount' => $amount, 
-            'orderId' => $orderIdMomo, 'orderInfo' => $orderInfo, 'redirectUrl' => $redirectUrl,
-            'ipnUrl' => $ipnUrl, 'lang' => 'vi', 'extraData' => $extraData,
-            'requestType' => $requestType, 'signature' => $signature,
+            'partnerCode' => $partnerCode,
+            'requestId' => $requestId,
+            'amount' => $amount,
+            'orderId' => $orderIdMomo,
+            'orderInfo' => $orderInfo,
+            'redirectUrl' => $redirectUrl,
+            'ipnUrl' => $ipnUrl,
+            'lang' => 'vi',
+            'extraData' => $extraData,
+            'requestType' => $requestType,
+            'signature' => $signature,
         ];
 
         $result = $this->execPostRequest($endpoint, json_encode($data));
@@ -176,12 +186,13 @@ class PaymentController extends Controller
             return redirect()->to($jsonResult['payUrl']);
         }
         
-        Log::error('Momo payment creation failed.', ['response' => $jsonResult]);
+        Log::error('Momo payment creation failed.', ['data_sent' => $data, 'response' => $jsonResult]);
         return redirect()->route('client.checkout.index')->with('error', 'Không thể tạo yêu cầu thanh toán Momo. Vui lòng thử lại.');
     }
 
     public function returnMomo(Request $request)
     {
+        // TODO: Cần có logic xác thực chữ ký của Momo trả về
         if ($request->query('resultCode') == 0) {
             $orderId = explode('_', $request->query('orderId'))[0];
             $order = Order::find($orderId);
