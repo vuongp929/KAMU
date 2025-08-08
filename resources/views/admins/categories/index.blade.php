@@ -34,12 +34,12 @@
                         <div class="card-header d-flex justify-content-between">
                             <div>
                                 <h5 class="card-title mb-0 align-content-center "></h5>
-                            <a href="{{ route('admins.categories.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
                                 <i data-feather="plus-square"></i> Thêm danh mục
                             </a>
                             </div>
                             <div>
-                               <form method="GET" action="{{ route('admins.categories.index') }}" class="mb-3 d-flex gap-2">
+                               <form method="GET" action="{{ route('admin.categories.index') }}" class="mb-3 d-flex gap-2">
                                 <input type="text" name="search" placeholder="Tìm kiếm theo tên..." value="{{ request('search') }}" class="form-control w-25">
                                 
                                 <select name="statu" class="form-select w-25" onchange="this.form.submit()">
@@ -86,13 +86,13 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex gap-2">
-                                                        <a href="{{ route('admins.categories.edit', $item->id) }}" 
+                                                        <a href="{{ route('admin.categories.edit', $item->id) }}" 
                                                         class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
                                                         title="Sửa">
                                                             <i class="bi bi-pencil-fill"></i>
                                                         </a>
 
-                                                        <form method="POST" action="{{ route('admins.categories.destroy', $item->id) }}" 
+                                                        <form method="POST" action="{{ route('admin.categories.destroy', $item->id) }}" 
                                                             onsubmit="return confirm('Bạn có chắc muốn xoá danh mục cha này không?');">
                                                             @csrf
                                                             @method('DELETE')
@@ -116,13 +116,13 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex gap-2">
-                                                            <a href="{{ route('admins.categories.edit', $child->id) }}" 
+                                                            <a href="{{ route('admin.categories.edit', $child->id) }}" 
                                                             class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
                                                             title="Sửa">
                                                                 <i class="bi bi-pencil-fill"></i>
                                                             </a>
 
-                                                            <form method="POST" action="{{ route('admins.categories.destroy', $child->id) }}" 
+                                                            <form method="POST" action="{{ route('admin.categories.destroy', $child->id) }}" 
                                                                 onsubmit="return confirm('Bạn có chắc muốn xoá danh mục con này không?');">
                                                                 @csrf
                                                                 @method('DELETE')
