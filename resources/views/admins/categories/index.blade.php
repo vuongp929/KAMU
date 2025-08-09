@@ -40,7 +40,7 @@
                             </div>
                             <div>
                                <form method="GET" action="{{ route('admin.categories.index') }}" class="mb-3 d-flex gap-2">
-                                <input type="text" name="search" placeholder="Tìm kiếm theo tên..." value="{{ request('search') }}" class="form-control w-25">
+                                <input type="text" name="search" placeholder="Tìm kiếm..." value="{{ request('search') }}" class="form-control w-25">
                                 
                                 <select name="statu" class="form-select w-25" onchange="this.form.submit()">
                                     <option value="">-- Tất cả trạng thái --</option>
@@ -89,7 +89,7 @@
                                                         <a href="{{ route('admin.categories.edit', $item->id) }}" 
                                                         class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
                                                         title="Sửa">
-                                                            <i class="bi bi-pencil-fill"></i>
+                                                            <i class="bi bi-pencil-fill">Sửa</i>
                                                         </a>
 
                                                         <form method="POST" action="{{ route('admin.categories.destroy', $item->id) }}" 
@@ -99,7 +99,7 @@
                                                             <button type="submit" 
                                                                     class="btn btn-light btn-sm rounded-circle shadow-sm border border-danger text-danger" 
                                                                     title="Xoá">
-                                                                <i class="bi bi-trash3-fill"></i>
+                                                                <i class="bi bi-trash3-fill">Xóa</i>
                                                             </button>
                                                         </form>
                                                     </div>
@@ -119,7 +119,8 @@
                                                             <a href="{{ route('admin.categories.edit', $child->id) }}" 
                                                             class="btn btn-light btn-sm rounded-circle shadow-sm border border-primary text-primary" 
                                                             title="Sửa">
-                                                                <i class="bi bi-pencil-fill"></i>
+                                                                {{-- <i class="bi bi-pencil-fill"></i> --}}
+                                                                <i class="bi bi-pencil-fill">Sửa</i>
                                                             </a>
 
                                                             <form method="POST" action="{{ route('admin.categories.destroy', $child->id) }}" 
@@ -129,7 +130,7 @@
                                                                 <button type="submit" 
                                                                         class="btn btn-light btn-sm rounded-circle shadow-sm border border-danger text-danger" 
                                                                         title="Xoá">
-                                                                    <i class="bi bi-trash3-fill"></i>
+                                                                    <i class="bi bi-trash3-fill">Xóa</i>
                                                                 </button>
                                                             </form>
                                                         </div>
