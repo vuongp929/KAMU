@@ -24,10 +24,8 @@ use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
-use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
 use App\Http\Controllers\Client\RewardController;
-use App\Http\Controllers\Client\PaymentController;
 
 
 
