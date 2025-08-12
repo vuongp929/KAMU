@@ -125,7 +125,7 @@ class CategoryController extends Controller
             // Cập nhật dữ liệu
             $Category->update($params);
     
-            return redirect()->route('admins.categories.index')->with('success', 'Cập nhật danh mục thành công');
+            return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
         }
     }
 
@@ -142,7 +142,7 @@ class CategoryController extends Controller
                 Storage::disk('public')->delete($Category->image);
             }
         }
-        return redirect()->route('admins.categories.index')->with('success', 'Xoá danh mục thành công');
+        return redirect()->route('admin.categories.index')->with('success', 'Xoá danh mục thành công');
 
     }
 }

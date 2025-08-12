@@ -31,21 +31,24 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password), 
-
+            'password' => Hash::make($request->password),
+            'role' => 'customer', // 👈 nếu bạn muốn gán role mặc định
         ]);
-
-        // event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('/admin/dashboard', absolute: false));
+        // 👇 Kiểm tra role và chuyển hướng phù hợp
+        if ($user->role === 'customer') {
+            return redirect('/'); // Trang chủ client
+        }
+
+        return redirect('/admin/dashboard'); // Trang admin
     }
 }

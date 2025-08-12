@@ -1,29 +1,31 @@
 <?php
 
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 
 // === IMPORT CONTROLLERS ===
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Client\MyOrderController;
+use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
-use App\Http\Controllers\Client\CartController;
+
 use App\Http\Controllers\Admin\ProductReviewController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\Client\MyOrderController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
 use App\Http\Controllers\Client\RewardController;
-use App\Http\Controllers\Client\PaymentController;
 
 
 
@@ -71,8 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/{product}/reviews/{review}/reply', [\App\Http\Controllers\ProductReviewController::class, 'reply'])->name('products.reviews.reply');
     Route::delete('/products/{product}/reviews/{review}', [\App\Http\Controllers\ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
     Route::get('/orders/{order}/confirm', [MyOrderController::class, 'confirm'])
-    ->name('client.orders.confirm')
-    ->middleware('signed');
+        ->name('client.orders.confirm')
+        ->middleware('signed');
 
 
     Route::prefix('cart')->name('client.cart.')->group(function () {
@@ -94,10 +96,10 @@ Route::middleware('auth')->group(function () {
 
     // Routes cho điểm thưởng
     Route::prefix('rewards')->name('client.rewards.')->group(function () {
-        Route::get('/', [RewardController::class, 'index'])->name('index');
-        Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
-        Route::get('/history', [RewardController::class, 'history'])->name('history');
-        Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
+        // Route::get('/', [RewardController::class, 'index'])->name('index');
+        // Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
+        // Route::get('/history', [RewardController::class, 'history'])->name('history');
+        // Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
     });
 
     // Routes cho thanh toán
@@ -134,7 +136,7 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
     Route::resource('reviews', ProductReviewController::class)
         ->except(['create', 'edit', 'show'])
         ->names('admin.reviews'); // Đặt tên cho resource
-        
+
     // Đặt tên đầy đủ cho các route tùy chỉnh
     Route::post('/reviews/{id}/reply', [ProductReviewController::class, 'reply'])->name('admin.reviews.reply');
     Route::post('/reviews/{id}/toggle-hide', [ProductReviewController::class, 'toggleHide'])->name('admin.reviews.toggleHide');
@@ -150,6 +152,8 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
     Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');
     Route::get('/chat/search-users', [AdminChatController::class, 'searchUsers'])->name('admin.chat.searchUsers');
 
+    //Hóa đơn 
+    Route::get('admin/invoices/{order}', [InvoiceController::class, 'show'])->name('admin.invoices.show');
 });
 
 

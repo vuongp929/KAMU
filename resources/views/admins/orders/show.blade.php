@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <h4 class="mb-4">Chi tiết đơn hàng #{{ $order->id }}</h4>
+        <h4 class="mb-4 text-primary">📦 Chi tiết đơn hàng #{{ $order->id }}</h4>
 
         <div class="row mb-4">
             <div class="col-md-6">
