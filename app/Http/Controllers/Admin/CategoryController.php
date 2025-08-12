@@ -74,7 +74,7 @@ class CategoryController extends Controller
             : null,
     ]);
 
-    return redirect()->route('admins.categories.index')->with('success', 'Thêm danh mục thành công');
+    return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
 }
 
     public function show(string $id)
