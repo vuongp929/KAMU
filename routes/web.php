@@ -20,6 +20,7 @@ use App\Http\Controllers\Client\MyOrderController;
 use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\ShippingController;
 
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
@@ -42,7 +43,12 @@ Route::get('/products/{product}', [ClientProductController::class, 'show'])->nam
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
 });
-
+Route::prefix('shipping')->name('shipping.')->group(function () {
+    Route::get('/provinces', [ShippingController::class, 'getProvinces'])->name('provinces');
+    Route::get('/districts', [ShippingController::class, 'getDistricts'])->name('districts');
+    Route::get('/wards', [ShippingController::class, 'getWards'])->name('wards');
+    Route::post('/calculate-fee', [ShippingController::class, 'calculateFee'])->name('calculateFee');
+});
 // Trang giao hàng
 Route::get('giao-hang', [PageController::class, 'giaoHang'])->name('giao-hang');
 Route::get('dich-vu-goi-qua', [PageController::class, 'goiQua'])->name('dich-vu-goi-qua');
@@ -96,10 +102,10 @@ Route::middleware('auth')->group(function () {
 
     // Routes cho điểm thưởng
     Route::prefix('rewards')->name('client.rewards.')->group(function () {
-        // Route::get('/', [RewardController::class, 'index'])->name('index');
-        // Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
-        // Route::get('/history', [RewardController::class, 'history'])->name('history');
-        // Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
+        Route::get('/', [RewardController::class, 'index'])->name('index');
+        Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
+        Route::get('/history', [RewardController::class, 'history'])->name('history');
+        Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
     });
 
     // Routes cho thanh toán
@@ -158,21 +164,16 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
 
 
 Route::prefix('payment')->name('payment.')->group(function () {
-    // VNPay Routes (nếu có)
-    // Route::get('/vnpay/create', [PaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
-    // Route::get('/vnpay/return', [PaymentController::class, 'returnVnpay'])->name('vnpay.return');
-
-    // Momo Routes
-    Route::get('/momo/create', [PaymentController::class, 'createMomo'])->name('momo.create')->middleware('auth'); // Chỉ người đã đăng nhập mới được tạo
+    // Route cần đăng nhập để tạo
+    Route::middleware('auth')->group(function () {
+        Route::get('/vnpay/create', [PaymentController::class, 'createVnpay'])->name('vnpay.create');
+        Route::get('/momo/create', [PaymentController::class, 'createMomo'])->name('momo.create');
+    });
+    // Route mà các cổng thanh toán gọi về
+    Route::get('/vnpay/return', [PaymentController::class, 'returnVnpay'])->name('vnpay.return');
     Route::get('/momo/return', [PaymentController::class, 'returnMomo'])->name('momo.return');
     Route::post('/momo/ipn', [PaymentController::class, 'ipnMomo'])->name('momo.ipn');
-
-    Route::get('/vnpay/create', [ClientPaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
-    
-    // Route VNPAY
-    Route::get('/vnpay/return', [ClientPaymentController::class, 'returnVnpay'])->name('vnpay.return');
-    Route::get('/vnpay/ipn', [ClientPaymentController::class, 'ipnVnpay'])->name('vnpay.ipn');
-    // Các trang thông báo chung
+    // Trang kết quả
     Route::get('/success', function () { return view('clients.payment.success'); })->name('success');
     Route::get('/failed', function () { return view('clients.payment.failed'); })->name('failed');
 });
