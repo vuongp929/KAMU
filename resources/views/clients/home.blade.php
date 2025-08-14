@@ -11,17 +11,17 @@
                 {{-- Banner lớn bên trái --}}
                 <div class="main-banner">
                     {{-- Thay bằng ảnh banner thực tế của bạn --}}
-                    <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-1.jpg" alt="Gấu Bông An Toàn Cao Cấp Hot Trend" class="img-responsive">
+                    <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_DC.jpg" alt="Gấu Bông An Toàn Cao Cấp Hot Trend" class="img-responsive">
                 </div>
             </div>
             <div class="col-lg-4 col-md-12">
                 {{-- Hai banner nhỏ bên phải --}}
                 <div class="side-banners">
                     <div class="side-banner-item">
-                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-2.jpg" alt="Điện Gấu Tận Nhà" class="img-responsive">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_Dien-gau.jpg" alt="Điện Gấu Tận Nhà" class="img-responsive">
                     </div>
                     <div class="side-banner-item">
-                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-3.jpg" alt="Teddy With Love" class="img-responsive">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_Dich-vu.jpg" alt="Teddy With Love" class="img-responsive">
                     </div>
                 </div>
             </div>

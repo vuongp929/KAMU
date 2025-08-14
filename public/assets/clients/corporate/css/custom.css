@@ -1,46 +1,377 @@
-/* Trang chủ Gấu Bông */
+/* Enhanced Trang chủ Gấu Bông */
 .home-page {
-    background-color: #fff; /* Màu nền trắng sạch sẽ */
+    background: linear-gradient(135deg, #ffffff 0%, #fef7ff 50%, #fff0f5 100%);
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* Phần Banner */
+.home-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(234, 115, 172, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(234, 115, 172, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.home-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Enhanced Banner Section */
 .banner-section {
-    padding: 15px 0;
+    padding: 30px 0 40px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
 }
-.main-banner, .side-banner-item {
-    border-radius: 15px;
+
+.banner-section .col-lg-8,
+.banner-section .col-lg-4 {
+    display: flex;
+    align-items: stretch;
+}
+
+.banner-section .col-lg-8 {
+    flex: 0 0 66.666667% !important;
+    max-width: 66.666667% !important;
+}
+
+.banner-section .col-lg-4 {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+}
+
+.main-banner,
+.side-banners {
+    width: 100%;
+}
+
+.main-banner {
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(234, 115, 172, 0.15);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(254, 247, 255, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(234, 115, 172, 0.1);
+    height: 400px;
 }
+
+.side-banner-item {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(234, 115, 172, 0.15);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(254, 247, 255, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(234, 115, 172, 0.1);
+    height: 190px;
+    flex: 1;
+}
+
+.main-banner::before, .side-banner-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(234, 115, 172, 0.1) 0%, rgba(255, 105, 180, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.main-banner:hover::before, .side-banner-item:hover::before {
+    opacity: 1;
+}
+
+.main-banner:hover, .side-banner-item:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(234, 115, 172, 0.25);
+    border-color: rgba(234, 115, 172, 0.3);
+}
+
 .side-banners {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    height: 100%;
+    gap: 20px;
+    height: 400px;
 }
-.side-banner-item {
-    flex: 1;
-}
+
 .main-banner img, .side-banner-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 0;
 }
 
-/* Phần Icon Dịch vụ */
+.main-banner:hover img, .side-banner-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Add floating animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.main-banner {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 0s;
+}
+
+.side-banner-item:first-child {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
+.side-banner-item:last-child {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 2s;
+}
+
+/* Responsive enhancements */
+@media (max-width: 991px) {
+    .banner-section {
+        gap: 15px;
+    }
+    
+    .side-banners {
+        flex-direction: row;
+        height: 200px;
+        gap: 15px;
+    }
+    
+    .side-banner-item {
+        height: 200px;
+        flex: 1;
+    }
+    
+    .main-banner {
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .banner-section {
+        padding: 20px 0;
+    }
+    
+    .side-banners {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+    }
+    
+    .side-banner-item {
+        height: 150px;
+        border-radius: 15px;
+    }
+    
+    .main-banner {
+        height: 200px;
+        border-radius: 15px;
+    }
+    
+    .main-banner:hover, .side-banner-item:hover {
+        transform: translateY(-4px) scale(1.01);
+    }
+}
+
+@media (max-width: 480px) {
+    .side-banners {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+    }
+    
+    .side-banner-item {
+        height: 120px;
+    }
+    
+    .main-banner {
+        height: 180px;
+    }
+}
+
+/* Enhanced Services Section */
 .services-section {
-    padding: 40px 0;
-    background-color: #FFF5F7; /* Màu hồng nền nhạt */
-    margin: 30px 0;
+    padding: 60px 0;
+    background: linear-gradient(135deg, #fff5f7 0%, #fef7ff 50%, #fff0f5 100%);
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
 }
+
+.services-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(234, 115, 172, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 105, 180, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.services-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+.service-item {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(234, 115, 172, 0.1);
+    box-shadow: 0 8px 25px rgba(234, 115, 172, 0.1);
+    position: relative;
+    overflow: hidden;
+    height: auto;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.service-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(234, 115, 172, 0.05) 0%, rgba(255, 105, 180, 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.service-item:hover::before {
+    opacity: 1;
+}
+
+.service-item:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(234, 115, 172, 0.2);
+    border-color: rgba(234, 115, 172, 0.3);
+}
+
+.service-item:nth-child(2) {
+    background: linear-gradient(135deg, rgba(252, 231, 243, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
+    border-color: rgba(249, 168, 212, 0.3);
+    box-shadow: 0 8px 25px rgba(244, 114, 182, 0.15);
+}
+
+.service-item:nth-child(2):hover {
+    box-shadow: 0 20px 40px rgba(244, 114, 182, 0.25);
+    border-color: rgba(249, 168, 212, 0.5);
+}
+
 .service-item img {
-    max-width: 80px;
-    margin-bottom: 15px;
+    max-width: 70px;
+    height: 70px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 8px rgba(234, 115, 172, 0.2));
+    position: relative;
+    z-index: 1;
 }
+
+.service-item:hover img {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 8px 16px rgba(234, 115, 172, 0.3));
+}
+
 .service-item h4 {
-    font-weight: 600;
-    color: #444;
-    font-size: 16px;
+    font-weight: 700;
+    color: #5d3b80;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.4;
+    margin: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.service-item:hover h4 {
+    color: #ea73ac;
+    transform: translateY(-2px);
+}
+
+/* Add staggered animation on load */
+.service-item {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.service-item:nth-child(1) { animation-delay: 0.1s; }
+.service-item:nth-child(2) { animation-delay: 0.2s; }
+.service-item:nth-child(3) { animation-delay: 0.3s; }
+.service-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive enhancements for services */
+@media (max-width: 768px) {
+    .services-section {
+        padding: 40px 0;
+        margin: 20px 0;
+    }
+    
+    .service-item {
+        padding: 25px 15px;
+        min-height: 160px;
+        border-radius: 15px;
+    }
+    
+    .service-item:hover {
+        transform: translateY(-6px) scale(1.02);
+    }
+    
+    .service-item img {
+        max-width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+    }
+    
+    .service-item h4 {
+        font-size: 13px;
+    }
 }
 
 /* Tiêu đề của các khu vực sản phẩm */
