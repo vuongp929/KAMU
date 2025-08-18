@@ -79,6 +79,7 @@
     @include('clients.layouts.footer')
 
     @include('clients.layouts.chatbox')
+    @include('clients.layouts.discount-modal')
 
     {{-- Div ẩn cho pop-up xem nhanh --}}
     <div id="product-pop-up" style="display: none; width: 700px;"></div>
@@ -111,6 +112,7 @@
     </script> --}}
 
     {{-- 5. Vị trí để nhúng các script của từng trang riêng biệt --}}
+    {{-- <script src="{{ asset('js/discount-modal.js') }}"></script> --}}
     @stack('scripts')
 
 </body>

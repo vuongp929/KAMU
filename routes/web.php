@@ -33,6 +33,7 @@ Route::get('/products/{product}', [ClientProductController::class, 'show'])->nam
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
+    Route::get('/vouchers', [DiscountController::class, 'getAvailableVouchers'])->name('vouchers');
 });
 
 // --- ROUTE XÁC THỰC (Laravel Breeze) ---

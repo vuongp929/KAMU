@@ -27,7 +27,7 @@
                         <td>{{ $order->id }}</td>
                         <td>{{ $order->customer?->name ?? 'Không xác định' }}</td>
                         <td>{{ $order->status }}</td>
-                        <td>{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
+                        <td>{{ number_format($order->final_total ?? $order->total_price, 0, ',', '.') }} VNĐ</td>
                         <td>{{ $order->created_at->format('d-m-Y') }}</td>
                         <td>
                             <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">Xem</a>

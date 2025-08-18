@@ -1,57 +1,5 @@
 @extends('layouts.client')
 
-
-{{-- @section('content')
-    <div class="container">
-        <h2>Đơn hàng của bạn</h2>
-
-        @if ($checkouts->isEmpty())
-            <p>Không có đơn hàng nào.</p>
-        @else
-            <table class="table table-bcheckouted">
-                <thead>
-                    <tr>
-                        <th>Mã đơn hàng</th>
-                        <th>Tổng giá trị</th>
-                        <th>Trạng thái</th>
-                        <th>Trạng thái thanh toán</th>
-                        <th>Ngày tạo</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($checkouts as $checkout)
-                        <tr>
-                            <td>{{ $checkout->id }}</td>
-                            <td>{{ number_format($checkout->total_price, 0, ',', '.') }} VND</td>
-                            <td>{{ $checkout->status }}</td>
-                            <td>{{ $checkout->payment_status }}</td>
-                            <td>{{ $checkout->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                <a href="{{ route('client.checkouts.show', $checkout->id) }}" class="btn btn-info">Xem chi
-                                    tiết</a>
-
-                                <!-- Hiển thị nút hủy nếu trạng thái là "Đang chờ xử lý" -->
-                                @if ($checkout->status === 'pending')
-                                    <a href="{{ route('client.checkouts.cancel', $checkout->id) }}" class="btn btn-danger"
-                                        onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')">
-                                        Hủy đơn hàng
-                                    </a>
-                                @elseif ($checkout->status === 'cancelled')
-                                    <a href="{{ route('client.checkouts.restore', $checkout->id) }}" class="btn btn-warning"
-                                        onclick="return confirm('Bạn có muốn khôi phục đơn hàng đã hủy này không?')">
-                                        Khôi phục đơn hàng
-                                    </a>
-                                @endif
-
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    </div>
-@endsection --}}
 @section('title', 'Thanh toán đơn hàng')
 
 @push('styles')
@@ -77,27 +25,58 @@
         border-radius: 10px;
         padding: 25px;
         border: 1px solid #eee;
+        position: relative;
+        overflow: hidden;
+        
+        box-sizing: border-box;
+    }
+    
+    /* Đảm bảo voucher section không ảnh hưởng layout */
+    .voucher-section {
+        margin: 15px 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        clear: both !important;
+    }
+    
+    /* Đảm bảo order items container ổn định */
+    .order-items-container {
+        width: 100% !important;
+        overflow: hidden !important;
+        margin-bottom: 15px !important;
     }
     .order-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #f5f5f5;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        margin-bottom: 15px !important;
+        padding: 15px !important;
+        background: white !important;
+        border-radius: 10px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        border-bottom: 1px solid #f5f5f5 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        overflow: hidden !important;
+        gap: 15px !important;
     }
     .order-item:last-child {
         border-bottom: none;
         margin-bottom: 0;
-        padding-bottom: 0;
     }
     .order-item .item-details {
-        display: flex;
-        align-items: center;
+        display: flex !important;
+        align-items: flex-start !important;
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        gap: 15px !important;
     }
     .order-item .item-image {
-        position: relative;
-        margin-right: 15px;
+        position: relative !important;
+        margin-right: 15px !important;
+        flex-shrink: 0 !important;
     }
     .order-item .item-image img {
         width: 65px;
@@ -121,17 +100,64 @@
         justify-content: center;
         border: 2px solid white;
     }
+    .item-info {
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
     .item-info .product-name {
-        font-weight: 600;
-        color: #333;
+        font-weight: 600 !important;
+        color: #333 !important;
+        margin-bottom: 4px !important;
+        word-wrap: break-word !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        white-space: normal !important;
+        line-height: 1.4 !important;
+        max-height: 2.8em !important;
     }
     .item-info .variant-name {
-        color: #777;
-        font-size: 14px;
+        color: #777 !important;
+        font-size: 14px !important;
+        word-wrap: break-word !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        max-width: 100% !important;
     }
     .item-price {
-        font-weight: 600;
-        color: #555;
+        font-weight: 600 !important;
+        color: #555 !important;
+        flex-shrink: 0 !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+        font-size: 14px !important;
+        min-width: 80px !important;
+    }
+    
+    /* Responsive cho mobile */
+    @media (max-width: 768px) {
+        .order-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+        .order-item .item-details {
+            width: 100% !important;
+            margin-bottom: 10px !important;
+        }
+        .item-info {
+            max-width: calc(100% - 80px) !important;
+        }
+        .item-price {
+            width: auto !important;
+            min-width: auto !important;
+            text-align: left !important;
+            margin-left: 0 !important;
+            font-size: 16px !important;
+        }
     }
     .summary-row {
         display: flex;
@@ -179,12 +205,12 @@
             </div>
         @endif
 
-        <form action="{{ route('client.checkout.placeOrder') }}" method="POST">
+        <form id="checkout-form" action="{{ route('client.checkout.placeOrder') }}" method="POST">
             @csrf
             <!-- Hidden fields để lưu thông tin mã giảm giá -->
             <input type="hidden" name="discount_code" id="discount-code-hidden" value="">
             <input type="hidden" name="discount_value" id="discount-value-hidden" value="0">
-            <input type="hidden" name="final_total" id="final-total-hidden" value="{{ $cart->total_price }}">
+            <input type="hidden" name="final_total" id="final-total-hidden" value="{{ $subtotal + $shipping_fee - $discount }}" data-order-total="{{ $subtotal + $shipping_fee - $discount }}">
             <div class="row">
                 {{-- CỘT TRÁI: THÔNG TIN GIAO HÀNG --}}
                 <div class="col-lg-7 checkout-form">
@@ -193,37 +219,7 @@
                         <p>Bạn đã có tài khoản? <a href="{{ route('login') }}">Đăng nhập</a> để điền thông tin nhanh hơn.</p>
                     @endguest
 
-                    {{-- Form nhập mã giảm giá --}}
-                    <div class="checkout-section">
-                        <h5 class="section-title">
-                            Mã giảm giá
-                        </h5>
-                        <div class="discount-container">
-                            <div class="input-group discount-input-group">
-                                <input type="text" id="discount-code" class="form-control discount-input" placeholder="Nhập mã giảm giá của bạn">
-                                <button type="button" id="apply-discount-btn" class="btn btn-apply-discount">
-                                    <i class="fas fa-check me-1"></i>Áp dụng
-                                </button>
-                            </div>
-                            <div id="discount-message" class="mt-2"></div>
-                            <div id="applied-discount" class="mt-3" style="display: none;">
-                                <div class="applied-discount-card">
-                                    <div class="discount-info">
-                                        <div class="discount-badge">
-                                            <i class="fas fa-check-circle"></i>
-                                            <span id="applied-code"></span>
-                                        </div>
-                                        <div class="discount-details">
-                                            <span id="discount-value"></span>
-                                        </div>
-                                    </div>
-                                    <button type="button" id="remove-discount-btn" class="btn-remove-discount">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
                     
                     {{-- Thông tin giao hàng --}}
                     <div class="checkout-section">
@@ -338,6 +334,8 @@
                             <span id="total-amount">{{ number_format($cart->total_price, 0, ',', '.') }}đ</span>
                         </div>
 
+                        @include('clients.checkout.voucher-component')
+
                         <div class="d-grid mt-4">
                              <button type="submit" class="btn btn-place-order">ĐẶT HÀNG</button>
                         </div>
@@ -363,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const subtotal = document.getElementById('subtotal');
     
     let currentDiscount = null;
-    let originalTotal = {{ $cart->total_price }};
+    let originalTotal = {{ $subtotal + $shipping_fee - $discount }};
     
     // Format số tiền
     function formatCurrency(amount) {
@@ -648,29 +646,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .payment-label {
     display: block;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     margin: 0;
-    height: 100%;
+    min-height: auto;
 }
 
 .payment-content {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .payment-icon {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     color: #6c757d;
     transition: all 0.3s ease;
 }
@@ -726,13 +724,7 @@ document.addEventListener('DOMContentLoaded', function() {
     padding-bottom: 10px;
 }
 
-.order-item {
-    background: white;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
+/* .order-item styles moved to top section to avoid conflicts */
 
 .summary-row {
     display: flex;
@@ -752,6 +744,20 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 /* Responsive */
+@media (max-width: 576px) {
+    .payment-methods .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0 10px;
+    }
+    
+    .payment-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+}
+
 @media (max-width: 768px) {
     .form-row {
         flex-direction: column;
@@ -773,9 +779,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     .payment-content {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        text-align: left;
         gap: 10px;
+    }
+    
+    .payment-methods .row {
+        margin: 0;
+    }
+    
+    .payment-methods .col-md-6 {
+        padding: 0 5px;
+        margin-bottom: 15px;
     }
     
     .payment-icon {
@@ -806,6 +821,33 @@ document.addEventListener('DOMContentLoaded', function() {
         gap: 15px;
         text-align: center;
     }
+    
+    /* Fix order item layout on mobile */
+    .order-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+    
+    .order-item .item-details {
+        width: 100% !important;
+    }
+    
+    .order-item .item-price {
+        align-self: flex-end !important;
+        min-width: auto !important;
+    }
+    
+    .item-info {
+        margin-right: 0 !important;
+    }
 }
 </style>
 @endsection
+
+{{-- Include discount modal --}}
+@include('clients.layouts.discount-modal')
+
+@push('scripts')
+<script src="{{ asset('js/voucher-checkout.js') }}"></script>
+@endpush

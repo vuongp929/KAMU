@@ -39,8 +39,8 @@ class Cart extends Model
         return $this->items->reduce(function ($total, $item) {
             // $total là tổng tích lũy, $item là sản phẩm hiện tại trong vòng lặp.
             
-            // Lấy giá đã lưu tại thời điểm đặt hàng.
-            $price = $item->price_at_order ?? 0;
+            // Lấy giá từ CartItem hoặc từ ProductVariant
+            $price = $item->price ?? ($item->variant ? $item->variant->price : 0);
             
             // Cộng dồn vào tổng: (tổng cũ + số lượng * giá)
             return $total + ($item->quantity * $price);

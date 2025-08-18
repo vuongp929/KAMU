@@ -39,6 +39,7 @@
     </table>
 
     <p>Chúng tôi sẽ xử lý đơn hàng của bạn sớm nhất có thể.</p>
-    <p>Cảm ơn bạn đã tin tưởng và mua sắm tại Ôm Là Yêu!</p>
+    // Dòng 42:
+    <p>Cảm ơn bạn đã tin tưởng và mua sắm tại KUMA House!</p>
 </body>
 </html>

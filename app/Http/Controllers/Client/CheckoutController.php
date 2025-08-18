@@ -47,12 +47,24 @@ public function index()
     }
 
     // Lấy các mã giảm giá đang hoạt động
-    $discounts = Discount::where('is_active', 1)
+    $vouchers = Discount::where('is_active', 1)
         ->where('start_at', '<=', now())
         ->where('end_at', '>=', now())
         ->get();
 
-    return view('clients.checkout.index', compact('cart', 'discounts'));
+    // Tính subtotal từ cart items
+    $subtotal = $cart->items->sum(function ($item) {
+        $price = $item->price ?? ($item->variant ? $item->variant->price : 0);
+        return $item->quantity * $price;
+    });
+
+    // Phí vận chuyển (có thể tùy chỉnh logic)
+    $shipping_fee = 0; // Miễn phí vận chuyển
+    
+    // Giá trị giảm giá hiện tại (mặc định là 0)
+    $discount = 0;
+
+    return view('clients.checkout.index', compact('cart', 'vouchers', 'subtotal', 'shipping_fee', 'discount'));
 }
 
     /**
@@ -60,6 +72,9 @@ public function index()
      */
     public function placeOrder(Request $request)
 {
+    // Debug: Log dữ liệu nhận được
+    Log::info('Checkout data received:', $request->all());
+    
     // 1. Validate (Giữ nguyên)
     $validated = $request->validate([
         'name' => 'required|string|max:255',
@@ -99,7 +114,10 @@ public function index()
         
         $order = Order::create([
             'user_id' => $user->id,
-            'total_price' => $finalTotal, // Sử dụng tổng tiền đã được giảm giá
+            'total_price' => $cart->total_price, // Giá gốc
+            'final_total' => $finalTotal, // Giá sau giảm
+            'discount_code' => $discountCode,
+            'discount_amount' => $discountValue,
             'status' => 'pending',
             'payment_method' => $validated['payment_method'],
             'payment_status' => 'unpaid',
