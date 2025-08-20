@@ -92,7 +92,7 @@
                                                      class="img-thumbnail" 
                                                      style="width: 60px; height: 60px; object-fit: cover;">
                                             @else
-                                                <img src="{{ asset('images/default-product.jpg') }}" 
+                                                <img src="{{ asset('images/default-product.svg') }}" 
                                                      alt="Hình ảnh mặc định" 
                                                      class="img-thumbnail" 
                                                      style="width: 60px; height: 60px; object-fit: cover;">
@@ -143,10 +143,17 @@
                                     @php
                                         // Tính toán số tiền giảm giá từ tổng tiền gốc và tổng tiền cuối
                                         $originalTotal = $subtotal;
-                                        $finalTotal = $order->total_price;
+                                        $finalTotal = $order->final_total ?? $order->total_price; // Ưu tiên final_total
                                         $orderDiscount = $originalTotal - $finalTotal;
                                     @endphp
-                                    @if($orderDiscount > 0)
+                                    
+                                    {{-- Hiển thị thông tin voucher nếu có --}}
+                                    @if($order->discount_code && $order->discount_amount > 0)
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Mã giảm giá ({{ $order->discount_code }}):</span>
+                                            <span class="text-success">-{{ number_format($order->discount_amount, 0, ',', '.') }}đ</span>
+                                        </div>
+                                    @elseif($orderDiscount > 0)
                                         <div class="d-flex justify-content-between mb-2">
                                             <span>Giảm giá:</span>
                                             <span class="text-success">-{{ number_format($orderDiscount, 0, ',', '.') }}đ</span>
@@ -159,7 +166,7 @@
                                     <hr>
                                     <div class="d-flex justify-content-between fw-bold">
                                         <span>Tổng cộng:</span>
-                                        <span class="text-primary fs-5">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
+                                        <span class="text-primary fs-5">{{ number_format($order->final_total ?? $order->total_price, 0, ',', '.') }}đ</span>
                                     </div>
                                 </div>
                             </div>
@@ -197,7 +204,7 @@
                                 @if (isset($item['image']))
                                                         <img src="{{ Storage::url($item['image']) }}" alt="Hình ảnh sản phẩm" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                 @else
-                                                        <img src="{{ asset('images/default-product.jpg') }}" alt="Hình ảnh mặc định" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                        <img src="{{ asset('images/default-product.svg') }}" alt="Hình ảnh mặc định" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                 @endif
                             </td>
                                                 <td>{{ $item['name'] ?? 'N/A' }}</td>

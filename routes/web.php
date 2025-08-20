@@ -42,6 +42,7 @@ Route::get('/products/{product}', [ClientProductController::class, 'show'])->nam
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
+    Route::get('/vouchers', [DiscountController::class, 'getAvailableVouchers'])->name('vouchers');
 });
 Route::prefix('shipping')->name('shipping.')->group(function () {
     Route::get('/provinces', [ShippingController::class, 'getProvinces'])->name('provinces');
@@ -118,7 +119,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');
 
-    Route::post('/my-orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
+    Route::patch('/my-orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
 
 });
 

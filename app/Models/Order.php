@@ -16,6 +16,10 @@ class Order extends Model
         'payment_status',
         'payment_method',
         'total_price',
+        'final_total',
+        'discount_code',
+        'discount_amount',
+        'shipping_fee',
         'shipping_address',
     ];
 

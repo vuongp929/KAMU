@@ -115,4 +115,28 @@ class MyOrderController extends Controller
         return redirect()->route('client.orders.index')
             ->with('error', 'Đơn hàng phải ở trạng thái "Đã giao" để hoàn thành.');
     }
+
+    /**
+     * Hủy đơn hàng
+     */
+    public function cancel(Order $order)
+    {
+        // Kiểm tra quyền truy cập
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
+        // Kiểm tra trạng thái đơn hàng - chỉ cho phép hủy khi đang chờ xử lý hoặc đang xử lý
+        if (in_array($order->status, ['pending', 'processing'])) {
+            // Chuyển sang trạng thái cancelled
+            $order->status = 'cancelled';
+            $order->save();
+
+            return redirect()->route('client.orders.index')
+                ->with('success', 'Đơn hàng #' . $order->id . ' đã được hủy thành công!');
+        }
+
+        return redirect()->route('client.orders.index')
+            ->with('error', 'Không thể hủy đơn hàng này. Chỉ có thể hủy đơn hàng đang chờ xử lý hoặc đang xử lý.');
+    }
 }

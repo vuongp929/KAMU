@@ -210,28 +210,59 @@ function confirmCancelOrder(orderId) {
                                 @endforeach
                             </div>
                             <div class="order-footer">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="me-3">Thành tiền:</span>
-                                        <span class="total-price">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
-                                        @if($order->payment_status == 'paid')
-                                            <span class="badge badge-success ml-2">
-                                                <i class="fas fa-star"></i> +20 điểm
-                                            </span>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Tạm tính:</span>
+                                            <span>{{ number_format($orderSubtotal, 0, ',', '.') }}đ</span>
+                                        </div>
+                                        @php
+                                            // Tính toán số tiền giảm giá từ tổng tiền gốc và tổng tiền cuối
+                                            $originalTotal = $orderSubtotal;
+                                            $finalTotal = $order->final_total ?? $order->total_price; // Ưu tiên final_total
+                                            $orderDiscount = $originalTotal - $finalTotal;
+                                        @endphp
+                                        
+                                        {{-- Hiển thị thông tin voucher nếu có --}}
+                                        @if($order->discount_code && $order->discount_amount > 0)
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Mã giảm giá ({{ $order->discount_code }}):</span>
+                                                <span class="text-success">-{{ number_format($order->discount_amount, 0, ',', '.') }}đ</span>
+                                            </div>
+                                        @elseif($orderDiscount > 0)
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Giảm giá:</span>
+                                                <span class="text-success">-{{ number_format($orderDiscount, 0, ',', '.') }}đ</span>
+                                            </div>
                                         @endif
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Phí vận chuyển:</span>
+                                                <span class="text-success">{{ $order->shipping_fee > 0 ? number_format($order->shipping_fee, 0, ',', '.') . ' VNĐ' : 'Miễn phí' }}</span>
+                                        </div>
                                     </div>
-                                    <div class="order-actions">
-                                        @if($order->status == 'delivered')
-                                            <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check"></i> Hoàn Thành
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye"></i> Chi Tiết
-                                        </a>
+                                    <div class="col-md-4 text-end">
+                                        <div class="total-price mb-2">
+                                            <span class="me-2">Tổng cộng:</span>
+                                            <span class="fw-bold">{{ number_format($order->final_total ?? $order->total_price, 0, ',', '.') }}đ</span>
+                                            @if($order->payment_status == 'paid')
+                                                <span class="badge badge-success ml-2">
+                                                    <i class="fas fa-star"></i> +20 điểm
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="order-actions">
+                                            @if($order->status == 'delivered')
+                                                <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check"></i> Hoàn Thành
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Chi Tiết
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

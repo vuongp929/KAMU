@@ -26,7 +26,7 @@
             <div class="row align-items-center">
                 <!-- Logo -->
                 <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="{{ route('home') }}" class="logo-link">Ôm Là Yêu</a>
+                    <a href="{{ route('home') }}" class="logo-link">KUMA House</a>
                 </div>
 
                 <!-- Thanh tìm kiếm -->

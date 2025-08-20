@@ -61,11 +61,14 @@
         </div>
 
         <p>Sau khi xác nhận, chúng tôi sẽ tiến hành đóng gói và giao hàng cho bạn trong thời gian sớm nhất.</p>
-        <p>Cảm ơn bạn đã tin tưởng và mua sắm tại Ôm Là Yêu!</p>
+        // Dòng 21:
+        <h2>Cảm ơn bạn đã đặt hàng tại KUMA House!</h2>
         
-        <div class="footer">
-            <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.</p>
-            <p>© {{ date('Y') }} Ôm Là Yêu. All rights reserved.</p>
+        // Dòng 64:
+        <p>Cảm ơn bạn đã tin tưởng và mua sắm tại KUMA House!</p>
+        
+        // Dòng 68:
+        <p>© {{ date('Y') }} KUMA House. All rights reserved.</p>
         </div>
     </div>
 </body>

@@ -65,3 +65,19 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// Xóa dữ liệu form checkout đã lưu khi thanh toán thành công
+document.addEventListener('DOMContentLoaded', function() {
+    // Xóa dữ liệu form checkout
+    localStorage.removeItem('checkoutFormData');
+    
+    // Xóa dữ liệu voucher nếu có
+    localStorage.removeItem('selectedVoucher');
+    localStorage.removeItem('appliedDiscount');
+    
+    console.log('Checkout data cleared after successful payment');
+});
+</script>
+@endpush

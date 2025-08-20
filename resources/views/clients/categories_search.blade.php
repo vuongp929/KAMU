@@ -23,7 +23,7 @@
                         @if($product->image)
                             <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}">
                         @else
-                            <img src="{{ asset('images/default-product.jpg') }}" class="card-img-top" alt="Hình ảnh mặc định">
+                            <img src="{{ asset('images/default-product.svg') }}" class="card-img-top" alt="Hình ảnh mặc định">
                         @endif
                         <div class="card-body">
                             <h5 class="card-title text-truncate" title="{{ $product->name }}">{{ $product->name }}</h5>

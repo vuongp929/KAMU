@@ -51,7 +51,7 @@ class PaymentController extends Controller
         $vnp_TxnRef = $order->id . '_' . time();
         $vnp_OrderInfo = "Thanh toan don hang #" . $order->id;
         $vnp_OrderType = 'billpayment';
-        $vnp_Amount = $order->total_price * 100;
+        $vnp_Amount = ($order->final_total ?? $order->total_price) * 100;
         $vnp_Locale = 'vn';
         $vnp_IpAddr = $request->ip();
 
@@ -151,13 +151,15 @@ class PaymentController extends Controller
         }
         
         $orderInfo = "Thanh toan don hang #" . $order->id;
-        $amount = (string)(int)$order->total_price;
+        $amount = (string)(int)($order->final_total ?? $order->total_price);
         $orderIdMomo = $order->id . '_' . uniqid();
         $requestId = time() . "";
         $requestType = "payWithMethod";
         $extraData = "";
-        $redirectUrl = route('payment.momo.return');
-        $ipnUrl = route('payment.momo.ipn');
+        // Sử dụng URL công khai cho MoMo callback (cần thay đổi khi deploy)
+        $baseUrl = env('MOMO_CALLBACK_URL', 'https://your-domain.com');
+        $redirectUrl = $baseUrl . '/payment/momo/return';
+        $ipnUrl = $baseUrl . '/payment/momo/ipn';
         
         // Chuỗi để tạo chữ ký cho payWithMethod KHÔNG BAO GỒM paymentOptions
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderIdMomo . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
@@ -179,21 +181,40 @@ class PaymentController extends Controller
             'signature' => $signature,
         ];
 
+        Log::info('MoMo payment request data:', $data);
+        
         $result = $this->execPostRequest($endpoint, json_encode($data));
         $jsonResult = json_decode($result, true);
+        
+        Log::info('MoMo API response:', ['raw_response' => $result, 'parsed_response' => $jsonResult]);
 
         if (isset($jsonResult['payUrl'])) {
+            Log::info('MoMo payment URL created successfully:', ['payUrl' => $jsonResult['payUrl']]);
             return redirect()->to($jsonResult['payUrl']);
         }
         
-        Log::error('Momo payment creation failed.', ['data_sent' => $data, 'response' => $jsonResult]);
-        return redirect()->route('client.checkout.index')->with('error', 'Không thể tạo yêu cầu thanh toán Momo. Vui lòng thử lại.');
+        Log::error('Momo payment creation failed.', [
+            'data_sent' => $data, 
+            'raw_response' => $result,
+            'parsed_response' => $jsonResult,
+            'endpoint' => $endpoint
+        ]);
+        
+        $errorMessage = 'Không thể tạo yêu cầu thanh toán Momo.';
+        if (isset($jsonResult['message'])) {
+            $errorMessage .= ' Lỗi: ' . $jsonResult['message'];
+        }
+        
+        return redirect()->route('client.checkout.index')->with('error', $errorMessage);
     }
 
     public function returnMomo(Request $request)
     {
-        // TODO: Cần có logic xác thực chữ ký của Momo trả về
-        if ($request->query('resultCode') == 0) {
+        $resultCode = $request->query('resultCode');
+        $message = $request->query('message', '');
+        
+        // Xử lý kết quả thanh toán thành công
+        if ($resultCode == 0) {
             $orderId = explode('_', $request->query('orderId'))[0];
             $order = Order::find($orderId);
             
@@ -205,7 +226,51 @@ class PaymentController extends Controller
             }
             return redirect()->route('payment.success');
         }
-        return redirect()->route('payment.failed');
+        
+        // Xử lý các mã lỗi cụ thể từ MoMo
+        $errorMessage = $this->getMomoErrorMessage($resultCode, $message);
+        
+        Log::warning('MoMo payment failed', [
+            'resultCode' => $resultCode,
+            'message' => $message,
+            'orderId' => $request->query('orderId')
+        ]);
+        
+        return redirect()->route('payment.failed')->with('error_message', $errorMessage);
+    }
+    
+    /**
+     * Lấy thông báo lỗi phù hợp dựa trên mã lỗi MoMo
+     */
+    private function getMomoErrorMessage($resultCode, $message = '')
+    {
+        $errorMessages = [
+            1000 => 'Giao dịch được khởi tạo, chờ người dùng xác nhận thanh toán.',
+            1001 => 'Giao dịch thành công nhưng chưa hoàn tất.',
+            1004 => 'Giao dịch bị từ chối do số dư không đủ.',
+            1005 => 'Giao dịch bị từ chối do thẻ/tài khoản bị khóa.',
+            1006 => 'Giao dịch bị từ chối do vượt quá hạn mức giao dịch.',
+            1007 => 'Giao dịch bị từ chối bởi ngân hàng phát hành.',
+            2001 => 'Giao dịch thất bại do lỗi hệ thống.',
+            2007 => 'Giao dịch bị từ chối do sai thông tin thanh toán.',
+            4001 => 'Giao dịch bị từ chối do lỗi định dạng dữ liệu.',
+            4100 => 'Giao dịch thất bại do lỗi kết nối.',
+            7000 => 'Giao dịch đang được xử lý.',
+            7002 => 'Giao dịch bị hủy bởi người dùng.',
+            9000 => 'Giao dịch được xác nhận thành công.',
+        ];
+        
+        // Trả về thông báo lỗi cụ thể hoặc thông báo mặc định
+        if (isset($errorMessages[$resultCode])) {
+            return $errorMessages[$resultCode];
+        }
+        
+        // Nếu có message từ MoMo thì hiển thị
+        if (!empty($message)) {
+            return "Thanh toán thất bại: {$message}";
+        }
+        
+        return "Thanh toán thất bại với mã lỗi: {$resultCode}. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.";
     }
     
     public function ipnMomo(Request $request) { /* Logic xử lý IPN của Momo */ }
