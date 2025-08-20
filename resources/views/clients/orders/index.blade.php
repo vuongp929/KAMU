@@ -115,6 +115,12 @@ function confirmCancelOrder(orderId) {
                         <a class="nav-link active" href="{{ route('client.orders.index') }}"><i class="fas fa-clipboard-list"></i> Đơn Mua</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('client.rewards.index') }}"><i class="fas fa-star"></i> Điểm Thưởng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('client.rewards.discount-codes') }}"><i class="fas fa-ticket-alt"></i> Mã Đổi Thưởng</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-bell"></i> Thông Báo</a>
                     </li>
                 </ul>
@@ -231,20 +237,33 @@ function confirmCancelOrder(orderId) {
                                         @endif
                                         <div class="d-flex justify-content-between mb-1">
                                             <span>Phí vận chuyển:</span>
-                                            <span>Miễn phí</span>
+                                                <span class="text-success">{{ $order->shipping_fee > 0 ? number_format($order->shipping_fee, 0, ',', '.') . ' VNĐ' : 'Miễn phí' }}</span>
                                         </div>
                                     </div>
                                     <div class="col-md-4 text-end">
-                                        <div class="total-price">
+                                        <div class="total-price mb-2">
                                             <span class="me-2">Tổng cộng:</span>
                                             <span class="fw-bold">{{ number_format($order->final_total ?? $order->total_price, 0, ',', '.') }}đ</span>
+                                            @if($order->payment_status == 'paid')
+                                                <span class="badge badge-success ml-2">
+                                                    <i class="fas fa-star"></i> +20 điểm
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="order-actions">
+                                            @if($order->status == 'delivered')
+                                                <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check"></i> Hoàn Thành
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Chi Tiết
+                                            </a>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mt-3 text-end">
-                                    <a href="{{ route('client.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-2">
-                                        <i class="fas fa-eye me-1"></i>Xem chi tiết
-                                    </a>
                                 </div>
                             </div>
                         </div>

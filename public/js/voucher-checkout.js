@@ -43,7 +43,7 @@ class VoucherCheckout {
         });
 
         // Đóng modal khi chọn voucher
-        document.getElementById('voucherModal')?.addEventListener('hidden.bs.modal', () => {
+        $('#voucherModal').on('hidden.bs.modal', () => {
             this.clearMessage();
         });
 
@@ -236,10 +236,7 @@ class VoucherCheckout {
         this.saveVoucher();
         
         // Đóng modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('voucherModal'));
-        if (modal) {
-            modal.hide();
-        }
+        $('#voucherModal').modal('hide');
         
         // Hiển thị thông báo thành công
         this.showToast(`Áp dụng voucher ${voucher.code} thành công!`, 'success');

@@ -39,314 +39,194 @@ class DiscountModal {
         this.loadAppliedDiscount();
         this.renderDiscountList();
         this.updateAppliedDiscountDisplay();
-        // this.loadVouchersFromAPI(); // Tạm thời comment để dùng dữ liệu mẫu
+    }
+
+    resetModal() {
+        $('#voucherCode').val('');
+        $('.voucher-card').removeClass('selected');
+        this.selectedDiscount = null;
+        this.hideConfirmButton();
     }
 
     bindEvents() {
-        // Apply discount code
-        $(document).on('click', '#applyCodeBtn', () => this.applyDiscountCode());
-
-        // Enter key for input
-        $(document).on('keypress', '#discountCodeInput', (e) => {
-            if (e.which === 13) { // Enter key
-                this.applyDiscountCode();
-            }
+        const self = this;
+        
+        // Apply discount code button
+        $(document).on('click', '#applyDiscountBtn', function() {
+            self.applyDiscountCode();
         });
 
         // Select discount from list
-        $(document).on('click', '.select-discount-btn', (e) => {
-            const code = $(e.target).attr('data-code');
-            this.selectDiscountFromList(code);
+        $(document).on('click', '.select-discount-btn', function(e) {
+            e.stopPropagation();
+            const code = $(this).data('code');
+            self.selectDiscountFromList(code);
+        });
+
+        // Modal events
+        $('#voucherModal').on('shown.bs.modal', function() {
+            self.loadVouchers();
+        });
+
+        $('#voucherModal').on('hidden.bs.modal', function() {
+            self.resetModal();
         });
 
         // Remove applied discount
-        $(document).on('click', '.btn-remove, #remove-voucher-btn', () => {
-            this.removeAppliedDiscount();
+        $(document).on('click', '.btn-remove, #remove-voucher-btn', function() {
+            self.removeAppliedDiscount();
+        });
+
+        // Confirm voucher selection
+        $(document).on('click', '#confirmVoucherBtn', function(e) {
+            e.preventDefault();
+            self.confirmVoucherSelection();
         });
     }
 
     applyDiscountCode() {
-        const code = $('#discountCodeInput').val().trim().toUpperCase();
-        
+        const code = $('#voucherCode').val().trim().toUpperCase();
         if (!code) {
-            this.showResult('Vui lòng nhập mã voucher', 'error');
+            this.showResult('Vui lòng nhập mã giảm giá', 'error');
             return;
         }
 
         const discount = this.discountCodes.find(d => d.code === code);
-        
-        if (!discount) {
-            this.showResult('Mã voucher không hợp lệ', 'error');
-            return;
-        }
-
-        this.appliedDiscount = { ...discount };
-        this.saveAppliedDiscount();
-        this.updateAppliedDiscountDisplay();
-        
-        // Show success message
-        $('.success-message').show().find('span').text(`Đã áp dụng mã ${code} thành công!`);
-        
-        $('#discountCodeInput').val('');
-        
-        // Close modal after short delay
-        setTimeout(() => {
-            $('#discountModal').modal('hide');
-            this.showToast(`Đã áp dụng voucher ${code}!`, 'success');
-        }, 1500);
-        
-        // Update cart if function exists
-        if (typeof updateCartTotal === 'function') {
-            updateCartTotal();
+        if (discount) {
+            this.selectDiscountFromList(code);
+        } else {
+            this.showResult('Mã giảm giá không hợp lệ', 'error');
         }
     }
 
     selectDiscountFromList(code) {
         const discount = this.discountCodes.find(d => d.code === code);
-        
-        if (discount) {
-            this.appliedDiscount = { ...discount };
-            this.saveAppliedDiscount();
-            this.updateAppliedDiscountDisplay();
-            
-            // Update UI
-            $('.voucher-item').removeClass('selected');
-            $(`[data-code="${code}"]`).addClass('selected');
-            
-            // Show success message
-            $('#selectResult').html(`<div class="alert alert-success"><i class="fas fa-check-circle"></i> Đã chọn voucher ${code} thành công!</div>`);
-            
-            // Close modal after short delay
-            setTimeout(() => {
-                $('#voucherModal').modal('hide');
-                this.showToast(`Đã áp dụng voucher ${code}!`, 'success');
-            }, 1500);
-            
-            // Update cart if function exists
-            if (typeof updateCartTotal === 'function') {
-                updateCartTotal();
-            }
+        if (!discount) {
+            this.showResult('Mã giảm giá không tồn tại', 'error');
+            return;
         }
+
+        // Remove previous selection
+        $('.voucher-card').removeClass('selected');
+        
+        // Add selection to current card
+        $(`.voucher-card[data-code="${code}"]`).addClass('selected');
+        
+        // Store selected discount
+        this.selectedDiscount = discount;
+        
+        // Show confirm button instead of auto-closing
+        this.showConfirmButton();
+        
+        this.showResult(`Đã chọn voucher ${discount.title}`, 'success');
     }
 
     selectDiscount(code) {
-        // Keep this method for backward compatibility
         this.selectDiscountFromList(code);
     }
 
     removeAppliedDiscount() {
         this.appliedDiscount = null;
-        this.saveAppliedDiscount();
+        this.selectedDiscount = null;
+        localStorage.removeItem('appliedDiscount');
         this.updateAppliedDiscountDisplay();
-        
-        // Update cart if function exists
-        if (typeof updateCartTotal === 'function') {
-            updateCartTotal();
-        }
-        
-        this.showToast('Đã hủy voucher', 'info');
+        this.showResult('Đã hủy áp dụng mã giảm giá', 'info');
     }
 
     calculateDiscount(subtotal) {
         if (!this.appliedDiscount) return 0;
         
-        const discount = this.appliedDiscount;
-        
-        // Check minimum order
-        if (subtotal < discount.minOrder) {
-            return 0;
-        }
-        
-        switch (discount.type) {
-            case 'percentage':
-                return Math.min(subtotal * (discount.value / 100), subtotal);
-            case 'fixed':
-                return Math.min(discount.value, subtotal);
-            case 'freeship':
-                return 0; // Handle shipping separately
-            default:
-                return 0;
-        }
-    }
-
-    async loadVouchersFromAPI() {
-        try {
-            this.isLoading = true;
-            this.showLoadingState();
-            
-            const response = await fetch('/cart/vouchers');
-            const data = await response.json();
-            
-            if (data.success && data.vouchers) {
-                this.discountCodes = data.vouchers.map(voucher => ({
-                    id: voucher.id,
-                    code: voucher.code,
-                    type: voucher.type,
-                    value: voucher.value,
-                    title: voucher.title,
-                    description: voucher.description,
-                    condition: voucher.condition,
-                    note: `HSD: ${new Date(voucher.endAt).toLocaleDateString('vi-VN')}`,
-                    minOrder: voucher.minOrder,
-                    maxDiscount: voucher.maxDiscount,
-                    category: voucher.type === 'percentage' ? 'percent' : 'fixed',
-                    icon: voucher.icon
-                }));
-                
-                this.renderDiscountList();
-            } else {
-                this.showError('Không thể tải danh sách voucher');
-            }
-        } catch (error) {
-            console.error('Error loading vouchers:', error);
-            this.showError('Lỗi kết nối. Vui lòng thử lại sau.');
-        } finally {
-            this.isLoading = false;
-            this.hideLoadingState();
-        }
-    }
-
-    showLoadingState() {
-        const container = document.getElementById('voucherList');
-        if (container) {
-            container.innerHTML = `
-                <div class="voucher-loading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Đang tải...</span>
-                    </div>
-                    <p class="mt-2">Đang tải danh sách voucher...</p>
-                </div>
-            `;
-        }
-    }
-
-    hideLoadingState() {
-        // Loading state will be replaced by renderDiscountList
-    }
-
-    showError(message) {
-        const container = document.getElementById('voucherList');
-        if (container) {
-            container.innerHTML = `
-                <div class="voucher-error text-center p-4">
-                    <i class="fas fa-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"></i>
-                    <p class="mb-2">${message}</p>
-                    <button class="btn btn-primary btn-sm" onclick="discountModal.loadVouchersFromAPI()">Thử lại</button>
-                </div>
-            `;
+        if (this.appliedDiscount.discount_type === 'percentage') {
+            return Math.min(subtotal * this.appliedDiscount.discount_value / 100, this.appliedDiscount.max_discount || subtotal);
+        } else {
+            return Math.min(this.appliedDiscount.discount_value, subtotal);
         }
     }
 
     renderDiscountList() {
-        const container = document.getElementById('voucherList');
-        if (!container) return;
+        const container = $('#voucher-list');
+        if (!container.length) return;
         
-        if (this.discountCodes.length === 0) {
-            container.innerHTML = `
-                <div class="voucher-empty text-center p-4">
-                    <i class="fas fa-ticket-alt text-muted mb-2" style="font-size: 2rem;"></i>
-                    <p class="text-muted">Hiện tại không có voucher nào khả dụng</p>
+        container.html(this.discountCodes.map(discount => {
+            const iconClass = this.getVoucherIconClass(discount.discount_type);
+            const iconText = this.getVoucherIconText(discount);
+            const discountText = discount.discount_type === 'percentage' 
+                ? `Giảm ${discount.discount_value}%` 
+                : `Giảm ${this.formatCurrency(discount.discount_value)}`;
+            
+            return `
+                <div class="voucher-card" data-code="${discount.code}" onclick="discountModal.selectDiscount('${discount.code}')">
+                    <div class="voucher-icon ${iconClass}">
+                        <div class="icon-text">${iconText}</div>
+                        <div class="icon-subtitle">TOÀN NGÀNH HÀNG</div>
+                    </div>
+                    <div class="voucher-content">
+                        <div class="voucher-title">${discountText}</div>
+                        <div class="voucher-subtitle">Đơn Tối Thiểu ${this.formatCurrency(discount.min_order_value || 0)}</div>
+                        <div class="voucher-expiry">Sắp hết hạn. Còn 1 ngày. Điều Kiện</div>
+                    </div>
+                    <div class="voucher-action">
+                        <button class="btn-apply select-discount-btn" data-code="${discount.code}">
+                            ÁP DỤNG
+                        </button>
+                    </div>
                 </div>
             `;
-            return;
-        }
-        
-        container.innerHTML = this.discountCodes.map(discount => `
-            <div class="voucher-item" data-code="${discount.code}" onclick="discountModal.selectDiscount('${discount.code}')">
-                <div class="voucher-left">
-                    <div class="voucher-icon">
-                        ${discount.discount_type === 'percentage' ? discount.discount_value + '%<br>OFF' : 
-                          discount.discount_type === 'fixed' ? '₫' + (discount.discount_value / 1000) + 'K<br>OFF' : 'FREE<br>SHIP'}
-                    </div>
-                    <div class="voucher-details">
-                        <div class="voucher-title">${discount.title}</div>
-                        <div class="voucher-desc">${discount.description}</div>
-                        <div class="voucher-condition">Đơn tối thiểu: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount.min_order_value)}</div>
-                        <div class="voucher-code">Mã: ${discount.code}</div>
-                    </div>
-                </div>
-                <div class="voucher-right">
-                    <button class="btn-select">Chọn</button>
-                </div>
-            </div>
-        `).join('');
+        }).join(''));
     }
 
-    updateAppliedDiscountDisplay() {
-        const selectedVoucher = $('#selected-voucher');
-        const voucherMain = $('.voucher-main');
-        
-        if (this.appliedDiscount) {
-            // Hiển thị voucher đã chọn
-            $('#selected-voucher-code').text(this.appliedDiscount.code);
-            $('#selected-voucher-value').text(this.formatDiscount(this.appliedDiscount));
-            selectedVoucher.show();
-            voucherMain.hide();
-        } else {
-            // Ẩn voucher đã chọn và hiển thị nút chọn voucher
-            selectedVoucher.hide();
-            voucherMain.show();
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount);
+    }
+
+    getVoucherIconClass(discountType) {
+        switch(discountType) {
+            case 'percentage':
+                return 'voucher-percentage';
+            case 'fixed':
+                return 'voucher-fixed';
+            case 'shipping':
+                return 'voucher-shipping';
+            default:
+                return 'voucher-default';
         }
     }
-    
-    formatDiscount(discount) {
-        if (discount.discount_type === 'percentage') {
-            return discount.discount_value + '%';
-        } else if (discount.discount_type === 'fixed') {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            }).format(discount.discount_value);
+
+    getVoucherIconText(voucher) {
+        if (voucher.discount_type === 'percentage') {
+            return `${voucher.discount_value}%`;
+        } else if (voucher.discount_type === 'fixed') {
+            if (voucher.discount_value >= 1000) {
+                return `${voucher.discount_value / 1000}K`;
+            } else {
+                return `${voucher.discount_value}`;
+            }
         } else {
-            // Fallback for other formats
-            return discount.discount_value || discount.amount || discount.discount || '0';
+            return 'FREE';
         }
     }
 
     showResult(message, type) {
-        const resultDiv = document.getElementById('voucherResult');
-        if (resultDiv) {
-            resultDiv.className = `result-message ${type}`;
-            resultDiv.textContent = message;
-            resultDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                resultDiv.style.display = 'none';
-            }, 3000);
-        }
-    }
-
-    showToast(message, type = 'info') {
-        // Create toast element
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0`;
-        toast.setAttribute('role', 'alert');
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        const alertClass = type === 'error' ? 'alert-danger' : 
+                          type === 'success' ? 'alert-success' : 'alert-info';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
             </div>
         `;
         
-        // Add to toast container
-        let toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'toastContainer';
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-            document.body.appendChild(toastContainer);
-        }
+        $('#discount-result').html(alertHtml);
         
-        toastContainer.appendChild(toast);
-        
-        // Show toast
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        
-        // Remove after hide
-        toast.addEventListener('hidden.bs.toast', () => {
-            toast.remove();
-        });
+        setTimeout(() => {
+            $('.alert').fadeOut();
+        }, 3000);
     }
 
     saveAppliedDiscount() {
@@ -358,16 +238,49 @@ class DiscountModal {
     loadAppliedDiscount() {
         const saved = localStorage.getItem('appliedDiscount');
         if (saved) {
-            try {
-                this.appliedDiscount = JSON.parse(saved);
-            } catch (e) {
-                localStorage.removeItem('appliedDiscount');
-            }
+            this.appliedDiscount = JSON.parse(saved);
         }
     }
 
     getAppliedDiscount() {
         return this.appliedDiscount;
+    }
+
+    showConfirmButton() {
+        $('#confirmVoucherBtn').show();
+    }
+
+    hideConfirmButton() {
+        $('#confirmVoucherBtn').hide();
+    }
+
+    confirmVoucherSelection() {
+        if (this.selectedDiscount) {
+            // Apply the selected discount
+            this.appliedDiscount = this.selectedDiscount;
+            this.saveAppliedDiscount();
+            
+            // Close modal
+            $('#voucherModal').modal('hide');
+            
+            // Update cart if function exists
+            if (typeof updateCartTotal === 'function') {
+                updateCartTotal();
+            }
+            
+            // Show success message
+            this.showResult(`Đã áp dụng voucher ${this.appliedDiscount.title}`, 'success');
+        }
+    }
+
+    loadVouchers() {
+        // For now, just render the static list
+        this.renderDiscountList();
+    }
+
+    updateAppliedDiscountDisplay() {
+        // This function can be used to update UI when discount is applied
+        // For now, it's just a placeholder
     }
 }
 

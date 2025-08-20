@@ -34,5 +34,20 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'vnpay' => [
+    'tmn_code' => env('VNPAY_TMN_CODE'),
+    'hash_secret' => env('VNPAY_HASH_SECRET'),
+    'url' => env('VNPAY_URL'),
+    ],
+    'momo' => [
+        'endpoint' => env('MOMO_ENDPOINT'),
+        'partner_code' => env('MOMO_PARTNER_CODE'),
+        'access_key' => env('MOMO_ACCESS_KEY'),
+        'secret_key' => env('MOMO_SECRET_KEY'),
+    ],
+    'ghn' => [
+        'token' => env('GHN_TOKEN'),
+        'shop_id' => env('GHN_SHOP_ID'),
+        'api_url' => env('GHN_API_URL'),
+    ],
 ];

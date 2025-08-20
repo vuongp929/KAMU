@@ -4,7 +4,7 @@
     <div id="selected-voucher" class="selected-voucher" style="display: none;">
         <div class="voucher-applied">
             <div class="voucher-applied-icon">
-                <i class="fas fa-check-circle"></i>
+                <i class="fa fa-check-circle"></i>
             </div>
             <div class="voucher-applied-content">
                 <div class="voucher-applied-title">
@@ -15,17 +15,14 @@
                 </div>
             </div>
             <button type="button" id="remove-voucher-btn" class="voucher-remove-btn">
-                <i class="fas fa-times"></i>
+                <i class="fa fa-times"></i>
             </button>
         </div>
     </div>
     
     {{-- Nút chọn voucher --}}
-    <div class="voucher-main" data-toggle="modal" data-target="#voucherModal">
+    <div class="voucher-main" data-toggle="modal" data-target="#voucherModal" style="cursor: pointer;">
         <div class="voucher-left">
-            <div class="voucher-icon">
-                <i class="fas fa-ticket-alt"></i>
-            </div>
             <div class="voucher-content">
                 <span class="voucher-title">KUMA Voucher</span>
             </div>
@@ -82,7 +79,7 @@
     align-items: center;
     justify-content: flex-start;
     flex: 1;
-    margin-left: -80px;
+    margin-left: -20px;
 }
 
 .voucher-title {

@@ -112,7 +112,7 @@
     </script> --}}
 
     {{-- 5. Vị trí để nhúng các script của từng trang riêng biệt --}}
-    {{-- <script src="{{ asset('js/discount-modal.js') }}"></script> --}}
+    <script src="{{ asset('js/discount-modal.js') }}"></script>
     @stack('scripts')
 
 </body>

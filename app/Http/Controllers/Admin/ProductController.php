@@ -214,16 +214,16 @@ class ProductController extends Controller
             $relatedProducts = Product::whereHas('categories', function ($query) use ($firstCategoryId) {
                 $query->where('category_id', $firstCategoryId);
             })
-            ->where('id', '!=', $product->id)
-            ->with(['thumbnail', 'variants'])
-            ->inRandomOrder()
-            ->take(4)
-            ->get();
+                ->where('id', '!=', $product->id)
+                ->with(['thumbnail', 'variants'])
+                ->inRandomOrder()
+                ->take(4)
+                ->get();
         }
 
         return view('clients.products.show', compact(
-            'product', 
-            'relatedProducts', 
+            'product',
+            'relatedProducts',
             'cartCount'
         ));
     }
@@ -231,6 +231,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return redirect()->route('admins.products.index')->with('success', 'Đã xóa sản phẩm thành công.');
+        return redirect()->back();
     }
 }

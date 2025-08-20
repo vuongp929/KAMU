@@ -61,7 +61,8 @@ class Discount extends Model
                 return 'expired';
             }
             
-            if ($this->max_uses <= 0) {
+            // Kiểm tra số lượng sử dụng
+            if ($this->max_uses !== null && $this->used_count >= $this->max_uses) {
                 return 'used_up';
             }
             
@@ -88,10 +89,6 @@ class Discount extends Model
     public function incrementUsageCount()
     {
         $this->increment('used_count');
-        // Giảm số lượng tối đa khi sử dụng
-        if ($this->max_uses > 0) {
-            $this->decrement('max_uses');
-        }
     }
 
     /**

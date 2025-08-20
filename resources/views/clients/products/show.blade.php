@@ -12,7 +12,7 @@
                 <div class="product-gallery">
                     <div class="main-image-container">
                         {{-- Ảnh chính sẽ được cập nhật bằng JS khi click vào thumbnail --}}
-                        <img id="main-product-image" src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" class="img-responsive">
+                        <img id="main-product-image" src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" class="img-responsive" />
                     </div>
                     {{-- Danh sách ảnh thumbnail --}}
                     @if($product->images->count() > 1)
@@ -21,7 +21,7 @@
                         <div class="thumbnail-item">
                             <img src="{{ Storage::url($image->image_path) }}" 
                                  data-large-src="{{ Storage::url($image->image_path) }}" 
-                                 alt="Thumbnail {{ $loop->iteration }}" class="img-responsive">
+                                 alt="Thumbnail {{ $loop->iteration }}" class="img-responsive" />
                         </div>
                         @endforeach
                     </div>
@@ -248,7 +248,7 @@
             </div>
             @forelse($relatedProducts as $relatedProduct)
                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                    @include('clients.product-card-v2', ['product' => $relatedProduct])
+                    @include('clients.product-card', ['product' => $relatedProduct])
                 </div>
             @empty
                 <p class="text-center col-xs-12">Không có sản phẩm nào tương tự.</p>
@@ -277,7 +277,7 @@ const reviewPopupHtml = `
       <div style="margin-bottom:18px;">
         <label style="font-weight:600;font-size:14px;color:#374151;">Đánh giá của bạn</label>
         <div id="popupStars" style="display:flex;gap:8px;margin:10px 0 0 0;">
-          ${[1,2,3,4,5].map(i=>`<span class='popup-star' data-rating='${i}' style='font-size:2rem;cursor:pointer;color:#d1d5db;transition:.2s;'><i class=\"fa fa-star\"></i></span>`).join('')}
+          ${[1,2,3,4,5].map(i=>'<span class="popup-star" data-rating="'+i+'" style="font-size:2rem;cursor:pointer;color:#d1d5db;transition:.2s;"><i class="fa fa-star"></i></span>').join('')}
         </div>
         <div id="popupRatingBadge" style="display:none;margin-top:4px;font-size:12px;font-weight:500;color:#92400e;background:#fef3c7;border-radius:12px;padding:2px 10px;border:1px solid #fde68a;display:inline-block;"></div>
       </div>

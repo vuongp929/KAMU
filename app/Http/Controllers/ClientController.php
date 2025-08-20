@@ -13,10 +13,17 @@ class ClientController extends Controller
         // === BẮT ĐẦU PHẦN SỬA LẠI ===
 
         // 1. Lấy dữ liệu cho Header (sẽ được dùng trên nhiều trang)
-        $categoriesForMenu = Category::whereNull('parent_id')
-                                     ->with('children')
-                                     ->get();
-        
+        // $categoriesForMenu = Category::whereNull('parent_id')
+        //                      ->where('statu', 1)
+        //                      ->with('children') // children đã tự lọc sẵn
+        //                      ->get();
+
+       $categoriesForMenu = Category::whereNull('parent_id')
+        ->where('statu', 1)
+        ->with('activeChildren') 
+        ->get();
+
+
         $cartCount = count(session('cart', []));
 
         // 2. Lấy dữ liệu riêng cho trang chủ
@@ -29,15 +36,16 @@ class ClientController extends Controller
                                ->inRandomOrder()
                                ->take(4)
                                ->get();
-        
         // 3. Trả về view với TẤT CẢ dữ liệu
         return view('clients.home', [
-            'categories' => $categoriesForMenu, // Đổi tên để tránh nhầm lẫn
+            // 'categories' => $categoriesForMenu, 
+            'categoriesForMenu' => $categoriesForMenu, 
             'cartCount' => $cartCount,
             'newProducts' => $newProducts,
             'featuredProducts' => $featuredProducts,
             // Giờ đây 'categories' đã được truyền thẳng vào view 'home'
         ]);
+
     }
 
     // Khi bạn tạo các phương thức khác, ví dụ trang chi tiết sản phẩm,

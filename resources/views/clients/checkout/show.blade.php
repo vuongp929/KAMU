@@ -27,7 +27,7 @@
                             @if(isset($item->productVariant->product->image))
                                 <img src="{{ Storage::url($item->productVariant->product->image) }}" width="100px" alt="Ảnh sản phẩm">
                             @else
-                                <img src="{{ asset('images/default-product.jpg') }}" width="100px" alt="Mặc định">
+                                <img src="{{ asset('images/default-product.svg') }}" width="100px" alt="Mặc định">
                             @endif
                         </td>
                         <td>{{ $item->productVariant->product->name ?? 'Không rõ' }}</td>

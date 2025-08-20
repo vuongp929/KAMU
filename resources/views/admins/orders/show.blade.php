@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <h4 class="mb-4">Chi tiết đơn hàng #{{ $order->id }}</h4>
+        <h4 class="mb-4 text-primary">📦 Chi tiết đơn hàng #{{ $order->id }}</h4>
 
         <div class="row mb-4">
             <div class="col-md-6">
@@ -92,7 +92,7 @@
                                                      class="img-thumbnail" 
                                                      style="width: 60px; height: 60px; object-fit: cover;">
                                             @else
-                                                <img src="{{ asset('images/default-product.jpg') }}" 
+                                                <img src="{{ asset('images/default-product.svg') }}" 
                                                      alt="Hình ảnh mặc định" 
                                                      class="img-thumbnail" 
                                                      style="width: 60px; height: 60px; object-fit: cover;">
@@ -204,7 +204,7 @@
                                 @if (isset($item['image']))
                                                         <img src="{{ Storage::url($item['image']) }}" alt="Hình ảnh sản phẩm" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                 @else
-                                                        <img src="{{ asset('images/default-product.jpg') }}" alt="Hình ảnh mặc định" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                        <img src="{{ asset('images/default-product.svg') }}" alt="Hình ảnh mặc định" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                 @endif
                             </td>
                                                 <td>{{ $item['name'] ?? 'N/A' }}</td>

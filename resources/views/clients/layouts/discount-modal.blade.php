@@ -6,9 +6,7 @@
                 <h5 class="modal-title" id="voucherModalLabel">
                     <i class="fas fa-ticket-alt" style="margin-right: 8px;"></i>Chọn Voucher
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body shopee-body">
                 {{-- Applied Discount Display --}}
@@ -146,7 +144,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary" id="confirmDiscountBtn" disabled>Xác nhận</button>
             </div>
         </div>

@@ -272,7 +272,7 @@ class DiscountController extends Controller
         }
 
         // Kiểm tra số lượng còn lại
-        if ($discount->max_uses <= 0) {
+        if ($discount->max_uses !== null && $discount->used_count >= $discount->max_uses) {
             return response()->json(['error' => 'Mã giảm giá này đã hết số lượng sử dụng.'], 400);
         }
 
