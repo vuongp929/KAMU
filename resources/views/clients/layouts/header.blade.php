@@ -26,7 +26,13 @@
             <div class="row align-items-center">
                 <!-- Logo -->
                 <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="{{ route('home') }}" class="logo-link">KUMA House</a>
+                    <a href="{{ route('home') }}" class="logo-link d-flex align-items-center">
+                        
+                        {{-- SỬA LẠI DÒNG NÀY --}}
+                        <img src="{{ asset('images/kumahouse.jpg') }}" alt="KUMA House Logo" class="logo-image" style="height: 40px;">
+                        
+                        <span class="logo-text">KUMA House</span>
+                    </a>
                 </div>
 
                 <!-- Thanh tìm kiếm -->
@@ -118,10 +124,6 @@
     </nav> --}}
         <nav class="navbar navbar-expand-lg header-nav">
         <div class="container">
-            <button class="navbar-toggler d-lg-none ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">

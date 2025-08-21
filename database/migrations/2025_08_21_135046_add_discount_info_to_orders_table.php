@@ -12,16 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('shipping_fee', 10, 2)->default(0); // Bỏ after()
+            // Thêm cột để lưu mã code đã sử dụng
+            $table->string('discount_code')->nullable()->after('payment_status');
+            // (Tùy chọn) Thêm cột để lưu số tiền đã giảm
+            $table->decimal('discount_amount', 10, 2)->default(0)->after('discount_code');
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('shipping_fee');
+            //
         });
     }
 };

@@ -1,28 +1,40 @@
 <div class="app-menu navbar-menu">
     <!-- LOGO -->
     <div class="navbar-brand-box">
-        <!-- Dark Logo-->
-        <a href="/dashboard" class="logo logo-dark">
+        <!-- LOGO -->
+    <div class="navbar-brand-box">
+        <a href="{{ route('admin.dashboard') }}" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="{{ asset('assets/admins/images/logo-sm.png') }}" alt="" height="22">
+                <img src="{{ asset('images/kumahouse.jpg') }}" alt="Logo" height="40"> {{-- Ảnh logo nhỏ --}}
             </span>
-            <span class="logo-lg">
-                <img src="{{ asset('assets/admins/images/logo-dark.png') }}" alt="" height="17">
+            <span class="logo-lg d-flex align-items-center">
+                <img src="{{ asset('images/kumahouse.jpg') }}" alt="Logo" height="40"> {{-- Ảnh logo lớn --}}
+                <span class="logo-text ms-2">KUMAHOUSE</span>
             </span>
         </a>
-        <!-- Light Logo-->
-        <a href="/dashboard" class="logo logo-light">
+        <a href="{{ route('admin.dashboard') }}" class="logo logo-light">
             <span class="logo-sm">
-                <img src="{{ asset('assets/admins/images/logo-sm.png') }}" alt="" height="22">
+                <img src="{{ asset('images/kumahouse.jpg') }}" alt="Logo" height="40">
             </span>
-            <span class="logo-lg">
-                <img src="{{ asset('assets/admins/images/logo-light.png') }}" alt="" height="17">
+            <span class="logo-lg d-flex align-items-center">
+                <img src="{{ asset('images/kumahouse.jpg') }}" alt="Logo" height="40">
+                <span class="logo-text ms-2">KUMAHOUSE</span>
             </span>
         </a>
-        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
-            id="vertical-hover">
-            <i class="ri-record-circle-line"></i>
-        </button>
+    </div>
+
+{{-- Thêm CSS này vào --}}
+<style>
+    .logo-text {
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff; /* Màu chữ trên nền tối */
+        vertical-align: middle;
+    }
+    .logo.logo-light .logo-text {
+        color: #ea73ac; /* Màu chữ trên nền sáng */
+    }
+</style>
     </div>
 
     <div class="dropdown sidebar-user m-1 rounded">

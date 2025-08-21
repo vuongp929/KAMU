@@ -1,96 +1,101 @@
 @extends('layouts.client')
 
-@section('title', 'Kết Quả Tìm Kiếm')
-
-@section('CSS')
-
-@endsection
+@section('title', 'Kết Quả Tìm Kiếm cho "' . request('query') . '"')
 
 @section('content')
+<div class="main">
+    <div class="container py-5">
+        
+        {{-- TIÊU ĐỀ VÀ SỐ LƯỢNG KẾT QUẢ --}}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="search-title">Kết Quả Tìm Kiếm</h2>
+                <p class="search-subtitle">
+                    Tìm thấy <span class="fw-bold text-primary">{{ $products->total() }}</span> sản phẩm cho từ khóa 
+                    <span class="fst-italic">"{{ request('query') }}"</span>
+                </p>
+                <hr>
+            </div>
+        </div>
 
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-
-<div class="container">
-    <h2 class="my-4">Kết Quả Tìm Kiếm: "{{ request()->input('query') }}"</h2>
-
-    @if($products->isEmpty())
-        <div class="alert alert-warning">Không tìm thấy sản phẩm nào với từ khóa "{{ request()->input('query') }}"</div>
-    @else
-        <div class="row">
-            @foreach($products as $product)
-                <div class="col-md-3" >
-                    <a href="{{ route('client.products.show', $product->id) }}">
-                    <div class="card">
-                        <img src="{{ asset('storage/'.$product->image) }}" class="card-img-top" alt="{{ $product->name }}">
-                        <div class="card-body">
-                            <h5 class="card-title text-truncate" title="{{ $product->name }}">{{ $product->name }}</h5>
-
-                            <form action="{{ route('client.cart.add') }}" method="POST" onsubmit="return validateSizeSelection({{ $product->id }})">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <input type="hidden" id="selected-size-{{ $product->id }}" name="size" value="{{ $product->variants->first()->id }}">
-                                <input type="hidden" name="redirect_url" value="{{ url()->current() }}">
-                                <!-- Nút chọn size -->
-                                <div class="size-buttons">
-                                    @foreach ($product->variants as $variant)
-                                        <button type="button" class="size-button" 
-                                            data-size-id="{{ $variant->id }}" 
-                                            data-price="{{ $variant->price }}" 
-                                            onclick="selectSize({{ $product->id }}, this)">
-                                            {{ $variant->size }}
-                                        </button>
-                                    @endforeach
-                                </div>
-
-                                <!-- Giá sản phẩm -->
-                                <p class="price mt-2">
-                                    Giá: <span id="product-price-{{ $product->id }}">{{ number_format($product->variants->first()->price) }} VND</span>
-                                </p>
-
-                                <button type="submit" class="btn btn-primary btn-block mt-3">Thêm vào giỏ</button>
-                            </form>                            
-                        </div>
-                    </div>
-                    </a>
+        {{-- DANH SÁCH SẢN PHẨM --}}
+        <div class="row product-list">
+            @forelse($products as $product)
+                <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                    {{-- Tái sử dụng product-card để có giao diện đồng nhất --}}
+                    @include('clients.product-card', ['product' => $product])
                 </div>
-            @endforeach
+            @empty
+                <div class="col-12">
+                    <div class="text-center p-5 bg-light rounded">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>Không tìm thấy sản phẩm nào</h4>
+                        <p class="text-muted">Rất tiếc, chúng tôi không tìm thấy sản phẩm nào phù hợp với từ khóa "{{ request('query') }}".</p>
+                        <a href="{{ route('home') }}" class="btn btn-primary mt-3">Quay về trang chủ</a>
+                    </div>
+                </div>
+            @endforelse
         </div>
 
-        {{-- Phân trang --}}
-        <div class="d-flex justify-content-center mt-3">
-            {{ $products->appends(request()->input())->links() }}
-        </div>
-    @endif
+        {{-- PHÂN TRANG --}}
+        @if ($products->hasPages())
+            <div class="d-flex justify-content-center mt-5">
+                {{-- appends(request()->query()) để giữ lại từ khóa tìm kiếm khi chuyển trang --}}
+                {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
+
+    </div>
 </div>
 @endsection
 
-@section('JS')
-<script>
-    function selectSize(productId, buttonElement) 
-    {
-        const sizeButtons = buttonElement.parentElement.querySelectorAll('.size-button');
-        sizeButtons.forEach(button => button.classList.remove('selected'));
-        buttonElement.classList.add('selected');
 
-        const price = buttonElement.getAttribute('data-price');
-        document.getElementById('product-price-' + productId).textContent = new Intl.NumberFormat().format(price) + ' VND';
-
-        const sizeId = buttonElement.getAttribute('data-size-id');
-        document.getElementById('selected-size-' + productId).value = sizeId;
+@push('styles')
+<style>
+    .search-title {
+        color: #333;
+        font-weight: 600;
     }
-
-    function validateSizeSelection(productId) 
-    {
-        const selectedSize = document.getElementById('selected-size-' + productId).value;
-        if (!selectedSize) {
-            alert('Vui lòng chọn size sản phẩm trước khi thêm vào giỏ hàng!');
-            return false;
-        }
-        return true;
+    .search-subtitle {
+        font-size: 1.1rem;
+        color: #666;
     }
-</script>
-@endsection
+    .product-list {
+        row-gap: 25px;
+    }
+    /* Ghi đè CSS cho product-card để phù hợp với trang tìm kiếm (nếu cần) */
+    .product-card {
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 0; /* Bỏ margin bottom vì đã có row-gap */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .product-image-container {
+        position: relative;
+    }
+    .product-brand-icon {
+        position: absolute; top: 10px; left: 10px; width: 40px; height: 40px;
+    }
+    .product-info { padding: 15px; text-align: center; }
+    .product-name a {
+        font-size: 16px; font-weight: 600; color: #333; text-decoration: none;
+        height: 48px; overflow: hidden; display: -webkit-box;
+        -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    }
+    .product-price {
+        font-size: 18px; font-weight: bold; color: #ea73ac; margin: 10px 0;
+    }
+    .product-sizes { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; min-height: 26px; }
+    .product-sizes span {
+        background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 5px;
+        padding: 2px 8px; font-size: 12px; color: #666;
+    }
+</style>
+@endpush
