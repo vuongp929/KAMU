@@ -65,6 +65,40 @@ class DashboardController extends Controller
             ->take($limit)
             ->get();
 
+        // 6. Dữ liệu biểu đồ doanh thu theo tháng (12 tháng gần nhất)
+        $monthlyRevenue = [];
+        $months = [];
+        
+        for ($i = 11; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $monthStart = $month->startOfMonth()->toDateString();
+            $monthEnd = $month->endOfMonth()->toDateString();
+            
+            $revenue = Order::where('status', 'completed')
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->sum('total_price');
+                
+            $months[] = $month->format('m/Y');
+            $monthlyRevenue[] = $revenue;
+        }
+
+        // 7. Dữ liệu biểu đồ doanh thu theo ngày (7 ngày gần nhất)
+        $dailyRevenue = [];
+        $days = [];
+        
+        for ($i = 6; $i >= 0; $i--) {
+            $day = now()->subDays($i);
+            $dayStart = $day->startOfDay();
+            $dayEnd = $day->endOfDay();
+            
+            $revenue = Order::where('status', 'completed')
+                ->whereBetween('created_at', [$dayStart, $dayEnd])
+                ->sum('total_price');
+                
+            $days[] = $day->format('d/m');
+            $dailyRevenue[] = $revenue;
+        }
+
         return view('dashboard', compact(
             'totalRevenue',
             'totalOrders',
@@ -73,7 +107,11 @@ class DashboardController extends Controller
             'topProducts',
             'from',
             'to',
-            'limit'
+            'limit',
+            'monthlyRevenue',
+            'months',
+            'dailyRevenue',
+            'days'
         ));
     }
 }

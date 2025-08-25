@@ -37,8 +37,8 @@ class ProductVariant extends Model
 
     public function images(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        // Trỏ đến model ProductImage, sử dụng khóa ngoại 'product_variant_id'
-        return $this->hasMany(ProductImage::class, 'product_variant_id');
+        // Trỏ đến model ProductVariantImage, sử dụng khóa ngoại 'product_variant_id'
+        return $this->hasMany(ProductVariantImage::class, 'product_variant_id');
     }
 
     public function attributeValues()

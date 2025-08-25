@@ -67,101 +67,139 @@ class CheckoutController extends Controller
      */
     public function placeOrder(Request $request)
     {
-        // 1. Validate dữ liệu người dùng nhập
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'province_id' => 'required|integer',
-            'district_id' => 'required|integer',
-            'ward_code' => 'required|string',
-            'address' => 'required|string|max:255',
-            'payment_method' => 'required|string|in:cod,vnpay,momo',
-            'discount_code' => 'nullable|string', // Chỉ nhận mã code từ form
+    // Debug: Log dữ liệu nhận được
+    Log::info('Checkout data received:', $request->all());
+    
+    // 1. Validate (Giữ nguyên)
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:20',
+        'address' => 'required|string|max:255',
+        'payment_method' => 'required|string|in:cod,vnpay,momo',
+        'discount_code' => 'nullable|string',
+        'discount_value' => 'nullable|numeric|min:0',
+        'final_total' => 'nullable|numeric|min:0',
+        'shipping_fee' => 'nullable|numeric|min:0',
+    ]);
+
+    $user = Auth::user();
+    $cart = Cart::with('items.variant.product')->where('user_id', $user->id)->latest()->first();
+
+    // 2. Kiểm tra lại giỏ hàng (Giữ nguyên)
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('home')->with('error', 'Giỏ hàng của bạn đã hết hạn. Vui lòng thử lại.');
+    }
+
+    DB::beginTransaction();
+    try {
+        // 3. Tạo đơn hàng - sử dụng tổng tiền từ frontend (đã bao gồm phí vận chuyển)
+        $finalTotal = $validated['final_total'] ?? $cart->total_price;
+        $discountValue = $validated['discount_value'] ?? 0;
+        $shippingFee = $validated['shipping_fee'] ?? 0;
+        
+        // Đảm bảo final_total bao gồm phí vận chuyển nếu chưa có
+        if ($shippingFee > 0 && $finalTotal == $cart->total_price) {
+            $finalTotal = $cart->total_price + $shippingFee - $discountValue;
+        }
+        
+        // Kiểm tra và cập nhật mã giảm giá nếu có
+        $discountCode = $validated['discount_code'] ?? null;
+        $discount = null;
+        if ($discountCode) {
+            $discount = Discount::where('code', $discountCode)->first();
+            if ($discount && $discount->isValid()) {
+                // Tăng số lần sử dụng
+                $discount->incrementUsageCount();
+            }
+        }
+        
+        // Tạo thông tin khách hàng dưới dạng JSON
+        $customerInfo = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'address' => $validated['address']
+        ];
+        
+        // Xác định trạng thái thanh toán dựa trên phương thức thanh toán
+        $paymentStatus = 'unpaid'; // Mặc định
+        if (in_array($validated['payment_method'], ['vnpay', 'momo'])) {
+            $paymentStatus = 'awaiting_payment'; // Đang chờ thanh toán online
+        } elseif ($validated['payment_method'] === 'cod') {
+            $paymentStatus = 'cod'; // COD
+        }
+        
+        $order = Order::create([
+            'user_id' => $user->id,
+            'total_price' => $cart->total_price, // Giá gốc
+            'final_total' => $finalTotal, // Giá sau giảm
+            'discount_code' => $discountCode,
+            'discount_amount' => $discountValue,
+            'shipping_fee' => $shippingFee,
+            'status' => 'pending',
+            'payment_method' => $validated['payment_method'],
+            'payment_status' => $paymentStatus,
+            'shipping_address' => json_encode($customerInfo), // Lưu thông tin khách hàng dưới dạng JSON
         ]);
 
-        $user = Auth::user();
-        $cart = Cart::with('items.variant.product')->where('user_id', $user->id)->latest()->first();
-
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('home')->with('error', 'Giỏ hàng của bạn đã hết hạn.');
-        }
-        
-        // --- BẮT ĐẦU TÍNH TOÁN LẠI MỌI THỨ Ở SERVER ---
-        $subtotal = $cart->total_price;
-        $shippingFee = session('shipping_fee', 0); // Lấy phí ship đã được tính và lưu vào session
-        $discountAmount = 0;
-        $discount = null;
-        
-        if (!empty($validated['discount_code'])) {
-            $discount = Discount::where('code', $validated['discount_code'])->first();
-            // Kiểm tra lại mã giảm giá một lần nữa để đảm bảo an toàn
-            if ($discount && $discount->isValidFor($subtotal, $user)) {
-                $discountAmount = $discount->calculateDiscount($subtotal);
-            }
-        }
-        $finalTotal = ($subtotal + $shippingFee) - $discountAmount;
-        // --- KẾT THÚC TÍNH TOÁN ---
-
-        DB::beginTransaction();
-        try {
-            // Lấy tên địa chỉ từ ID/Code để lưu vào DB
-            // TODO: Bạn cần có model và logic để lấy tên từ ID/Code
-            $fullAddress = "{$validated['address']}, {$validated['ward_code']}, {$validated['district_id']}, {$validated['province_id']}";
-
-            // 4. TẠO ĐƠN HÀNG (ĐÃ SỬA LẠI)
-            // Chỉ lưu vào các cột thực sự có trong bảng 'orders'
-            $order = Order::create([
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'address' => $fullAddress,
-                'total_price' => $finalTotal, // <-- Lưu giá cuối cùng vào cột total_price
-                'status' => 'pending',
-                'payment_method' => trim($validated['payment_method']),
-                'payment_status' => 'unpaid',
-                'discount_code' => $discount ? $discount->code : null,
-                // Nếu bạn có các cột này trong DB, hãy thêm chúng vào
-                // 'subtotal' => $subtotal,
-                // 'shipping_fee' => $shippingFee,
-                // 'discount_amount' => $discountAmount,
-            ]);
-
-            // 5. TẠO CHI TIẾT ĐƠN HÀNG VÀ TRỪ TỒN KHO
-            foreach ($cart->items as $cartItem) {
-                $variant = $cartItem->variant;
-                if (!$variant || $variant->stock < $cartItem->quantity) {
-                    throw new \Exception("Sản phẩm \"{$variant->product->name}\" không đủ tồn kho.");
-                }
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $variant->product_id,
-                    'product_variant_id' => $cartItem->product_variant_id,
-                    'quantity' => $cartItem->quantity,
-                    'price' => $variant->price,
-                ]);
-                $variant->decrement('stock', $cartItem->quantity);
-            }
-
-            // 6. Cập nhật số lần sử dụng mã giảm giá
-            if ($discount) {
-                $discount->increment('used_count');
-                // Xử lý cả UserDiscountCode nếu cần
+        // Tạo order items
+        foreach ($cart->items as $cartItem) {
+            $variant = $cartItem->variant;
+            if (!$variant) {
+                throw new \Exception("Không tìm thấy biến thể sản phẩm.");
             }
             
+            // Chỉ kiểm tra tồn kho cơ bản, không trừ ngay
+            // Việc trừ tồn kho sẽ được thực hiện khi thanh toán thành công
+            if ($variant->stock < $cartItem->quantity) {
+                throw new \Exception("Sản phẩm \"{$variant->product->name}\" không đủ tồn kho. Còn lại: {$variant->stock}, yêu cầu: {$cartItem->quantity}");
+            }
+            
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $variant->product_id,
+                'product_variant_id' => $cartItem->product_variant_id,
+                'quantity' => $cartItem->quantity,
+                'price' => $variant->price,
+            ]);
+        }
+
             DB::commit();
 
-            // 7. PHÂN LUỒNG THANH TOÁN
+            // === LOGIC PHÂN LUỒNG QUAN TRỌNG ===
             $paymentMethod = $order->payment_method;
 
-            if ($paymentMethod === 'vnpay') { return redirect()->route('payment.vnpay.create', ['orderId' => $order->id]); }
-            if ($paymentMethod === 'momo') { return redirect()->route('payment.momo.create', ['orderId' => $order->id]); }
+            if ($paymentMethod === 'vnpay') {
+                return redirect()->route('payment.vnpay.create', ['orderId' => $order->id]);
+            }
             
-            // 8. XỬ LÝ COD
+            if ($paymentMethod === 'momo') {
+                return redirect()->route('payment.momo.create', ['orderId' => $order->id]);
+            }
+
+            // Mặc định là COD - trừ tồn kho ngay khi đặt hàng thành công
+            // Kiểm tra tồn kho trước khi trừ để tránh overselling
+            foreach ($order->items as $orderItem) {
+                $variant = $orderItem->variant;
+                if (!$variant) {
+                    throw new \Exception("Không tìm thấy biến thể sản phẩm cho đơn hàng #{$order->id}");
+                }
+                
+                if ($variant->stock < $orderItem->quantity) {
+                    throw new \Exception("Sản phẩm '{$variant->product->name}' đã hết hàng. Còn lại: {$variant->stock}, yêu cầu: {$orderItem->quantity}. Vui lòng chọn mặt hàng khác.");
+                }
+            }
+            
+            // Nếu tất cả sản phẩm đều đủ tồn kho, tiến hành trừ
+            foreach ($order->items as $orderItem) {
+                $variant = $orderItem->variant;
+                $variant->decrement('stock', $orderItem->quantity);
+            }
+            
             $order->status = 'processing';
             $order->save();
-            $cart->delete(); // Xóa giỏ hàng chỉ khi là COD
+            $cart->delete();
             
             try {
                 $order->load('items.variant.product');

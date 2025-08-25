@@ -52,11 +52,6 @@ class CartController extends Controller
         $user = Auth::user();
         $variant = ProductVariant::find($validated['variant_id']);
 
-        // Kiểm tra tồn kho
-        if ($variant->stock < $validated['quantity']) {
-            return back()->with('error', 'Số lượng sản phẩm trong kho không đủ.');
-        }
-
         // 2. Tìm hoặc tạo giỏ hàng cho người dùng
         // firstOrCreate sẽ tìm giỏ hàng của user, nếu không có sẽ tự tạo mới
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
@@ -64,9 +59,23 @@ class CartController extends Controller
         // 3. Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
         $cartItem = $cart->items()->where('product_variant_id', $variant->id)->first();
 
+        // Tính tổng số lượng sau khi thêm
+        $currentQuantityInCart = $cartItem ? $cartItem->quantity : 0;
+        $totalQuantityAfterAdd = $currentQuantityInCart + $validated['quantity'];
+
+        // Kiểm tra số lượng tồn kho
+        if ($variant->stock < $totalQuantityAfterAdd) {
+            $availableQuantity = $variant->stock - $currentQuantityInCart;
+            if ($availableQuantity <= 0) {
+                return back()->with('error', 'Sản phẩm này đã hết hàng hoặc bạn đã thêm tối đa số lượng có thể vào giỏ hàng.');
+            } else {
+                return back()->with('error', "Chỉ có thể thêm tối đa {$availableQuantity} sản phẩm nữa vào giỏ hàng. Hiện tại trong kho còn {$variant->stock} sản phẩm và bạn đã có {$currentQuantityInCart} sản phẩm trong giỏ hàng.");
+            }
+        }
+
         if ($cartItem) {
-            // Nếu đã có, chỉ cập nhật số lượng
-            $cartItem->quantity += $validated['quantity'];
+            // Nếu đã có, cập nhật số lượng
+            $cartItem->quantity = $totalQuantityAfterAdd;
             $cartItem->save();
         } else {
             // Nếu chưa có, tạo một item mới trong giỏ hàng
@@ -94,6 +103,13 @@ class CartController extends Controller
             foreach ($request->quantities as $cartItemId => $quantity) {
                 $item = $cart->items()->find($cartItemId);
                 if ($item && $quantity > 0) {
+                    $variant = $item->variant;
+                    
+                    // Kiểm tra số lượng tồn kho
+                    if ($variant->stock < $quantity) {
+                        return back()->with('error', "Không thể cập nhật. Trong kho chỉ còn {$variant->stock} sản phẩm.");
+                    }
+                    
                     $item->update(['quantity' => (int)$quantity]);
                 }
             }

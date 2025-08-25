@@ -1,0 +1,47 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pinkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff69b4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff1493;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9370db;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#663399;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#pinkGradient)" rx="15"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="350" cy="50" r="30" fill="#ffffff" opacity="0.3"/>
+  <circle cx="50" cy="150" r="20" fill="#ffffff" opacity="0.2"/>
+  <circle cx="320" cy="170" r="15" fill="#ffffff" opacity="0.4"/>
+  
+  <!-- Main text -->
+  <text x="200" y="60" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">Điểm Gấu Tại Nhà</text>
+  <text x="200" y="85" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14">Tặng Vàng Thưởng</text>
+  <text x="200" y="105" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14">Vui Tủy</text>
+  
+  <!-- Teddy bear icon -->
+  <g transform="translate(200, 120)">
+    <!-- Bear body -->
+    <ellipse cx="0" cy="15" rx="25" ry="20" fill="#8B4513"/>
+    <!-- Bear head -->
+    <circle cx="0" cy="-5" r="18" fill="#8B4513"/>
+    <!-- Bear ears -->
+    <circle cx="-12" cy="-15" r="8" fill="#8B4513"/>
+    <circle cx="12" cy="-15" r="8" fill="#8B4513"/>
+    <!-- Bear face -->
+    <circle cx="-6" cy="-8" r="2" fill="black"/>
+    <circle cx="6" cy="-8" r="2" fill="black"/>
+    <ellipse cx="0" cy="-2" rx="3" ry="2" fill="black"/>
+    <!-- Bear arms -->
+    <circle cx="-20" cy="5" r="8" fill="#8B4513"/>
+    <circle cx="20" cy="5" r="8" fill="#8B4513"/>
+  </g>
+  
+  <!-- Decorative hearts -->
+  <path d="M 80 40 C 75 35, 65 35, 65 45 C 65 35, 55 35, 50 40 C 50 50, 65 60, 65 60 C 65 60, 80 50, 80 40 Z" fill="white" opacity="0.6"/>
+  <path d="M 330 120 C 327 117, 322 117, 322 122 C 322 117, 317 117, 314 120 C 314 125, 322 130, 322 130 C 322 130, 330 125, 330 120 Z" fill="white" opacity="0.6"/>
+</svg>

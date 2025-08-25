@@ -29,7 +29,6 @@ class Product extends Model
         'code',
         'name',
         'description',
-        'image', // Cột này để lưu đường dẫn ảnh chính cho việc truy cập nhanh
     ];
 
     //======================================================================
@@ -120,9 +119,6 @@ class Product extends Model
      */
     public function getThumbnailUrlAttribute(): string
     {
-        if ($this->image) {
-            return Storage::url($this->image);
-        }
         if ($this->mainImage) {
             return Storage::url($this->mainImage->image_path);
         }
@@ -130,6 +126,21 @@ class Product extends Model
             return Storage::url($this->firstImage->image_path);
         }
         return asset('images/default-placeholder.png'); // Tạo ảnh mặc định tại public/images
+    }
+
+    /**
+     * Lấy ảnh chính của sản phẩm.
+     * @return string|null
+     */
+    public function getMainImagePathAttribute(): ?string
+    {
+        if ($this->mainImage) {
+            return $this->mainImage->image_path;
+        }
+        if ($this->firstImage) {
+            return $this->firstImage->image_path;
+        }
+        return null;
     }
 
     /**

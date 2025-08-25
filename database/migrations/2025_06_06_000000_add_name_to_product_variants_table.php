@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('shipping_fee', 10, 2)->default(0); // Bỏ after()
+        Schema::table('product_variants', function (Blueprint $table) {
+            $table->string('name')->nullable()->after('product_id');
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('shipping_fee');
+        Schema::table('product_variants', function (Blueprint $table) {
+            $table->dropColumn('name');
         });
     }
 };

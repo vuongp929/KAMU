@@ -23,7 +23,10 @@ class ClientLayoutComposer
         // 'categories_menu' là key của cache
         $this->categories = Cache::remember('categories_menu', 60 * 60, function () {
             return Category::whereNull('parent_id')
-                           ->with('children') // Tải sẵn các danh mục con
+                           ->where('statu', 1)
+                           ->with(['activeChildren' => function($query) {
+                               $query->where('statu', 1);
+                           }])
                            ->get();
         });
     }

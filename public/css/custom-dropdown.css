@@ -1,0 +1,437 @@
+/* Custom Dropdown Menu Styles */
+.navbar-nav .dropdown-menu {
+    background: linear-gradient(135deg, #ffffff 0%, #fff5f8 50%, #ffeef3 100%);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 4px 15px rgba(234, 115, 172, 0.1);
+    margin-top: 12px;
+    padding: 15px 0;
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1050;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(234, 115, 172, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Teddy bear pattern background */
+.navbar-nav .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" font-size="40" fill="%23ea73ac" opacity="0.1">🧸</text></svg>') no-repeat center;
+    background-size: contain;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+.navbar-nav .dropdown-menu::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: -10px;
+    width: 60px;
+    height: 60px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" font-size="30" fill="%23ff6b9d" opacity="0.08">🧸</text></svg>') no-repeat center;
+    background-size: contain;
+    transform: rotate(-20deg);
+    pointer-events: none;
+}
+
+.navbar-nav .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-menu .dropdown-item {
+    padding: 12px 25px 12px 45px;
+    color: #495057;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 8px;
+    margin: 2px 10px;
+    background: transparent;
+}
+
+/* Teddy bear icon before each dropdown item */
+.dropdown-menu .dropdown-item::before {
+    content: '🧸';
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%) scale(0.8);
+    font-size: 14px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    filter: grayscale(0.3);
+}
+
+.dropdown-menu .dropdown-item:hover::before {
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+    filter: grayscale(0) drop-shadow(0 2px 4px rgba(234, 115, 172, 0.3));
+    animation: teddyWiggle 0.5s ease;
+}
+
+@keyframes teddyWiggle {
+    0%, 100% { transform: translateY(-50%) scale(1) rotate(0deg); }
+    25% { transform: translateY(-50%) scale(1) rotate(-5deg); }
+    75% { transform: translateY(-50%) scale(1) rotate(5deg); }
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background: linear-gradient(135deg, #ea73ac, #ff6b9d);
+    color: #ffffff;
+    transform: translateX(8px);
+    box-shadow: 0 4px 15px rgba(234, 115, 172, 0.3);
+    border-left: 4px solid #ffffff;
+}
+
+/* Teddy bear icon for dropdown items */
+.dropdown-menu .dropdown-item::after {
+    content: '🧸';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%) translateX(10px) scale(0.8);
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.dropdown-menu .dropdown-item:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+    animation: teddyBounce 0.6s ease;
+}
+
+@keyframes teddyBounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(-50%) translateX(0) scale(1);
+    }
+    40% {
+        transform: translateY(-50%) translateX(0) scale(1.1);
+    }
+    60% {
+        transform: translateY(-50%) translateX(0) scale(1.05);
+    }
+}
+
+/* Dropdown toggle arrow styling */
+.navbar-nav .dropdown-toggle::after {
+    border-top: 0.35em solid;
+    border-right: 0.35em solid transparent;
+    border-bottom: 0;
+    border-left: 0.35em solid transparent;
+    margin-left: 0.8em;
+    vertical-align: 0.1em;
+    transition: transform 0.3s ease;
+}
+
+.navbar-nav .dropdown:hover .dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+/* Enhanced nav-link styling */
+.navbar-nav .nav-link {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Special styling for teddy bear categories */
+.navbar-nav .nav-item.dropdown .nav-link:hover {
+    background: linear-gradient(135deg, #fff0f5, #ffeef3);
+    color: #ea73ac;
+    box-shadow: 0 4px 15px rgba(234, 115, 172, 0.2);
+}
+
+/* Add teddy bear emoji to category links */
+.navbar-nav .nav-item.dropdown .nav-link::before {
+    content: '🧸';
+    margin-right: 8px;
+    font-size: 16px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    display: inline-block;
+    transform: scale(0.9);
+}
+
+.navbar-nav .nav-item.dropdown .nav-link:hover::before {
+    opacity: 1;
+    transform: scale(1) rotate(10deg);
+    animation: teddyDance 0.8s ease;
+}
+
+@keyframes teddyDance {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(10deg); }
+    50% { transform: scale(1) rotate(-5deg); }
+    75% { transform: scale(1.05) rotate(5deg); }
+}
+
+/* Floating teddy bears animation */
+.navbar-nav .dropdown-menu:hover::before {
+    animation: floatTeddy 3s ease-in-out infinite;
+}
+
+.navbar-nav .dropdown-menu:hover::after {
+    animation: floatTeddy 3s ease-in-out infinite reverse;
+}
+
+@keyframes floatTeddy {
+    0%, 100% { transform: rotate(15deg) translateY(0px); }
+    50% { transform: rotate(15deg) translateY(-5px); }
+}
+
+.navbar-nav .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(234, 115, 172, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.navbar-nav .nav-link:hover::before {
+    left: 100%;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 991.98px) {
+    .navbar-nav .dropdown-menu {
+        position: static;
+        float: none;
+        width: auto;
+        margin-top: 0;
+        background: #f8f9fa;
+        border: none;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        margin: 10px 15px;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+    }
+    
+    .dropdown-menu .dropdown-item {
+        margin: 2px 5px;
+        padding: 10px 15px;
+    }
+    
+    .dropdown-menu .dropdown-item:hover {
+        transform: none;
+    }
+}
+
+/* Animation keyframes */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Special styling for category items */
+.dropdown-menu .dropdown-item[href*="category"] {
+    background: linear-gradient(135deg, rgba(234, 115, 172, 0.05), rgba(255, 107, 157, 0.05));
+    border-left: 3px solid transparent;
+}
+
+.dropdown-menu .dropdown-item[href*="category"]:hover {
+    border-left-color: #ea73ac;
+    background: linear-gradient(135deg, #ea73ac, #ff6b9d);
+}
+
+/* Smooth scrollbar for long dropdown menus */
+.dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ea73ac #f1f1f1;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #ea73ac, #ff6b9d);
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #d65a96, #e55a87);
+}
+
+/* Ripple effect for dropdown items */
+.dropdown-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-item .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Enhanced hover effects */
+.navbar-nav .dropdown:hover .nav-link {
+    background: linear-gradient(135deg, rgba(234, 115, 172, 0.1), rgba(255, 107, 157, 0.1));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(234, 115, 172, 0.2);
+}
+
+/* Loading animation for dropdown */
+.dropdown-menu.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ea73ac, transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Improved focus states for accessibility */
+.dropdown-item:focus {
+    outline: 2px solid #ea73ac;
+    outline-offset: 2px;
+    background: linear-gradient(135deg, rgba(234, 115, 172, 0.1), rgba(255, 107, 157, 0.1));
+}
+
+/* Category-specific styling */
+.dropdown-item[href*="gau-bong"] {
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.1), rgba(255, 160, 180, 0.1));
+}
+
+.dropdown-item[href*="gau-bong"]:hover {
+    background: linear-gradient(135deg, #ffb6c1, #ffa0b4);
+    color: #fff;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 767.98px) {
+    .navbar-nav .dropdown-menu {
+        margin: 5px 10px;
+        padding: 10px 0;
+    }
+    
+    .dropdown-menu .dropdown-item {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-nav .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        box-shadow: inset 0 2px 8px rgba(234, 115, 172, 0.1);
+        border-radius: 8px;
+        margin: 5px 15px;
+        background: linear-gradient(135deg, #fef7fb, #fff0f5);
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .dropdown-menu .dropdown-item {
+        padding: 10px 20px 10px 40px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 12px 15px;
+        font-size: 15px;
+        border-radius: 8px;
+        margin: 2px 0;
+    }
+    
+    /* Mobile teddy bear icons */
+    .navbar-nav .nav-item.dropdown .nav-link::before {
+        font-size: 14px;
+        margin-right: 6px;
+    }
+    
+    .dropdown-menu .dropdown-item::before {
+        left: 12px;
+        font-size: 12px;
+    }
+    
+    .dropdown-menu .dropdown-item::after {
+        right: 15px;
+        font-size: 14px;
+    }
+}
+
+/* Special effects for teddy bear themed dropdown */
+.navbar-nav .dropdown-menu {
+    animation: teddyMenuAppear 0.4s ease-out;
+}
+
+@keyframes teddyMenuAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateY(-5px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Cute loading effect */
+.navbar-nav .dropdown:hover .dropdown-menu::before {
+    animation: floatTeddy 3s ease-in-out infinite, teddyGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes teddyGlow {
+    0% { filter: drop-shadow(0 0 5px rgba(234, 115, 172, 0.3)); }
+    100% { filter: drop-shadow(0 0 15px rgba(234, 115, 172, 0.6)); }
+}

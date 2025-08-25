@@ -20,7 +20,7 @@
         }
     }
 @endphp
-@section('title', 'Đơn hàng của tôi')
+@section('title', 'Đơn hàng chưa thanh toán')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -67,35 +67,11 @@
     .status-delivered { background: #e2e3e5; color: #383d41; }
     .status-completed { background: #d4edda; color: #155724; }
     .status-cancelled { background: #f8d7da; color: #721c24; }
+    .payment-status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; }
+    .payment-awaiting { background: #fff3cd; color: #856404; }
+    .payment-cod { background: #d1ecf1; color: #0c5460; }
+    .payment-unpaid { background: #f8d7da; color: #721c24; }
 </style>
-
-<script>
-function confirmCancelOrder(orderId) {
-    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
-        // Tạo form để submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ route("client.orders.cancel", ":orderId") }}'.replace(':orderId', orderId);
-        
-        // Thêm CSRF token
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-        
-        // Thêm method override
-        const methodField = document.createElement('input');
-        methodField.type = 'hidden';
-        methodField.name = '_method';
-        methodField.value = 'PATCH';
-        form.appendChild(methodField);
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-</script>
 @endpush
 
 @section('content')
@@ -104,32 +80,44 @@ function confirmCancelOrder(orderId) {
         {{-- Bắt đầu cột Sidebar bên trái --}}
         <div class="col-md-3">
             <div class="profile-sidebar">
+                {{-- Thông tin người dùng --}}
                 <div class="user-info">
-                    <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
                     <div>
                         <div class="user-name">{{ Auth::user()->name }}</div>
                         <div class="user-edit">
-                            <a href="{{ route('profile.edit') }}"><i class="fas fa-pencil-alt"></i> Sửa Hồ Sơ</a>
+                            <a href="#">Sửa hồ sơ</a>
                         </div>
                     </div>
                 </div>
-                <ul class="nav flex-column sidebar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('profile.edit') }}"><i class="fas fa-user"></i> Tài Khoản Của Tôi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('client.orders.index') }}"><i class="fas fa-clipboard-list"></i> Đơn Mua</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('client.rewards.index') }}"><i class="fas fa-star"></i> Điểm Thưởng</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('client.rewards.discount-codes') }}"><i class="fas fa-ticket-alt"></i> Mã Đổi Thưởng</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-bell"></i> Thông Báo</a>
-                    </li>
-                </ul>
+                
+                {{-- Menu điều hướng --}}
+                <nav class="sidebar-nav">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-user"></i> Tài khoản của tôi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('client.orders.index') }}">
+                                <i class="fas fa-clipboard-list"></i> Đơn mua
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-bell"></i> Thông báo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-gift"></i> Kho voucher
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
         {{-- Kết thúc cột Sidebar --}}
@@ -137,27 +125,14 @@ function confirmCancelOrder(orderId) {
         {{-- Bắt đầu cột Nội dung chính bên phải --}}
         <div class="col-md-9">
             <div class="profile-content">
-                {{-- Các Tab lọc đơn hàng --}}
-                <ul class="nav nav-tabs order-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request('status') == '' && request('payment_status') == '' ? 'active' : '' }}" href="{{ route('client.orders.index') }}">Tất cả</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request('payment_status') == 'unpaid_orders' ? 'active' : '' }}" href="{{ route('client.orders.index', ['payment_status' => 'unpaid_orders']) }}">Chưa thanh toán</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request('status') == 'pending' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'pending']) }}">Chờ xử lý</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request('status') == 'processing' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'processing']) }}">Vận chuyển</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request('status') == 'completed' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'completed']) }}">Hoàn thành</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request('status') == 'cancelled' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'cancelled']) }}">Đã hủy</a>
-                    </li>
-                </ul>
+                <h4 class="mb-4">Đơn hàng chưa thanh toán</h4>
+                
+                {{-- Nút quay lại --}}
+                <div class="mb-3">
+                    <a href="{{ route('client.orders.index') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Quay lại tất cả đơn hàng
+                    </a>
+                </div>
 
                 <div class="mt-4">
                     {{-- Lặp qua từng đơn hàng --}}
@@ -168,14 +143,12 @@ function confirmCancelOrder(orderId) {
                                     <span>Mã đơn hàng: #{{ $order->id }}</span>
                                     <br>
                                     <small class="text-muted">Thanh toán: 
-                                        @if($order->payment_status == 'paid')
-                                            <span class="text-success">Đã thanh toán</span>
-                                        @elseif($order->payment_status == 'awaiting_payment')
-                                            <span class="text-warning">Chờ thanh toán</span>
+                                        @if($order->payment_status == 'awaiting_payment')
+                                            <span class="payment-status-badge payment-awaiting">Chờ thanh toán</span>
                                         @elseif($order->payment_status == 'cod')
-                                            <span class="text-info">Thanh toán khi nhận hàng</span>
+                                            <span class="payment-status-badge payment-cod">Thanh toán khi nhận hàng</span>
                                         @else
-                                            <span class="text-secondary">Chưa thanh toán</span>
+                                            <span class="payment-status-badge payment-unpaid">Chưa thanh toán</span>
                                         @endif
                                     </small>
                                 </div>
@@ -267,11 +240,6 @@ function confirmCancelOrder(orderId) {
                                         <div class="total-price mb-2">
                                             <span class="me-2">Tổng cộng:</span>
                                             <span class="fw-bold">{{ number_format($order->final_total ?? $order->total_price, 0, ',', '.') }}đ</span>
-                                            @if($order->payment_status == 'paid')
-                                                <span class="badge badge-success ml-2">
-                                                    <i class="fas fa-star"></i> +20 điểm
-                                                </span>
-                                            @endif
                                         </div>
                                         <div class="order-actions">
                                             @if($order->payment_status == 'awaiting_payment' && in_array($order->payment_method, ['vnpay', 'momo']) && $order->status !== 'cancelled')
@@ -285,14 +253,6 @@ function confirmCancelOrder(orderId) {
                                                     </a>
                                                 @endif
                                             @endif
-                                            @if($order->status == 'delivered')
-                                                <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-success btn-sm">
-                                                        <i class="fas fa-check"></i> Hoàn Thành
-                                                    </button>
-                                                </form>
-                                            @endif
                                             <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye"></i> Chi Tiết
                                             </a>
@@ -303,7 +263,11 @@ function confirmCancelOrder(orderId) {
                         </div>
                     @empty
                         <div class="text-center p-5">
-                            <p>Chưa có đơn hàng nào.</p>
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Không có đơn hàng chưa thanh toán nào.</p>
+                            <a href="{{ route('client.orders.index') }}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Xem tất cả đơn hàng
+                            </a>
                         </div>
                     @endforelse
                 </div>
