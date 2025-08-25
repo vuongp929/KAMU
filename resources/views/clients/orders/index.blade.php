@@ -7,6 +7,10 @@
                 return 'CHỜ XỬ LÝ';
             case 'processing':
                 return 'ĐANG XỬ LÝ';
+            case 'shipping':
+                return 'ĐANG GIAO HÀNG';
+            case 'delivered':
+                return 'ĐÃ GIAO HÀNG';
             case 'completed':
                 return 'HOÀN THÀNH';
             case 'cancelled':
@@ -59,6 +63,8 @@
     .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
     .status-pending { background: #fff3cd; color: #856404; }
     .status-processing { background: #d1ecf1; color: #0c5460; }
+    .status-shipping { background: #cce5ff; color: #004085; }
+    .status-delivered { background: #e2e3e5; color: #383d41; }
     .status-completed { background: #d4edda; color: #155724; }
     .status-cancelled { background: #f8d7da; color: #721c24; }
 </style>
@@ -134,10 +140,13 @@ function confirmCancelOrder(orderId) {
                 {{-- Các Tab lọc đơn hàng --}}
                 <ul class="nav nav-tabs order-tabs">
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') == '' ? 'active' : '' }}" href="{{ route('client.orders.index') }}">Tất cả</a>
+                        <a class="nav-link {{ request('status') == '' && request('payment_status') == '' ? 'active' : '' }}" href="{{ route('client.orders.index') }}">Tất cả</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') == 'pending' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'pending']) }}">Chờ thanh toán</a>
+                        <a class="nav-link {{ request('payment_status') == 'unpaid_orders' ? 'active' : '' }}" href="{{ route('client.orders.index', ['payment_status' => 'unpaid_orders']) }}">Chưa thanh toán</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') == 'pending' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'pending']) }}">Chờ xử lý</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request('status') == 'processing' ? 'active' : '' }}" href="{{ route('client.orders.index', ['status' => 'processing']) }}">Vận chuyển</a>
@@ -155,7 +164,21 @@ function confirmCancelOrder(orderId) {
                     @forelse($orders as $order)
                         <div class="order-card">
                             <div class="order-header">
-                                <span>Mã đơn hàng: #{{ $order->id }}</span>
+                                <div>
+                                    <span>Mã đơn hàng: #{{ $order->id }}</span>
+                                    <br>
+                                    <small class="text-muted">Thanh toán: 
+                                        @if($order->payment_status == 'paid')
+                                            <span class="text-success">Đã thanh toán</span>
+                                        @elseif($order->payment_status == 'awaiting_payment')
+                                            <span class="text-warning">Chờ thanh toán</span>
+                                        @elseif($order->payment_status == 'cod')
+                                            <span class="text-info">Thanh toán khi nhận hàng</span>
+                                        @else
+                                            <span class="text-secondary">Chưa thanh toán</span>
+                                        @endif
+                                    </small>
+                                </div>
                                 <span class="status-badge status-{{ $order->status }}">
                                     {{ getOrderStatusText($order->status) }}
                                 </span>
@@ -210,28 +233,70 @@ function confirmCancelOrder(orderId) {
                                 @endforeach
                             </div>
                             <div class="order-footer">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="me-3">Thành tiền:</span>
-                                        <span class="total-price">{{ number_format($order->total_price, 0, ',', '.') }}đ</span>
-                                        @if($order->payment_status == 'paid')
-                                            <span class="badge badge-success ml-2">
-                                                <i class="fas fa-star"></i> +20 điểm
-                                            </span>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Tạm tính:</span>
+                                            <span>{{ number_format($orderSubtotal, 0, ',', '.') }}đ</span>
+                                        </div>
+                                        @php
+                                            // Tính toán số tiền giảm giá từ tổng tiền gốc và tổng tiền cuối
+                                            $originalTotal = $orderSubtotal;
+                                            $finalTotal = $order->final_total ?? $order->total_price; // Ưu tiên final_total
+                                            $orderDiscount = $originalTotal - $finalTotal;
+                                        @endphp
+                                        
+                                        {{-- Hiển thị thông tin voucher nếu có --}}
+                                        @if($order->discount_code && $order->discount_amount > 0)
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Mã giảm giá ({{ $order->discount_code }}):</span>
+                                                <span class="text-success">-{{ number_format($order->discount_amount, 0, ',', '.') }}đ</span>
+                                            </div>
+                                        @elseif($orderDiscount > 0)
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Giảm giá:</span>
+                                                <span class="text-success">-{{ number_format($orderDiscount, 0, ',', '.') }}đ</span>
+                                            </div>
                                         @endif
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Phí vận chuyển:</span>
+                                                <span class="text-success">{{ $order->shipping_fee > 0 ? number_format($order->shipping_fee, 0, ',', '.') . ' VNĐ' : 'Miễn phí' }}</span>
+                                        </div>
                                     </div>
-                                    <div class="order-actions">
-                                        @if($order->status == 'delivered')
-                                            <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check"></i> Hoàn Thành
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye"></i> Chi Tiết
-                                        </a>
+                                    <div class="col-md-4 text-end">
+                                        <div class="total-price mb-2">
+                                            <span class="me-2">Tổng cộng:</span>
+                                            <span class="fw-bold">{{ number_format($order->final_total ?? $order->total_price, 0, ',', '.') }}đ</span>
+                                            @if($order->payment_status == 'paid')
+                                                <span class="badge badge-success ml-2">
+                                                    <i class="fas fa-star"></i> +20 điểm
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="order-actions">
+                                            @if($order->payment_status == 'awaiting_payment' && in_array($order->payment_method, ['vnpay', 'momo']) && $order->status !== 'cancelled')
+                                                @if($order->payment_method == 'vnpay')
+                                                    <a href="{{ route('payment.vnpay.create', ['orderId' => $order->id]) }}" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-credit-card"></i> Tiếp tục thanh toán VNPay
+                                                    </a>
+                                                @elseif($order->payment_method == 'momo')
+                                                    <a href="{{ route('payment.momo.create', ['orderId' => $order->id]) }}" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-credit-card"></i> Tiếp tục thanh toán MoMo
+                                                    </a>
+                                                @endif
+                                            @endif
+                                            @if($order->status == 'delivered')
+                                                <form action="{{ route('client.orders.complete', $order) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check"></i> Hoàn Thành
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a href="{{ route('client.orders.show', $order) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Chi Tiết
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

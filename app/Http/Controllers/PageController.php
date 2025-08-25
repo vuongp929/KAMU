@@ -23,5 +23,24 @@ class PageController extends Controller
         return view('clients.pages.chinh-sach-doi-tra');
     }
 
+    // Các method cho dịch vụ
+    public function guide()
+    {
+        return view('clients.services.guide');
+    }
 
+    public function washing()
+    {
+        return view('clients.services.washing');
+    }
+
+    public function giftWrap()
+    {
+        return view('clients.services.gift-wrap');
+    }
+
+    public function freeCard()
+    {
+        return view('clients.services.free-card');
+    }
 }

@@ -49,7 +49,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.js" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
     <!-- THEME STYLES -->
     <link href="{{ asset('assets/clients/pages/css/components.css') }}" rel="stylesheet" type="text/css" />
@@ -79,6 +79,7 @@
     @include('clients.layouts.footer')
 
     @include('clients.layouts.chatbox')
+    @include('clients.layouts.discount-modal')
 
     {{-- Div ẩn cho pop-up xem nhanh --}}
     <div id="product-pop-up" style="display: none; width: 700px;"></div>
@@ -111,6 +112,16 @@
     </script> --}}
 
     {{-- 5. Vị trí để nhúng các script của từng trang riêng biệt --}}
+    <script src="{{ asset('js/discount-modal.js') }}"></script>
+    
+    {{-- Khởi tạo dropdown Bootstrap --}}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Khởi tạo dropdown
+            $('.dropdown-toggle').dropdown();
+        });
+    </script>
+    
     @stack('scripts')
 
 </body>

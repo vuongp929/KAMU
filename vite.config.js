@@ -7,6 +7,9 @@ export default defineConfig({
         laravel({
             // Các file CSS và JS đầu vào
             input: [
+                // CSS chính
+                'resources/css/app.css',
+                
                 // CSS của Velzon
                 'resources/assets_velzon/css/bootstrap.min.css',
                 'resources/assets_velzon/css/icons.min.css',

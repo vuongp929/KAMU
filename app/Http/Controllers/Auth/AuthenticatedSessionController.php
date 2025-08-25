@@ -41,7 +41,7 @@ public function store(LoginRequest $request): RedirectResponse
 
     // Sau khi đăng nhập thành công, sẽ chuyển hướng đến trang được định nghĩa trong RouteServiceProvider
     // Mặc định là '/dashboard', nhưng chúng ta có thể tùy chỉnh sau
-    return redirect()->intended('/admin/dashboard');
+    return redirect()->intended('admin/dashboard');
 }
 
 

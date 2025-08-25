@@ -179,6 +179,68 @@ class DiscountController extends Controller
             ->with('success', 'Mã giảm giá đã được xóa thành công.');
     }
 
+    public function getAvailableVouchers()
+    {
+        $vouchers = Discount::where('is_active', true)
+            ->where('max_uses', '>', 0)
+            ->where('start_at', '<=', now())
+            ->where('end_at', '>=', now())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $formattedVouchers = $vouchers->map(function ($voucher) {
+            return [
+                'id' => $voucher->id,
+                'code' => $voucher->code,
+                'title' => $this->generateVoucherTitle($voucher),
+                'description' => $this->generateVoucherDescription($voucher),
+                'type' => $voucher->discount_type === 'percent' ? 'percentage' : 'fixed',
+                'value' => $voucher->discount_type === 'percent' ? (int)$voucher->discount : (float)$voucher->amount,
+                'maxDiscount' => $voucher->discount_type === 'percent' ? ((float) $voucher->amount > 0 ? (float) $voucher->amount : null) : null,
+                'minOrder' => $voucher->min_order_amount,
+                'condition' => 'Đơn tối thiểu ' . number_format($voucher->min_order_amount) . 'đ',
+                'maxUses' => $voucher->max_uses,
+                'usedCount' => $voucher->used_count,
+                'startAt' => $voucher->start_at,
+                'endAt' => $voucher->end_at,
+                'icon' => $this->getVoucherIcon($voucher)
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'vouchers' => $formattedVouchers
+        ]);
+    }
+
+    private function generateVoucherTitle($voucher)
+    {
+        if ($voucher->discount_type === 'percent') {
+            return 'Giảm ' . $voucher->discount . '%';
+        } else {
+            return 'Giảm ' . number_format($voucher->amount) . 'đ';
+        }
+    }
+
+    private function generateVoucherDescription($voucher)
+    {
+        if ($voucher->discount_type === 'percent') {
+            $maxDiscount = $voucher->amount ? ' tối đa ' . number_format($voucher->amount) . 'đ' : '';
+            return 'Giảm ' . $voucher->discount . '%' . $maxDiscount;
+        } else {
+            return 'Giảm ngay ' . number_format($voucher->amount) . 'đ';
+        }
+    }
+
+    private function getVoucherIcon($voucher)
+    {
+        if ($voucher->discount_type === 'percent') {
+            return 'fas fa-percentage';
+        } else {
+            return 'fas fa-money-bill-wave';
+        }
+    }
+
     public function applyDiscount(Request $request)
     {
         // Xử lý JSON request
@@ -210,7 +272,7 @@ class DiscountController extends Controller
         }
 
         // Kiểm tra số lượng còn lại
-        if ($discount->max_uses <= 0) {
+        if ($discount->max_uses !== null && $discount->used_count >= $discount->max_uses) {
             return response()->json(['error' => 'Mã giảm giá này đã hết số lượng sử dụng.'], 400);
         }
 

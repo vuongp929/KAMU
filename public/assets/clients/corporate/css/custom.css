@@ -1,46 +1,201 @@
-/* Trang chủ Gấu Bông */
+/* Trang chủ Gấu Bông - Style đơn giản như ảnh mong muốn */
 .home-page {
-    background-color: #fff; /* Màu nền trắng sạch sẽ */
+    background: #ffffff;
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* Phần Banner */
+/* Banner Section - Style đơn giản */
 .banner-section {
-    padding: 15px 0;
+    padding: 0;
+    margin-bottom: 0;
 }
-.main-banner, .side-banner-item {
-    border-radius: 15px;
+
+.main-banner {
+    border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    background: #ffffff;
+    height: 400px;
+    margin-right: 5px;
 }
+
+.side-banner-item {
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    background: #ffffff;
+    height: 197px;
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.main-banner:hover, .side-banner-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .side-banners {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    height: 100%;
+    gap: 5px;
+    height: 400px;
 }
-.side-banner-item {
-    flex: 1;
-}
+
 .main-banner img, .side-banner-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 0;
 }
 
-/* Phần Icon Dịch vụ */
+.main-banner:hover img, .side-banner-item:hover img {
+    transform: scale(1.02);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .side-banners {
+        flex-direction: row;
+        height: 250px;
+        gap: 5px;
+    }
+    
+    .side-banner-item {
+        height: 250px;
+        flex: 1;
+    }
+    
+    .main-banner {
+        height: 300px;
+        margin-right: 5px;
+    }
+}
+
+@media (max-width: 768px) {
+    .banner-section {
+        padding: 0;
+    }
+    
+    .banner-section .col-md-8,
+    .banner-section .col-md-4 {
+        margin-bottom: 5px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .side-banners {
+        flex-direction: column;
+        height: auto;
+        gap: 5px;
+    }
+    
+    .side-banner-item {
+        height: 150px;
+        border-radius: 5px;
+    }
+    
+    .main-banner {
+        height: 220px;
+        border-radius: 5px;
+        margin-right: 0;
+    }
+}
+
+/* Services Section - Style đơn giản */
 .services-section {
-    padding: 40px 0;
-    background-color: #FFF5F7; /* Màu hồng nền nhạt */
-    margin: 30px 0;
+    padding: 30px 0;
+    background: #ffffff;
+    margin: 20px 0;
+    position: relative;
 }
+
+.service-item {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    height: auto;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.service-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #EA738C;
+}
+
+
+
 .service-item img {
-    max-width: 80px;
-    margin-bottom: 15px;
+    max-width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
 }
+
+.service-item:hover img {
+    transform: scale(1.05);
+}
+
 .service-item h4 {
     font-weight: 600;
-    color: #444;
-    font-size: 16px;
+    color: #333;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    margin: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.service-item:hover h4 {
+    color: #EA738C;
+}
+
+
+
+/* Responsive for services */
+@media (max-width: 768px) {
+    .services-section {
+        padding: 20px 0;
+        margin: 15px 0;
+    }
+    
+    .service-item {
+        padding: 15px 10px;
+        min-height: 100px;
+        border-radius: 8px;
+    }
+    
+    .service-item img {
+        max-width: 40px;
+        height: 40px;
+        margin-bottom: 8px;
+    }
+    
+    .service-item h4 {
+        font-size: 12px;
+    }
 }
 
 /* Tiêu đề của các khu vực sản phẩm */

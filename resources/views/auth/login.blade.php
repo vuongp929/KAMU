@@ -9,7 +9,7 @@
             <div class="col-md-8 col-lg-6 col-xl-5">
                 <div class="auth-card">
                     <div class="auth-card-header">
-                        <a href="{{ route('home') }}" class="auth-logo">Ôm Là Yêu</a>
+                        <a href="{{ route('home') }}" class="auth-logo">KUMA House</a>
                         <p class="auth-subtitle">Chào mừng bạn trở lại!</p>
                     </div>
 

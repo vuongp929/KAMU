@@ -4,24 +4,23 @@
 
 @section('content')
 <div class="main home-page">
-    <div class="container-fluid">
-        {{-- SECTION 1: BANNER CHÍNH & BANNER PHỤ --}}
-        <div class="row banner-section">
-            <div class="col-lg-8 col-md-12">
-                {{-- Banner lớn bên trái --}}
+    <div class="container-fluid px-0">
+        {{-- SECTION 1: BANNER CHÍNH --}}
+        <div class="row banner-section no-gutters">
+            <div class="col-md-8 px-0">
+                {{-- Banner chính ở giữa --}}
                 <div class="main-banner">
-                    {{-- Thay bằng ảnh banner thực tế của bạn --}}
-                    <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-1.jpg" alt="Gấu Bông An Toàn Cao Cấp Hot Trend" class="img-responsive">
+                    <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_DC.jpg" alt="Gấu Bông An Toàn Cao Cấp Hot Trend" class="img-responsive">
                 </div>
             </div>
-            <div class="col-lg-4 col-md-12">
-                {{-- Hai banner nhỏ bên phải --}}
+            <div class="col-md-4 px-0">
+                {{-- Banner phụ bên phải --}}
                 <div class="side-banners">
                     <div class="side-banner-item">
-                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-2.jpg" alt="Điện Gấu Tận Nhà" class="img-responsive">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_Dien-gau.jpg" alt="Điểm Gấu Tại Nhà - Tặng Vàng Thưởng Vui Tủy" class="img-responsive">
                     </div>
                     <div class="side-banner-item">
-                        <img src="https://teddy.vn/wp-content/uploads/2024/05/Banner-PC-3.jpg" alt="Teddy With Love" class="img-responsive">
+                        <img src="https://teddy.vn/wp-content/uploads/2024/01/banner-thuong_Dich-vu.jpg" alt="Teddy With Love" class="img-responsive">
                     </div>
                 </div>
             </div>
@@ -29,35 +28,37 @@
 
         {{-- SECTION 2: ICON DỊCH VỤ --}}
         <div class="row services-section text-center">
-            <div class="container">
-              <a href="{{ route('giao-hang') }}" class="text-decoration-none text-dark">
-                    <div class="col-md-3 col-sm-6 service-item">
+            <div class="col-md-3 col-sm-6">
+                <a href="{{ route('giao-hang') }}" class="text-decoration-none text-dark">
+                    <div class="service-item">
                         <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-1-e1661254198715.png" alt="Giao Hàng Tận Nhà">
                         <h4>GIAO HÀNG TẬN NHÀ</h4>
                     </div>
                 </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
                 <a href="{{ route('dich-vu-goi-qua') }}" class="text-decoration-none text-dark">
-                    <div class="col-md-3 col-sm-6 service-item">
+                    <div class="service-item">
                         <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-1.png" alt="Gói Quà Siêu Đẹp">
                         <h4>GÓI QUÀ SIÊU ĐẸP</h4>
                     </div>
-                    </a>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
                 <a href="{{ url('cach-giat-gau-bong') }}" class="text-decoration-none text-dark">
-
-                <div class="col-md-3 col-sm-6 service-item">
-                    <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-2-1.png" alt="Cách Giặt Gấu Bông">
-                    <h4>CÁCH GIẶT GẤU BÔNG</h4>
-                </div>
-                    </a>
-
+                    <div class="service-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2017/07/Artboard-16-copy-2-1.png" alt="Cách Giặt Gấu Bông">
+                        <h4>CÁCH GIẶT GẤU BÔNG</h4>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
                 <a href="{{ url('chinh-sach-doi-tra') }}" class="text-decoration-none text-dark">
-
-                <div class="col-md-3 col-sm-6 service-item">
-                    <img src="https://teddy.vn/wp-content/uploads/2018/04/Artboard-16-copy-3-1.png" alt="Bảo Hành Gấu Bông">
-                    <h4>BẢO HÀNH GẤU BÔNG</h4>
-                </div>
-                    </a>
-
+                    <div class="service-item">
+                        <img src="https://teddy.vn/wp-content/uploads/2018/04/Artboard-16-copy-3-1.png" alt="Bảo Hành Gấu Bông">
+                        <h4>BẢO HÀNH GẤU BÔNG</h4>
+                    </div>
+                </a>
             </div>
         </div>
     </div>

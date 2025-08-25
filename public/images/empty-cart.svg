@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#f8f9fa"/>
+  <!-- Shopping cart icon -->
+  <g transform="translate(50, 50)">
+    <path d="M20 20 L30 20 L35 60 L85 60 L90 40 L40 40" stroke="#6c757d" stroke-width="3" fill="none"/>
+    <circle cx="45" cy="75" r="5" fill="#6c757d"/>
+    <circle cx="75" cy="75" r="5" fill="#6c757d"/>
+    <rect x="35" y="25" width="50" height="30" fill="none" stroke="#6c757d" stroke-width="2"/>
+  </g>
+  <text x="100" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">Giỏ hàng trống</text>
+</svg>

@@ -14,7 +14,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admins.attributes.update', $attribute) }}" method="POST">
+            <form action="{{ route('admin.attributes.update', $attribute) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
@@ -28,7 +28,7 @@
                     <div class="form-text">Nhập các giá trị, cách nhau bởi dấu phẩy.</div>
                 </div>
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
-                <a href="{{ route('admins.attributes.index') }}" class="btn btn-secondary">Hủy</a>
+                <a href="{{ route('admin.attributes.index') }}" class="btn btn-secondary">Hủy</a>
             </form>
         </div>
     </div>

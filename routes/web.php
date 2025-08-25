@@ -20,6 +20,7 @@ use App\Http\Controllers\Client\MyOrderController;
 use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\ShippingController;
 
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
@@ -37,17 +38,34 @@ use App\Http\Controllers\Client\RewardController;
 
 // --- ROUTE CÔNG KHAI ---
 Route::get('/', [ClientController::class, 'index'])->name('home');
+Route::get('/products', [ClientProductController::class, 'index'])->name('client.products.index');
 Route::get('/products/{product}', [ClientProductController::class, 'show'])->name('client.products.show');
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
+    Route::get('/vouchers', [DiscountController::class, 'getAvailableVouchers'])->name('vouchers');
 });
 
+
+Route::prefix('shipping')->name('shipping.')->group(function () {
+    Route::get('/provinces', [ShippingController::class, 'getProvinces'])->name('provinces');
+    Route::get('/districts', [ShippingController::class, 'getDistricts'])->name('districts');
+    Route::get('/wards', [ShippingController::class, 'getWards'])->name('wards');
+    Route::post('/calculate-fee', [ShippingController::class, 'calculateFee'])->name('calculateFee');
+});
 // Trang giao hàng
 Route::get('giao-hang', [PageController::class, 'giaoHang'])->name('giao-hang');
 Route::get('dich-vu-goi-qua', [PageController::class, 'goiQua'])->name('dich-vu-goi-qua');
 Route::get('cach-giat-gau-bong', [PageController::class, 'giatGau'])->name('cach-giat-gau-bong');
 Route::get('chinh-sach-doi-tra', [PageController::class, 'doiTra'])->name('chinh-sach-doi-tra');
+
+// Routes cho dịch vụ
+Route::prefix('services')->name('client.services.')->group(function () {
+    Route::get('/guide', [PageController::class, 'guide'])->name('guide');
+    Route::get('/washing', [PageController::class, 'washing'])->name('washing');
+    Route::get('/gift-wrap', [PageController::class, 'giftWrap'])->name('gift-wrap');
+    Route::get('/free-card', [PageController::class, 'freeCard'])->name('free-card');
+});
 Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist',                 [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/add',            [WishlistController::class, 'addWishlist'])->name('wishlist.add');
@@ -91,15 +109,16 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
+    Route::get('/my-orders/unpaid', [MyOrderController::class, 'unpaidOrders'])->name('client.orders.unpaid');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
     Route::post('/my-orders/{order}/complete', [MyOrderController::class, 'complete'])->name('client.orders.complete');
 
     // Routes cho điểm thưởng
     Route::prefix('rewards')->name('client.rewards.')->group(function () {
-        // Route::get('/', [RewardController::class, 'index'])->name('index');
-        // Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
-        // Route::get('/history', [RewardController::class, 'history'])->name('history');
-        // Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
+        Route::get('/', [RewardController::class, 'index'])->name('index');
+        Route::post('/exchange', [RewardController::class, 'exchangePoints'])->name('exchange');
+        Route::get('/history', [RewardController::class, 'history'])->name('history');
+        Route::get('/discount-codes', [RewardController::class, 'discountCodes'])->name('discount-codes');
     });
 
     // Routes cho thanh toán
@@ -112,7 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/history/{receiverId}', [ChatController::class, 'getHistory'])->name('chat.history');
 
-    Route::post('/my-orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
+    Route::patch('/my-orders/{order}/cancel', [MyOrderController::class, 'cancel'])->name('client.orders.cancel');
 
 });
 
@@ -129,6 +148,11 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
     Route::resource('products', ProductController::class)->names('admin.products');
     Route::resource('attributes', AttributeController::class)->names('admin.attributes');
     Route::resource('orders', OrderController::class)->names('admin.orders');
+    
+    // Routes quản lý đơn hàng theo trạng thái thanh toán
+    Route::get('orders/awaiting-payment', [OrderController::class, 'awaitingPayment'])->name('admin.orders.awaiting-payment');
+    Route::get('orders/unpaid', [OrderController::class, 'unpaidOrders'])->name('admin.orders.unpaid');
+    Route::patch('orders/{id}/mark-as-paid', [OrderController::class, 'markAsPaid'])->name('admin.orders.mark-as-paid');
     Route::resource('discounts', DiscountController::class)->names('admin.discounts');
     Route::resource('categories', CategoryController::class)->names('admin.categories');
 
@@ -158,23 +182,18 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
 
 
 Route::prefix('payment')->name('payment.')->group(function () {
-    // VNPay Routes (nếu có)
-    // Route::get('/vnpay/create', [PaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
-    // Route::get('/vnpay/return', [PaymentController::class, 'returnVnpay'])->name('vnpay.return');
-
-    // Momo Routes
-    Route::get('/momo/create', [PaymentController::class, 'createMomo'])->name('momo.create')->middleware('auth'); // Chỉ người đã đăng nhập mới được tạo
+    // Route cần đăng nhập để tạo
+    Route::middleware('auth')->group(function () {
+        Route::get('/vnpay/create', [PaymentController::class, 'createVnpay'])->name('vnpay.create');
+        Route::get('/momo/create', [PaymentController::class, 'createMomo'])->name('momo.create');
+    });
+    // Route mà các cổng thanh toán gọi về
+    Route::get('/vnpay/return', [PaymentController::class, 'returnVnpay'])->name('vnpay.return');
     Route::get('/momo/return', [PaymentController::class, 'returnMomo'])->name('momo.return');
     Route::post('/momo/ipn', [PaymentController::class, 'ipnMomo'])->name('momo.ipn');
-
-    Route::get('/vnpay/create', [ClientPaymentController::class, 'createVnpay'])->name('vnpay.create')->middleware('auth');
-    
-    // Route VNPAY
-    Route::get('/vnpay/return', [ClientPaymentController::class, 'returnVnpay'])->name('vnpay.return');
-    Route::get('/vnpay/ipn', [ClientPaymentController::class, 'ipnVnpay'])->name('vnpay.ipn');
-    // Các trang thông báo chung
-    Route::get('/success', function () { /* ... */ })->name('success');
-    Route::get('/failed', function () { /* ... */ })->name('failed');
+    // Trang kết quả
+    Route::get('/success', function () { return view('clients.payment.success'); })->name('success');
+    Route::get('/failed', function () { return view('clients.payment.failed'); })->name('failed');
 });
 // === DEBUG ROUTE ===
 Route::get('/test-cache-driver', function () {

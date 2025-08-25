@@ -104,7 +104,7 @@
         @else
             {{-- Hiển thị thông báo khi giỏ hàng rỗng --}}
             <div class="text-center py-5">
-                <img src="{{ asset('images/empty-cart.png') }}" alt="Giỏ hàng trống" style="max-width: 200px;" class="mb-3">
+                <img src="{{ asset('images/empty-cart.svg') }}" alt="Giỏ hàng trống" style="max-width: 200px;" class="mb-3">
                 <h4>Giỏ hàng của bạn đang trống!</h4>
                 <p class="text-muted">Hãy khám phá thêm các sản phẩm tuyệt vời của chúng tôi.</p>
                 <a href="{{ route('home') }}" class="btn btn-primary mt-2">Bắt đầu mua sắm</a>

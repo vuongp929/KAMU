@@ -21,12 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // // Đăng ký View Composer cho tất cả các view trong thư mục 'clients'
-        // // và cả layout 'layouts.client'.
-        // // Dấu * có nghĩa là áp dụng cho tất cả các file trong thư mục đó.
-        // View::composer(
-        //     ['layouts.client', 'clients.*'], 
-        //     ClientLayoutComposer::class
-        // );
+        // Đăng ký View Composer cho tất cả các view trong thư mục 'clients'
+        // và cả layout 'layouts.client'.
+        // Dấu * có nghĩa là áp dụng cho tất cả các file trong thư mục đó.
+        View::composer(
+            ['clients.*'], 
+            ClientLayoutComposer::class
+        );
     }
 }

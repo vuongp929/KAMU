@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <rect width="300" height="300" fill="#f8f9fa"/>
+  <rect x="75" y="75" width="150" height="150" fill="#dee2e6" rx="10"/>
+  <circle cx="125" cy="125" r="15" fill="#6c757d"/>
+  <path d="M100 175 L125 150 L150 175 L175 150 L200 175" stroke="#6c757d" stroke-width="3" fill="none"/>
+  <text x="150" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">Hình ảnh mặc định</text>
+</svg>

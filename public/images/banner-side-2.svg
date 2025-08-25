@@ -1,0 +1,61 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="loveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#c44569;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8b500;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#loveGradient)" rx="15"/>
+  
+  <!-- Decorative stars -->
+  <g fill="white" opacity="0.4">
+    <polygon points="50,30 52,36 58,36 53,40 55,46 50,42 45,46 47,40 42,36 48,36" />
+    <polygon points="350,40 351,44 355,44 352,47 353,51 350,48 347,51 348,47 345,44 349,44" />
+    <polygon points="80,160 81,163 84,163 82,165 83,168 80,166 77,168 78,165 76,163 79,163" />
+    <polygon points="320,160 321,163 324,163 322,165 323,168 320,166 317,168 318,165 316,163 319,163" />
+  </g>
+  
+  <!-- Main text -->
+  <text x="200" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">Teddy</text>
+  <text x="200" y="80" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">With</text>
+  <text x="200" y="110" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">LOVE</text>
+  
+  <!-- Large heart -->
+  <g transform="translate(200, 140)">
+    <path d="M 0 10 C -15 -5, -35 -5, -35 15 C -35 -5, -55 -5, -70 10 C -70 35, 0 60, 0 60 C 0 60, 70 35, 70 10 C 55 -5, 35 -5, 35 15 C 35 -5, 15 -5, 0 10 Z" fill="white" opacity="0.8" transform="scale(0.4)"/>
+  </g>
+  
+  <!-- Small decorative hearts -->
+  <path d="M 120 70 C 117 67, 112 67, 112 72 C 112 67, 107 67, 104 70 C 104 75, 112 80, 112 80 C 112 80, 120 75, 120 70 Z" fill="white" opacity="0.6"/>
+  <path d="M 290 90 C 287 87, 282 87, 282 92 C 282 87, 277 87, 274 90 C 274 95, 282 100, 282 100 C 282 100, 290 95, 290 90 Z" fill="white" opacity="0.6"/>
+  
+  <!-- Cute teddy silhouette -->
+  <g transform="translate(320, 140)" fill="white" opacity="0.5">
+    <!-- Bear body -->
+    <ellipse cx="0" cy="8" rx="12" ry="10"/>
+    <!-- Bear head -->
+    <circle cx="0" cy="-3" r="9"/>
+    <!-- Bear ears -->
+    <circle cx="-6" cy="-9" r="4"/>
+    <circle cx="6" cy="-9" r="4"/>
+    <!-- Bear arms -->
+    <circle cx="-10" cy="3" r="4"/>
+    <circle cx="10" cy="3" r="4"/>
+  </g>
+  
+  <g transform="translate(80, 140)" fill="white" opacity="0.5">
+    <!-- Bear body -->
+    <ellipse cx="0" cy="8" rx="12" ry="10"/>
+    <!-- Bear head -->
+    <circle cx="0" cy="-3" r="9"/>
+    <!-- Bear ears -->
+    <circle cx="-6" cy="-9" r="4"/>
+    <circle cx="6" cy="-9" r="4"/>
+    <!-- Bear arms -->
+    <circle cx="-10" cy="3" r="4"/>
+    <circle cx="10" cy="3" r="4"/>
+  </g>
+</svg>
