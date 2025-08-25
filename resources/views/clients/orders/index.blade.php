@@ -194,7 +194,6 @@ function confirmCancelOrder(orderId) {
                                                         <small>{{ number_format($originalPrice, 0, ',', '.') }}đ</small>
                                                     </div>
                                                 @endif
-                                                <div class="fw-bold">{{ number_format($orderPrice, 0, ',', '.') }}đ</div>
                                                 <div class="text-end fw-bold text-primary">
                                                     {{ number_format($itemTotal, 0, ',', '.') }}đ
                                                 </div>
