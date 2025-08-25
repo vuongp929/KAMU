@@ -7,6 +7,10 @@
                 return 'CHỜ XỬ LÝ';
             case 'processing':
                 return 'ĐANG XỬ LÝ';
+            case 'shipping':
+                return 'ĐANG GIAO HÀNG';
+            case 'delivered':
+                return 'ĐÃ GIAO HÀNG';
             case 'completed':
                 return 'HOÀN THÀNH';
             case 'cancelled':
@@ -125,14 +129,19 @@
             color: #0c5460;
         }
 
+        .status-shipping {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
         .status-completed {
             background-color: #d4edda;
             color: #155724;
         }
 
         .status-delivered {
-            background-color: #cce5ff;
-            color: #004085;
+            background-color: #e2e3e5;
+            color: #383d41;
         }
 
         .status-cancelled {
@@ -320,7 +329,30 @@
                                 <div class="col-md-6">
                                     <div class="info-row">
                                         <span class="info-label">Trạng thái thanh toán:</span>
-                                        <span class="info-value">{{ ucfirst($order->payment_status) }}</span>
+                                        <span class="info-value">
+                                            @if($order->payment_status == 'paid')
+                                                <span class="badge bg-success">Đã thanh toán</span>
+                                            @elseif($order->payment_status == 'awaiting_payment')
+                                                <span class="badge bg-warning">Chờ thanh toán</span>
+                                                @if(in_array($order->payment_method, ['vnpay', 'momo']) && $order->status !== 'cancelled')
+                                                    <div class="mt-2">
+                                                        @if($order->payment_method == 'vnpay')
+                                                            <a href="{{ route('payment.vnpay.create', ['orderId' => $order->id]) }}" class="btn btn-warning btn-sm">
+                                                                <i class="fas fa-credit-card"></i> Tiếp tục thanh toán VNPay
+                                                            </a>
+                                                        @elseif($order->payment_method == 'momo')
+                                                            <a href="{{ route('payment.momo.create', ['orderId' => $order->id]) }}" class="btn btn-warning btn-sm">
+                                                                <i class="fas fa-credit-card"></i> Tiếp tục thanh toán MoMo
+                                                            </a>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            @elseif($order->payment_status == 'cod')
+                                                <span class="badge bg-info">Thanh toán khi nhận hàng</span>
+                                            @else
+                                                <span class="badge bg-secondary">Chưa thanh toán</span>
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="info-row">
                                         <span class="info-label">Tổng tiền:</span>

@@ -17,6 +17,9 @@
     @endauth
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets_velzon/images/favicon.ico') }}">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     {{-- 
         Vite sẽ tự động nạp TẤT CẢ các file CSS và JS
@@ -64,7 +67,13 @@
     </div>
     <!-- KẾT THÚC layout-wrapper -->
 
+    {{-- jQuery cho các trang cần sử dụng --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     {{-- Điểm neo cho các trang con có thể thêm JS riêng (ví dụ: trang chat) --}}
     @stack('scripts')
+    
+    {{-- Điểm neo cho các trang con có thể thêm JS riêng qua @section('JS') --}}
+    @yield('JS')
 </body>
 </html>

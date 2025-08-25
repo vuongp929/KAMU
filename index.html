@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thú Bông Làm Đẹp Mặt - Gấu Bông Massage Thư Giãn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .lg\:grid-cols-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .aspect-square {
+            aspect-ratio: 1;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .bg-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .h-full {
+            height: 100%;
+        }
+
+        .object-cover {
+            object-fit: cover;
+        }
+
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .mb-12 {
+            margin-bottom: 3rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-primary {
+            color: #ea580c;
+        }
+
+        .text-muted-foreground {
+            color: #6b7280;
+        }
+
+        .text-foreground {
+            color: #1f2937;
+        }
+
+        .bg-primary {
+            background-color: #ea580c;
+        }
+
+        .bg-secondary {
+            background-color: #f3f4f6;
+        }
+
+        .text-primary-foreground {
+            color: white;
+        }
+
+        .text-secondary-foreground {
+            color: #374151;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-hot {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .badge-discount {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-baseline {
+            align-items: baseline;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .gap-8 {
+            gap: 2rem;
+        }
+
+        .star {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: #fbbf24;
+            color: #fbbf24;
+        }
+
+        .star-empty {
+            fill: #d1d5db;
+            color: #d1d5db;
+        }
+
+        .line-through {
+            text-decoration: line-through;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #ea580c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #c2410c;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-outline:hover {
+            background-color: #f9fafb;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .color-option {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            cursor: pointer;
+        }
+
+        .color-option.active {
+            border-color: #ea580c;
+        }
+
+        .color-pink {
+            background-color: #fbb6ce;
+        }
+
+        .color-blue {
+            background-color: #93c5fd;
+        }
+
+        .color-purple {
+            background-color: #c4b5fd;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-display {
+            width: 3rem;
+            text-align: center;
+            padding: 0.25rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+        }
+
+        .tabs {
+            margin-bottom: 3rem;
+        }
+
+        .tabs-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-trigger {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .tab-trigger.active {
+            background-color: white;
+            color: #1f2937;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            color: #ea580c;
+            margin: 0 auto 1rem;
+        }
+
+        .step-number {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: #ea580c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .prose {
+            max-width: none;
+        }
+
+        .prose ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+
+        .prose li {
+            margin: 0.25rem 0;
+        }
+
+        .image-thumbnail {
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .image-thumbnail.active {
+            border-color: #ea580c;
+        }
+
+        .heart {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .heart.filled {
+            fill: #ef4444;
+            color: #ef4444;
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <!-- Product Images -->
+            <div class="space-y-4">
+                <div class="aspect-square rounded-lg overflow-hidden bg-card">
+                    <img id="main-image" src="pink-plush-bunny-beauty-tool.png" alt="Thú bông làm đẹp mặt" class="w-full h-full object-cover">
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button class="image-thumbnail aspect-square rounded-lg overflow-hidden active" onclick="changeImage(0, 'pink-plush-bunny-beauty-tool.png')">
+                        <img src="pink-plush-bunny-beauty-tool.png" alt="Hình 1" class="w-full h-full object-cover">
+                    </button>
+                    <button class="image-thumbnail aspect-square rounded-lg overflow-hidden" onclick="changeImage(1, 'plush-beauty-tool-massage.png')">
+                        <img src="plush-beauty-tool-massage.png" alt="Hình 2" class="w-full h-full object-cover">
+                    </button>
+                    <button class="image-thumbnail aspect-square rounded-lg overflow-hidden" onclick="changeImage(2, 'plush-beauty-tool-texture.png')">
+                        <img src="plush-beauty-tool-texture.png" alt="Hình 3" class="w-full h-full object-cover">
+                    </button>
+                    <button class="image-thumbnail aspect-square rounded-lg overflow-hidden" onclick="changeImage(3, 'plush-beauty-tool-packaging.png')">
+                        <img src="plush-beauty-tool-packaging.png" alt="Hình 4" class="w-full h-full object-cover">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="space-y-6">
+                <div>
+                    <span class="badge badge-hot mb-2">Sản phẩm hot</span>
+                    <h1 class="text-3xl font-bold text-foreground mb-2">
+                        Thú Bông Làm Đẹp Mặt - Gấu Bông Massage Thư Giãn
+                    </h1>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="flex items-center">
+                            <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        </div>
+                        <span class="text-muted-foreground">(127 đánh giá)</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-bold text-primary">299.000₫</span>
+                        <span class="text-lg text-muted-foreground line-through">399.000₫</span>
+                        <span class="badge badge-discount">-25%</span>
+                    </div>
+                    <p class="text-muted-foreground">Miễn phí vận chuyển cho đơn hàng trên 200.000₫</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium mb-2" style="display: block;">Màu sắc:</label>
+                        <div class="flex gap-2">
+                            <button class="color-option color-pink active" onclick="selectColor(this)"></button>
+                            <button class="color-option color-blue" onclick="selectColor(this)"></button>
+                            <button class="color-option color-purple" onclick="selectColor(this)"></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium mb-2" style="display: block;">Số lượng:</label>
+                        <div class="quantity-control">
+                            <button class="btn btn-outline btn-sm" onclick="decreaseQuantity()">-</button>
+                            <input type="text" id="quantity" class="quantity-display" value="1" readonly>
+                            <button class="btn btn-outline btn-sm" onclick="increaseQuantity()">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button class="btn btn-primary btn-lg flex-1">
+                        <svg class="icon" style="margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"/>
+                        </svg>
+                        Thêm vào giỏ hàng
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="toggleFavorite()">
+                        <svg id="heart-icon" class="heart" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h3 class="font-semibold mb-2">Thông tin giao hàng</h3>
+                    <ul class="text-sm text-muted-foreground space-y-1">
+                        <li>• Giao hàng nhanh trong 2-3 ngày</li>
+                        <li>• Miễn phí đổi trả trong 7 ngày</li>
+                        <li>• Bảo hành 6 tháng</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-8">Tại sao chọn sản phẩm của chúng tôi?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card text-center">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <h3 class="font-semibold mb-2">An toàn cho da</h3>
+                    <p class="text-sm text-muted-foreground">Chất liệu siêu mềm, không gây kích ứng</p>
+                </div>
+                <div class="card text-center">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    <h3 class="font-semibold mb-2">Massage thư giãn</h3>
+                    <p class="text-sm text-muted-foreground">Kích thích tuần hoàn máu, giảm căng thẳng</p>
+                </div>
+                <div class="card text-center">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                    </svg>
+                    <h3 class="font-semibold mb-2">Phù hợp mọi lứa tuổi</h3>
+                    <p class="text-sm text-muted-foreground">Từ trẻ em đến người lớn đều có thể sử dụng</p>
+                </div>
+                <div class="card text-center">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                    </svg>
+                    <h3 class="font-semibold mb-2">Chất lượng cao</h3>
+                    <p class="text-sm text-muted-foreground">Được kiểm định an toàn và hiệu quả</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Tabs -->
+        <div class="tabs">
+            <div class="tabs-list">
+                <button class="tab-trigger active" onclick="showTab('description')">Mô tả sản phẩm</button>
+                <button class="tab-trigger" onclick="showTab('usage')">Hướng dẫn sử dụng</button>
+                <button class="tab-trigger" onclick="showTab('reviews')">Đánh giá (3)</button>
+            </div>
+
+            <div id="description" class="tab-content active">
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Thông tin chi tiết</h3>
+                    <div class="prose text-muted-foreground">
+                        <p class="mb-4">
+                            Thú bông làm đẹp mặt là sản phẩm độc đáo kết hợp giữa đồ chơi dễ thương và công cụ chăm sóc da hiệu
+                            quả. Được làm từ chất liệu siêu mềm, an toàn tuyệt đối cho mọi loại da, kể cả da nhạy cảm.
+                        </p>
+                        <p class="mb-4">
+                            Sản phẩm có thiết kế ergonomic, phù hợp với đường cong khuôn mặt, giúp massage nhẹ nhàng và kích thích
+                            tuần hoàn máu. Việc sử dụng thường xuyên sẽ giúp da mặt mềm mịn, tươi sáng hơn.
+                        </p>
+                        <ul>
+                            <li>Chất liệu: Cotton organic 100% an toàn</li>
+                            <li>Kích thước: 15cm x 12cm x 8cm</li>
+                            <li>Trọng lượng: 150g</li>
+                            <li>Màu sắc: Hồng, Xanh, Tím</li>
+                            <li>Xuất xứ: Việt Nam</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="usage" class="tab-content">
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Cách sử dụng</h3>
+                    <div class="space-y-4 text-muted-foreground">
+                        <div class="flex gap-4">
+                            <div class="step-number">1</div>
+                            <div>
+                                <h4 class="font-medium text-foreground">Làm sạch mặt</h4>
+                                <p class="text-sm">Rửa mặt sạch với sữa rửa mặt phù hợp với loại da của bạn.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="step-number">2</div>
+                            <div>
+                                <h4 class="font-medium text-foreground">Massage nhẹ nhàng</h4>
+                                <p class="text-sm">
+                                    Sử dụng thú bông massage theo chuyển động tròn từ trong ra ngoài, từ dưới lên trên.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="step-number">3</div>
+                            <div>
+                                <h4 class="font-medium text-foreground">Thời gian sử dụng</h4>
+                                <p class="text-sm">
+                                    Massage trong 5-10 phút mỗi lần, 2-3 lần mỗi tuần để đạt hiệu quả tốt nhất.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="step-number">4</div>
+                            <div>
+                                <h4 class="font-medium text-foreground">Vệ sinh sản phẩm</h4>
+                                <p class="text-sm">Rửa sạch với nước ấm và để khô tự nhiên sau mỗi lần sử dụng.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reviews" class="tab-content">
+                <div class="space-y-4">
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-semibold">Minh Anh</h4>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex">
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm text-muted-foreground">2 ngày trước</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted-foreground">Con thú bông này siêu dễ thương và thực sự có tác dụng massage mặt. Da mình mềm mịn hơn hẳn!</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-semibold">Thu Hà</h4>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex">
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm text-muted-foreground">1 tuần trước</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted-foreground">Mua cho con gái 12 tuổi, bé rất thích. Vừa chơi vừa chăm sóc da, rất tiện lợi.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-semibold">Quỳnh Như</h4>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex">
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <svg class="star-empty" style="width: 1rem; height: 1rem;" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm text-muted-foreground">2 tuần trước</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted-foreground">Chất liệu mềm mại, an toàn. Thiết kế cute lắm, đặt ở bàn trang điểm cũng xinh xắn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentImageIndex = 0;
+        let quantity = 1;
+        let isFavorite = false;
+
+        function changeImage(index, imageSrc) {
+            currentImageIndex = index;
+            document.getElementById('main-image').src = imageSrc;
+            
+            // Update thumbnail active state
+            const thumbnails = document.querySelectorAll('.image-thumbnail');
+            thumbnails.forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+        }
+
+        function selectColor(element) {
+            // Remove active class from all color options
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            // Add active class to selected option
+            element.classList.add('active');
+        }
+
+        function decreaseQuantity() {
+            if (quantity > 1) {
+                quantity--;
+                document.getElementById('quantity').value = quantity;
+            }
+        }
+
+        function increaseQuantity() {
+            quantity++;
+            document.getElementById('quantity').value = quantity;
+        }
+
+        function toggleFavorite() {
+            isFavorite = !isFavorite;
+            const heartIcon = document.getElementById('heart-icon');
+            if (isFavorite) {
+                heartIcon.classList.add('filled');
+                heartIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>';
+            } else {
+                heartIcon.classList.remove('filled');
+                heartIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>';
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab triggers
+            document.querySelectorAll('.tab-trigger').forEach(trigger => {
+                trigger.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab trigger
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

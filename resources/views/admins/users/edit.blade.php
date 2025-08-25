@@ -45,57 +45,105 @@
                         </script>
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
                     @endif
-                    <form action="{{ route('admins.users.update', ['id'=> $user->id]) }}" method="POST">
+                    <form action="{{ route('admin.users.update', ['id'=> $user->id]) }}" method="POST">
                         @csrf
                         @method('POST')
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="name">Tên người dùng</label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name) }}">
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email) }}">
-                                    @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="password">Mật khẩu (để trống nếu không đổi)</label>
-                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
-                                    @error('password')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="role">Vai trò</label>
-                                    <select class="form-control @error('role') is-invalid @enderror" id="role" name="role">
-                                        <option value="">-- Chọn vai trò --</option>
-                                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Quản trị viên</option>
-                                        <option value="customer" {{ old('role', $user->role) == 'customer' ? 'selected' : '' }}>Người dùng</option>
-                                    </select>
-                                    @error('role')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                        <!-- Hiển thị thông tin người dùng (chỉ đọc) -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin người dùng</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><strong><i class="fas fa-user-circle"></i> Tên:</strong> <span class="text-primary">{{ $user->name }}</span></p>
+                                                <p class="mb-2"><strong><i class="fas fa-envelope"></i> Email:</strong> <span class="text-primary">{{ $user->email }}</span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><strong><i class="fas fa-calendar-alt"></i> Ngày tạo:</strong> <span class="text-muted">{{ $user->created_at->format('d/m/Y H:i') }}</span></p>
+                                                <p class="mb-0"><strong><i class="fas fa-clock"></i> Cập nhật cuối:</strong> <span class="text-muted">{{ $user->updated_at->format('d/m/Y H:i') }}</span></p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="fas fa-info-circle"></i> <strong>Lưu ý:</strong> Chỉ có thể chỉnh sửa trạng thái và quyền của người dùng. Thông tin cá nhân không thể thay đổi từ trang này.
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">Cập nhật người dùng</button>
-                        <a href="{{ route('admins.users.index') }}" class="btn btn-secondary">Quay lại</a>
+                        <!-- Form chỉnh sửa -->
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-edit"></i> Chỉnh sửa quyền và trạng thái</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="role" class="form-label fw-bold"><i class="fas fa-user-tag me-2"></i> Vai trò người dùng</label>
+                                            <select class="form-select form-select-lg @error('role') is-invalid @enderror" id="role" name="role" style="font-size: 16px; padding: 12px 16px;">
+                                                <option value="">-- Chọn vai trò --</option>
+                                                @php
+                                                    $currentRole = $user->roles->isNotEmpty() ? $user->roles->first()->role : '';
+                                                @endphp
+                                                <option value="admin" {{ old('role', $currentRole) == 'admin' ? 'selected' : '' }}>
+                                                    👑 Quản trị viên - Toàn quyền hệ thống
+                                                </option>
+                                                <option value="customer" {{ old('role', $currentRole) == 'customer' ? 'selected' : '' }}>
+                                                    👤 Khách hàng - Quyền cơ bản
+                                                </option>
+                                            </select>
+                                            @error('role')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle"></i> 
+                                                    Vai trò quyết định quyền truy cập của người dùng trong hệ thống
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="status" class="form-label fw-bold"><i class="fas fa-toggle-on me-2"></i> Trạng thái tài khoản</label>
+                                            <select class="form-select form-select-lg @error('status') is-invalid @enderror" id="status" name="status" style="font-size: 16px; padding: 12px 16px;">
+                                                <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>
+                                                    ✅ Hoạt động - Cho phép đăng nhập
+                                                </option>
+                                                <option value="inactive" {{ old('status', $user->status) == 'inactive' ? 'selected' : '' }}>
+                                                    🔒 Đã khóa - Ngăn chặn đăng nhập
+                                                </option>
+                                            </select>
+                                            @error('status')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle"></i> 
+                                                    Tài khoản bị khóa sẽ không thể đăng nhập vào hệ thống
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Quay lại
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Cập nhật người dùng
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>

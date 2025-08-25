@@ -63,7 +63,7 @@ class ProductReviewController extends Controller
             'content' => 'required|string|max:1000',
         ]);
         ProductReview::create($request->only('user_id', 'product_id', 'stars', 'content'));
-        return redirect()->route('admins.reviews.index')->with('success', 'Đã thêm đánh giá mới!');
+        return redirect()->route('admin.reviews.index')->with('success', 'Đã thêm đánh giá mới!');
     }
 
     // Hiển thị form chỉnh sửa đánh giá
@@ -86,7 +86,7 @@ class ProductReviewController extends Controller
         ]);
         $review = ProductReview::findOrFail($id);
         $review->update($request->only('user_id', 'product_id', 'stars', 'content'));
-        return redirect()->route('admins.reviews.index')->with('success', 'Đã cập nhật đánh giá!');
+        return redirect()->route('admin.reviews.index')->with('success', 'Đã cập nhật đánh giá!');
     }
 
     // Chuyển đổi trạng thái ẩn/hiện bình luận
@@ -97,4 +97,4 @@ class ProductReviewController extends Controller
         $review->save();
         return back()->with('success', 'Đã cập nhật trạng thái bình luận!');
     }
-} 
+}
