@@ -4,26 +4,25 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="white_card card_height_100 mb_30">
-                    <div class="white_card_header">
-                        <div class="box_header m-0">
-                            <div class="main-title">
-                                <h3 class="m-0">Danh sách người dùng</h3>
-                            </div>
-                            <div class="header_more_tool">
-                                <a href="{{ route('admins.users.create') }}" class="btn btn-primary">Thêm người dùng</a>
-                            </div>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-users me-2"></i>Danh sách người dùng
+                        </h4>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-info">Tổng: {{ $users->total() }} người dùng</span>
                         </div>
                     </div>
-                    <div class="white_card_body">
+                    <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table">
-                                <thead>
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
                                     <tr>
-                                        <th>Tên</th>
-                                        <th>Email</th>
-                                        <th>Quyền</th>
-                                        <th>Thao tác</th>
+                                        <th><i class="fas fa-user me-1"></i>Tên</th>
+                                        <th><i class="fas fa-envelope me-1"></i>Email</th>
+                                        <th><i class="fas fa-shield-alt me-1"></i>Quyền</th>
+                                        <th><i class="fas fa-toggle-on me-1"></i>Trạng thái</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -32,31 +31,51 @@
                                             <td>{{ $item->name }}</td>
                                             <td>{{ $item->email }}</td>
                                             <td>
-                                                @if ($item->role && $item->role->role == 'admin')
-                                                    Admin
-                                                @elseif ($item->role && $item->role->role == 'customer')
-                                                    Customer
+                                @if ($item->roles->isNotEmpty())
+                                    @php
+                                        $userRole = $item->roles->first()->role;
+                                    @endphp
+                                    @if ($userRole == 'admin')
+                                        <span class="badge bg-danger"><i class="fas fa-crown me-1"></i>Admin</span>
+                                    @elseif ($userRole == 'customer')
+                                        <span class="badge bg-primary"><i class="fas fa-user me-1"></i>Customer</span>
+                                    @else
+                                        <span class="badge bg-secondary"><i class="fas fa-question me-1"></i>{{ ucfirst($userRole) }}</span>
+                                    @endif
+                                @else
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i>Chưa phân quyền</span>
+                                @endif
+                            </td>
+                                            <td>
+                                                @if($item->status == 'active')
+                                                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Hoạt động</span>
                                                 @else
-                                                    <span class="badge badge-secondary">N/A</span>
+                                                    <span class="badge bg-danger"><i class="fas fa-lock me-1"></i>Đã khóa</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('admins.users.edit', $item->id) }}"
-                                                    class="btn btn-sm btn-info">Sửa</a>
-                                                <form action="{{ route('admins.users.destroy', $item->id) }}"
-                                                    method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger"
-                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</button>
-                                                </form>
+                                                <a href="{{ route('admin.users.edit', $item->id) }}"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                                                </a>
                                             </td>
                                         </tr>
                                     @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                                <p class="text-muted">Không có người dùng nào được tìm thấy</p>
+                                            </td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
                             </table>
-                            {{ $users->links() }}
+                            
+                            @if($users->hasPages())
+                                <div class="d-flex justify-content-center mt-3">
+                                    {{ $users->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

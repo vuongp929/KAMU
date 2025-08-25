@@ -70,16 +70,9 @@
                                         data-url="{{ route('admin.products.show', $product->id) }}">
                                     <i class="ri-eye-line"></i> Xem
                                 </button>
-                                                            <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
+                                <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">
                                     <i class="ri-pencil-line"></i> Sửa
                                 </a>
-                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ri-delete-bin-line"></i> Xoá
-                                    </button>
-                                </form>
                             </td>
                         </tr>
                         @empty
@@ -135,8 +128,18 @@ document.addEventListener("DOMContentLoaded", function() {
             modalBody.innerHTML = '<div class="text-center p-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
             // Gọi API để lấy dữ liệu JSON
-            fetch(productUrl)
-                .then(response => response.json())
+            fetch(productUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(product => {
                     // Xây dựng nội dung HTML từ dữ liệu JSON nhận được
                     let html = `

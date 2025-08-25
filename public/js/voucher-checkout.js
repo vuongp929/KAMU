@@ -243,17 +243,31 @@ class VoucherCheckout {
     }
 
     calculateDiscount(voucher, orderTotal) {
+        // Đối với voucher free_shipping, chỉ áp dụng cho phí vận chuyển
+        if (voucher.type === 'free_shipping') {
+            const shippingFeeElement = document.getElementById('shipping-fee-hidden');
+            const shippingFee = shippingFeeElement ? parseInt(shippingFeeElement.value) || 0 : 0;
+            return Math.min(voucher.value, shippingFee);
+        }
+        
+        // Đối với voucher percentage và fixed, áp dụng trên giá gốc từ data-order-total
+        const finalTotalInput = document.getElementById('final-total-hidden');
+        const originalSubtotal = finalTotalInput ? parseInt(finalTotalInput.dataset.orderTotal) || 0 : 0;
+        
+        let discountAmount = 0;
         switch (voucher.type) {
             case 'percentage':
-                const percentDiscount = (orderTotal * voucher.value) / 100;
-                return voucher.maxDiscount ? Math.min(percentDiscount, voucher.maxDiscount) : percentDiscount;
+                const percentDiscount = (originalSubtotal * voucher.value) / 100;
+                discountAmount = (voucher.maxDiscount && voucher.maxDiscount > 0) ? Math.min(percentDiscount, voucher.maxDiscount) : percentDiscount;
+                break;
             case 'fixed':
-                return Math.min(voucher.value, orderTotal);
-            case 'free_shipping':
-                return voucher.value;
+                discountAmount = Math.min(voucher.value, originalSubtotal);
+                break;
             default:
-                return 0;
+                discountAmount = 0;
         }
+        
+        return discountAmount;
     }
 
     displaySelectedVoucher() {
@@ -282,26 +296,16 @@ class VoucherCheckout {
         const discountValueInput = document.getElementById('discount-value-hidden');
         const finalTotalInput = document.getElementById('final-total-hidden');
 
-        console.log('Updating hidden inputs:', {
-            selectedVoucher: this.selectedVoucher,
-            discountCodeInput: discountCodeInput,
-            discountValueInput: discountValueInput,
-            finalTotalInput: finalTotalInput
-        });
-
         if (this.selectedVoucher) {
             if (discountCodeInput) {
                 discountCodeInput.value = this.selectedVoucher.code;
-                console.log('Set discount code:', this.selectedVoucher.code);
             }
             if (discountValueInput) {
                 discountValueInput.value = this.selectedVoucher.discountAmount;
-                console.log('Set discount value:', this.selectedVoucher.discountAmount);
             }
             if (finalTotalInput) {
                 const finalTotal = this.getOrderTotal() - this.selectedVoucher.discountAmount;
                 finalTotalInput.value = finalTotal;
-                console.log('Set final total:', finalTotal);
             }
         } else {
             if (discountCodeInput) discountCodeInput.value = '';
@@ -333,14 +337,28 @@ class VoucherCheckout {
     }
 
     updateOrderTotal() {
-        const orderTotal = this.getOrderTotal();
+        // Lấy giá gốc từ data-order-total (không thay đổi)
+        const finalTotalInput = document.getElementById('final-total-hidden');
+        const originalSubtotal = finalTotalInput ? parseInt(finalTotalInput.dataset.orderTotal) || 0 : 0;
+        
+        // Lấy phí vận chuyển hiện tại
+        const shippingFeeElement = document.getElementById('shipping-fee-hidden');
+        const shippingFee = shippingFeeElement ? parseInt(shippingFeeElement.value) || 0 : 0;
+        
         const discount = this.selectedVoucher ? this.selectedVoucher.discountAmount : 0;
-        const finalTotal = orderTotal - discount;
+        
+        // Công thức: (giá gốc + phí vận chuyển) - voucher
+        const finalTotal = originalSubtotal + shippingFee - discount;
 
         // Cập nhật hiển thị tổng tiền
         const totalElement = document.getElementById('total-amount');
         if (totalElement) {
             totalElement.textContent = this.formatCurrency(finalTotal);
+        }
+
+        // Cập nhật hidden input final_total
+        if (finalTotalInput) {
+            finalTotalInput.value = finalTotal;
         }
 
         // Cập nhật hiển thị giảm giá
@@ -353,18 +371,16 @@ class VoucherCheckout {
     }
 
     getOrderTotal() {
-        // Lấy tổng tiền ban đầu từ data-order-total attribute
+        // Lấy giá gốc từ data-order-total
         const finalTotalInput = document.getElementById('final-total-hidden');
-        if (finalTotalInput && finalTotalInput.dataset.orderTotal) {
-            return parseInt(finalTotalInput.dataset.orderTotal) || 0;
-        }
+        const originalSubtotal = finalTotalInput ? parseInt(finalTotalInput.dataset.orderTotal) || 0 : 0;
         
-        // Fallback: lấy từ hidden input value
-        if (finalTotalInput) {
-            return parseInt(finalTotalInput.value) || 0;
-        }
+        // Lấy phí vận chuyển hiện tại
+        const shippingFeeElement = document.getElementById('shipping-fee-hidden');
+        const shippingFee = shippingFeeElement ? parseInt(shippingFeeElement.value) || 0 : 0;
         
-        return 0;
+        // Trả về tổng tiền bao gồm phí vận chuyển nhưng chưa trừ voucher
+        return originalSubtotal + shippingFee;
     }
 
     saveVoucher() {
@@ -467,7 +483,6 @@ class VoucherCheckout {
         // Xóa voucher khỏi localStorage sau khi đặt hàng thành công
         localStorage.removeItem('selectedVoucher');
         this.selectedVoucher = null;
-        console.log('Voucher cleared after order');
     }
 }
 
@@ -476,17 +491,10 @@ let voucherCheckout;
 document.addEventListener('DOMContentLoaded', function() {
     voucherCheckout = new VoucherCheckout();
     
-    // Debug form submission và clear voucher
+    // Clear voucher after order
     const checkoutForm = document.getElementById('checkout-form');
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
-            console.log('Form submitting...');
-            const formData = new FormData(checkoutForm);
-            console.log('Form data:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key + ': ' + value);
-            }
-            
             // Clear voucher ngay khi submit form
             setTimeout(() => {
                 if (voucherCheckout) {

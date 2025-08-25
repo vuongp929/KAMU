@@ -38,12 +38,15 @@ use App\Http\Controllers\Client\RewardController;
 
 // --- ROUTE CÔNG KHAI ---
 Route::get('/', [ClientController::class, 'index'])->name('home');
+Route::get('/products', [ClientProductController::class, 'index'])->name('client.products.index');
 Route::get('/products/{product}', [ClientProductController::class, 'show'])->name('client.products.show');
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/apply-discount', [DiscountController::class, 'applyDiscount'])->name('apply-discount')->middleware('auth');
     Route::get('/vouchers', [DiscountController::class, 'getAvailableVouchers'])->name('vouchers');
 });
+
+
 Route::prefix('shipping')->name('shipping.')->group(function () {
     Route::get('/provinces', [ShippingController::class, 'getProvinces'])->name('provinces');
     Route::get('/districts', [ShippingController::class, 'getDistricts'])->name('districts');
@@ -55,6 +58,14 @@ Route::get('giao-hang', [PageController::class, 'giaoHang'])->name('giao-hang');
 Route::get('dich-vu-goi-qua', [PageController::class, 'goiQua'])->name('dich-vu-goi-qua');
 Route::get('cach-giat-gau-bong', [PageController::class, 'giatGau'])->name('cach-giat-gau-bong');
 Route::get('chinh-sach-doi-tra', [PageController::class, 'doiTra'])->name('chinh-sach-doi-tra');
+
+// Routes cho dịch vụ
+Route::prefix('services')->name('client.services.')->group(function () {
+    Route::get('/guide', [PageController::class, 'guide'])->name('guide');
+    Route::get('/washing', [PageController::class, 'washing'])->name('washing');
+    Route::get('/gift-wrap', [PageController::class, 'giftWrap'])->name('gift-wrap');
+    Route::get('/free-card', [PageController::class, 'freeCard'])->name('free-card');
+});
 Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist',                 [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/add',            [WishlistController::class, 'addWishlist'])->name('wishlist.add');
@@ -98,6 +109,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('client.orders.index');
+    Route::get('/my-orders/unpaid', [MyOrderController::class, 'unpaidOrders'])->name('client.orders.unpaid');
     Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('client.orders.show');
     Route::post('/my-orders/{order}/complete', [MyOrderController::class, 'complete'])->name('client.orders.complete');
 
@@ -136,6 +148,11 @@ Route::middleware(['auth', 'check.admin'])->prefix('admin')->group(function () {
     Route::resource('products', ProductController::class)->names('admin.products');
     Route::resource('attributes', AttributeController::class)->names('admin.attributes');
     Route::resource('orders', OrderController::class)->names('admin.orders');
+    
+    // Routes quản lý đơn hàng theo trạng thái thanh toán
+    Route::get('orders/awaiting-payment', [OrderController::class, 'awaitingPayment'])->name('admin.orders.awaiting-payment');
+    Route::get('orders/unpaid', [OrderController::class, 'unpaidOrders'])->name('admin.orders.unpaid');
+    Route::patch('orders/{id}/mark-as-paid', [OrderController::class, 'markAsPaid'])->name('admin.orders.mark-as-paid');
     Route::resource('discounts', DiscountController::class)->names('admin.discounts');
     Route::resource('categories', CategoryController::class)->names('admin.categories');
 

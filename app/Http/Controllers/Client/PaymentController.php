@@ -35,6 +35,11 @@ class PaymentController extends Controller
     {
         $order = Order::findOrFail($request->query('orderId'));
         if ($order->user_id !== Auth::id()) { abort(403); }
+        
+        // Kiểm tra trạng thái đơn hàng - không cho phép thanh toán nếu đã hủy
+        if ($order->status === 'cancelled') {
+            return redirect()->route('client.orders.index')->with('error', 'Không thể thanh toán cho đơn hàng đã bị hủy.');
+        }
 
         // Lấy config một cách nhất quán
         $vnp_TmnCode = config('services.vnpay.tmn_code');
@@ -112,10 +117,8 @@ class PaymentController extends Controller
                 $orderId = explode('_', $request->vnp_TxnRef)[0];
                 $order = Order::find($orderId);
                 
-                if ($order && $order->payment_status == 'unpaid') {
-                    $order->payment_status = 'paid';
-                    $order->status = 'processing';
-                    $order->save();
+                if ($order && $order->payment_status == 'awaiting_payment') {
+                    $order->markAsPaid();
                     Cart::where('user_id', $order->user_id)->delete();
                 }
                 return redirect()->route('payment.success');
@@ -139,6 +142,11 @@ class PaymentController extends Controller
     {
         $order = Order::findOrFail($request->query('orderId'));
         if ($order->user_id !== Auth::id()) { abort(403); }
+        
+        // Kiểm tra trạng thái đơn hàng - không cho phép thanh toán nếu đã hủy
+        if ($order->status === 'cancelled') {
+            return redirect()->route('client.orders.index')->with('error', 'Không thể thanh toán cho đơn hàng đã bị hủy.');
+        }
 
         $endpoint = config('services.momo.endpoint');
         $partnerCode = config('services.momo.partner_code');
@@ -218,10 +226,8 @@ class PaymentController extends Controller
             $orderId = explode('_', $request->query('orderId'))[0];
             $order = Order::find($orderId);
             
-            if ($order && $order->payment_status == 'unpaid') {
-                $order->payment_status = 'paid';
-                $order->status = 'processing';
-                $order->save();
+            if ($order && $order->payment_status == 'awaiting_payment') {
+                $order->markAsPaid();
                 Cart::where('user_id', $order->user_id)->delete();
             }
             return redirect()->route('payment.success');
@@ -274,6 +280,47 @@ class PaymentController extends Controller
     }
     
     public function ipnMomo(Request $request) { /* Logic xử lý IPN của Momo */ }
+    
+    // ==========================================================
+    // === PHẦN XỬ LÝ THANH TOÁN COD ============================
+    // ==========================================================
+    
+    /**
+     * Xử lý thanh toán COD (Cash on Delivery)
+     */
+    public function processCodPayment(Order $order)
+    {
+        // Kiểm tra quyền truy cập
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+        
+        // Kiểm tra trạng thái đơn hàng
+        if ($order->payment_method !== 'cod') {
+            return redirect()->back()->with('error', 'Đơn hàng này không phải là thanh toán COD.');
+        }
+        
+        if ($order->payment_status === 'paid') {
+            return redirect()->back()->with('error', 'Đơn hàng này đã được thanh toán rồi.');
+        }
+        
+        try {
+            // Cập nhật trạng thái thanh toán
+            $order->payment_status = 'paid';
+            $order->status = 'processing';
+            $order->save();
+            
+            // Cộng điểm thưởng cho người dùng
+            $order->addRewardPointsOnPaymentSuccess();
+            
+            return redirect()->route('client.orders.show', $order)
+                ->with('success', 'Xác nhận thanh toán thành công! Bạn đã nhận được +20 điểm thưởng.');
+                
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi xử lý thanh toán COD: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại.');
+        }
+    }
     
     // Hàm cURL helper dùng chung
     private function execPostRequest($url, $data)

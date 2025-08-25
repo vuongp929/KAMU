@@ -23,6 +23,17 @@ class MyOrderController extends Controller
             $query->where('status', $status);
         }
 
+        // Áp dụng bộ lọc theo trạng thái thanh toán nếu có
+        $paymentStatus = $request->query('payment_status');
+        if ($paymentStatus) {
+            if ($paymentStatus === 'unpaid_orders') {
+                // Hiển thị đơn hàng chưa thanh toán (bao gồm COD và awaiting_payment)
+                $query->whereIn('payment_status', ['cod', 'awaiting_payment', 'unpaid']);
+            } else {
+                $query->where('payment_status', $paymentStatus);
+            }
+        }
+
         // Tải trước (eager load) tất cả các mối quan hệ cần thiết
         // để tránh lỗi N+1 và xử lý dữ liệu đã bị xóa mềm (soft deleted)
         $orders = $query->with([
@@ -43,6 +54,33 @@ class MyOrderController extends Controller
         ->paginate(5); // Phân trang, 5 đơn hàng mỗi trang
 
         return view('clients.orders.index', compact('orders'));
+    }
+
+    /**
+     * Hiển thị danh sách đơn hàng chưa thanh toán
+     */
+    public function unpaidOrders(Request $request)
+    {
+        // Lấy các đơn hàng chưa thanh toán của người dùng hiện tại
+        $query = Order::where('user_id', Auth::id())
+            ->whereIn('payment_status', ['cod', 'awaiting_payment', 'unpaid']);
+
+        // Tải trước các mối quan hệ cần thiết
+        $orders = $query->with([
+            'orderItems' => function ($query) {
+                $query->with(['productVariant' => function ($subQuery) {
+                    $subQuery->withTrashed()->with([
+                        'product' => function ($productQuery) {
+                            $productQuery->withTrashed()->with(['mainImage', 'firstImage']);
+                        }
+                    ]);
+                }]);
+            }
+        ])
+        ->latest()
+        ->paginate(5);
+
+        return view('clients.orders.unpaid', compact('orders'));
     }
 
     /**
@@ -99,17 +137,22 @@ class MyOrderController extends Controller
 
         // Kiểm tra trạng thái đơn hàng
         if ($order->status === 'delivered') {
-            // Chuyển sang trạng thái completed và cộng điểm thưởng
+            // Chuyển sang trạng thái completed
             $order->status = 'completed';
             $order->save();
 
-            // Cộng điểm thưởng cho người dùng
-            $user = Auth::user();
-            $user->reward_points += 20;
-            $user->save();
+            // Cộng điểm thưởng cho người dùng (chỉ cộng nếu đã thanh toán và chưa cộng điểm)
+            if ($order->payment_status === 'paid') {
+                $pointsAdded = $order->addRewardPointsOnPaymentSuccess();
+                $message = $pointsAdded ? 
+                    'Đơn hàng #' . $order->id . ' đã hoàn thành! Bạn nhận được +20 điểm thưởng.' :
+                    'Đơn hàng #' . $order->id . ' đã hoàn thành!';
+            } else {
+                $message = 'Đơn hàng #' . $order->id . ' đã hoàn thành!';
+            }
 
             return redirect()->route('client.orders.index')
-                ->with('success', 'Đơn hàng #' . $order->id . ' đã hoàn thành! Bạn nhận được +20 điểm thưởng.');
+                ->with('success', $message);
         }
 
         return redirect()->route('client.orders.index')
@@ -128,6 +171,16 @@ class MyOrderController extends Controller
 
         // Kiểm tra trạng thái đơn hàng - chỉ cho phép hủy khi đang chờ xử lý hoặc đang xử lý
         if (in_array($order->status, ['pending', 'processing'])) {
+            // Hoàn trả số lượng tồn kho nếu đã trừ (COD hoặc đã thanh toán)
+            if ($order->payment_method === 'cod' || $order->payment_status === 'paid') {
+                foreach ($order->items as $orderItem) {
+                    $variant = $orderItem->variant;
+                    if ($variant) {
+                        $variant->increment('stock', $orderItem->quantity);
+                    }
+                }
+            }
+            
             // Chuyển sang trạng thái cancelled
             $order->status = 'cancelled';
             $order->save();

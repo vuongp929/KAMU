@@ -16,6 +16,96 @@ use App\Models\Discount;
 class ProductController extends Controller
 {
     /**
+     * Hiển thị danh sách sản phẩm với chức năng lọc và sắp xếp.
+     */
+    public function index(Request $request)
+    {
+        $query = Product::with(['mainImage', 'firstImage', 'variants', 'categories']);
+        $currentCategory = null;
+        
+        // Lọc theo từ khóa tìm kiếm
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+        
+        // Lọc theo danh mục (hỗ trợ cả ID và slug)
+        if ($request->filled('category')) {
+            $categoryParam = $request->category;
+            
+            // Tìm danh mục hiện tại để hiển thị thông tin
+            if (is_numeric($categoryParam)) {
+                $currentCategory = Category::find($categoryParam);
+            } else {
+                $currentCategory = Category::where('slug', $categoryParam)->first();
+            }
+            
+            $query->whereHas('categories', function($q) use ($categoryParam) {
+                // Kiểm tra nếu là số (ID) hay chuỗi (slug)
+                if (is_numeric($categoryParam)) {
+                    $q->where('categories.id', $categoryParam);
+                } else {
+                    $q->where('categories.slug', $categoryParam);
+                }
+            });
+        }
+        
+        // Lọc theo khoảng giá
+        if ($request->filled('min_price')) {
+            $query->whereHas('variants', function($q) use ($request) {
+                $q->where('price', '>=', $request->min_price);
+            });
+        }
+        
+        if ($request->filled('max_price')) {
+            $query->whereHas('variants', function($q) use ($request) {
+                $q->where('price', '<=', $request->max_price);
+            });
+        }
+        
+        // Sắp xếp
+        $sortBy = $request->get('sort', 'newest');
+        switch ($sortBy) {
+            case 'price_asc':
+                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                      ->select('products.*')
+                      ->groupBy('products.id')
+                      ->orderBy(\DB::raw('MIN(product_variants.price)'), 'asc');
+                break;
+            case 'price_desc':
+                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                      ->select('products.*')
+                      ->groupBy('products.id')
+                      ->orderBy(\DB::raw('MIN(product_variants.price)'), 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'popular':
+                // Sắp xếp theo số lượng đã bán (giả sử có trường sold_count)
+                $query->orderBy('created_at', 'desc'); // Tạm thời dùng created_at
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+        
+        $products = $query->paginate(12)->appends($request->query());
+        
+        // Lấy danh mục cho filter
+        $categories = Category::where('statu', 1)->get();
+        
+        return view('clients.products.index', compact('products', 'categories', 'currentCategory'));
+    }
+    
+    /**
      * Hiển thị trang chi tiết sản phẩm.
      */
     public function show(Product $product)

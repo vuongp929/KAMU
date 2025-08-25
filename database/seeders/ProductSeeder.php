@@ -18,7 +18,6 @@ class ProductSeeder extends Seeder
                 ['code' => 'SP' . str_pad($i, 4, '0', STR_PAD_LEFT)],
                 [
                     'name' => 'Sản phẩm ' . $i,
-                    'image' => 'images/product_' . $i . '.jpg',
                 ]
             );
 

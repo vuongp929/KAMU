@@ -47,15 +47,23 @@ class AuthController extends Controller
 
         $user = \App\Models\User::where('email', $request->email)->first();
 
-        // So sánh mật khẩu thuần (KHÔNG mã hóa)
-        if ($user && $user->password === $request->password) {
-            Auth::login($user); // Không dùng attempt nữa
-            return redirect()->route('admins.dashboard');
+        // Kiểm tra tài khoản có tồn tại và mật khẩu đúng
+        if (!$user || $user->password !== $request->password) {
+            return redirect()->back()
+                ->withErrors(['email' => 'Tài khoản hoặc mật khẩu không đúng.'])
+                ->withInput();
         }
 
-        return redirect()->back()
-            ->withErrors(['email' => 'Tài khoản hoặc mật khẩu không đúng.'])
-            ->withInput();
+        // Kiểm tra trạng thái tài khoản
+        if ($user->status === 'inactive') {
+            return redirect()->back()
+                ->withErrors(['email' => 'Tài khoản này đã vi phạm chính sách và bị ngăn chặn đăng nhập. Vui lòng liên hệ quản trị viên để được hỗ trợ.'])
+                ->withInput();
+        }
+
+        // Đăng nhập thành công
+        Auth::login($user);
+        return redirect()->route('admins.dashboard');
     }
 
 
@@ -103,7 +111,7 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
         $user->roles()->create(['role' => $data['role']]);
 
-        return redirect()->route('admins.users.index')->with('success', 'Tạo người dùng thành công !');
+        return redirect()->route('admin.users.index')->with('success', 'Tạo người dùng thành công !');
     }
 
     public function editUser($id)
@@ -113,31 +121,23 @@ class AuthController extends Controller
     }
     public function updateUser()
     {
-
+        // Chỉ cho phép cập nhật role và status
         $data = request()->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'password' => 'nullable|string|min:8',
             'role' => 'required|in:admin,customer',
+            'status' => 'required|in:active,inactive',
         ]);
+        
         $user = User::findOrFail(request('id'));
-        // Kiểm tra trùng email
-        if (User::where('email', $data['email'])->where('id', '<>', $user->id)->exists()) {
-            return redirect()->back()
-                ->withErrors(['email' => 'Email đã tồn tại.'])
-                ->withInput();
-        }
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        if (!empty($data['password'])) {
-            $user->password = bcrypt($data['password']);
-        }
+        
+        // Chỉ cập nhật status
+        $user->status = $data['status'];
         $user->save();
+        
         // Cập nhật vai trò
         $user->roles()->delete(); 
         $user->roles()->create(['role' => $data['role']]); 
 
-        return redirect()->route('admins.users.index')->with('success', 'Cập nhật người dùng thành công !');
+        return redirect()->route('admin.users.index')->with('success', 'Cập nhật quyền và trạng thái người dùng thành công !');
     }
 
     public function deleteUser()
@@ -147,6 +147,6 @@ class AuthController extends Controller
             return redirect()->back()->withErrors(['error' => 'Bạn không thể xóa tài khoản của chính mình.']);
         }
         $user->delete();
-        return redirect()->route('admins.users.index')->with('success', 'Xóa người dùng thành công !');
+        return redirect()->route('admin.users.index')->with('success', 'Xóa người dùng thành công !');
     }
 }

@@ -40,9 +40,15 @@
                             </span>
                         </p>
                         <p><strong>Trạng thái thanh toán:</strong> 
-                            <span class="badge bg-{{ $order->payment_status == 'paid' ? 'success' : 'warning' }}">
-                                {{ $order->payment_status == 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
-                            </span>
+                            @if($order->payment_status == 'paid')
+                                <span class="badge bg-success">Đã thanh toán</span>
+                            @elseif($order->payment_status == 'awaiting_payment')
+                                <span class="badge bg-warning">Chờ thanh toán</span>
+                            @elseif($order->payment_status == 'cod')
+                                <span class="badge bg-info">Thanh toán khi nhận hàng</span>
+                            @else
+                                <span class="badge bg-secondary">Chưa thanh toán</span>
+                            @endif
                         </p>
                         <p><strong>Ngày tạo:</strong> {{ $order->created_at->format('d-m-Y H:i') }}</p>
                         <p><strong>Cập nhật lần cuối:</strong> {{ $order->updated_at->format('d-m-Y H:i') }}</p>
